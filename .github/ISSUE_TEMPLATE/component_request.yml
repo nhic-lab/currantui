@@ -1,0 +1,38 @@
+name: Component or feature request
+description: Propose a new component, variant, or token
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - New component
+        - New variant/prop on an existing component
+        - New design token
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: usecase
+    attributes:
+      label: Use case
+      description: Which NHIC project needs this and for what UI?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API
+      description: Sketch the props/variants or token names. If a shadcn/ui component covers this, link it.
+      render: tsx
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Fit
+      options:
+        - label: This is presentation-only (no data fetching, routing, auth, or business logic)
+          required: true
+        - label: It can be styled entirely with existing or new design tokens
+          required: true

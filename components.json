@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "radix-mira",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true
+  },
+  "iconLibrary": "phosphor",
+  "aliases": {
+    "components": "@nhic/currantui/components",
+    "utils": "@nhic/currantui/lib/utils",
+    "hooks": "@nhic/currantui/hooks",
+    "lib": "@nhic/currantui/lib",
+    "ui": "@nhic/currantui/components"
+  },
+  "rtl": true,
+  "menuColor": "default-translucent",
+  "menuAccent": "subtle"
+}

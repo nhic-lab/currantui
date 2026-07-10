@@ -1,0 +1,51 @@
+name: Bug report
+description: A component renders, styles, or behaves incorrectly
+title: "bug: "
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: "@nhic/currantui version"
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: stack
+    attributes:
+      label: Consumer stack
+      options:
+        - Vite / TanStack Start
+        - Next.js (App Router)
+        - Next.js (Pages Router)
+        - Other (specify below)
+    validations:
+      required: true
+  - type: input
+    id: component
+    attributes:
+      label: Affected component(s)
+      placeholder: button, dialog
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happens vs. what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimal snippet or repo link. Include your CSS entry if the issue is styling-related.
+      render: tsx
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: React, Tailwind, bundler, and Node versions.
+      placeholder: |
+        react 19.x, tailwindcss 4.x, vite 7.x, node 22.x

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Blocks PolinRider-class supply-chain loaders from being committed: obfuscated
+# loaders appended to config files, script payloads disguised as font files, and
+# .vscode auto-run persistence. Scans STAGED content, not the working tree.
+set -uo pipefail
+
+IOC="global\['!'\]=|_\\\$_[0-9a-fA-F]{2,8}=\(function|atob\([[:space:]]*process\.env|node \./public/fonts/[^ ]*\.woff|temp_auto_push\.bat|branch_structure\.json|task\.allowAutomaticTasks|\"runOn\":[[:space:]]*\"folderOpen\""
+
+fail=0
+
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  case "$f" in
+    .githooks/*) continue ;;
+  esac
+
+  if git show ":$f" | grep -aEq "$IOC"; then
+    echo "pre-commit: BLOCKED — supply-chain loader indicator in staged '$f':" >&2
+    git show ":$f" | grep -aEn "$IOC" | head -3 >&2
+    fail=1
+  fi
+
+  case "$f" in
+    *.woff|*.woff2|*.ttf|*.otf)
+      magic=$(git show ":$f" | head -c 4)
+      hexmagic=$(git show ":$f" | head -c 4 | od -An -tx1 | tr -d ' \n')
+      case "$magic" in
+        wOFF|wOF2|OTTO|ttcf|true) ;;
+        *)
+          if [ "$hexmagic" != "00010000" ]; then
+            echo "pre-commit: BLOCKED — '$f' has a font extension but no font magic bytes (possible script-in-font payload)." >&2
+            fail=1
+          fi
+          ;;
+      esac
+      ;;
+  esac
+done < <(git diff --cached --name-only --diff-filter=ACM)
+
+if [ "$fail" -ne 0 ]; then
+  echo "" >&2
+  echo "If you believe this is a false positive, inspect the flagged lines first —" >&2
+  echo "these patterns match known malware loaders, not ordinary code." >&2
+  exit 1
+fi
