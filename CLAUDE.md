@@ -4,6 +4,8 @@ CurrantUI is the National Health Intelligence Center (NHIC) standalone React des
 
 The repo is a pnpm workspace: `packages/currantui` is the published package, `apps/storybook` is the private Storybook workbench/docs/test app. Future packages (charts) land under `packages/*` and Storybook picks their stories up automatically.
 
+The repo is a pnpm workspace: `packages/currantui` is the published package, `apps/storybook` is the private Storybook workbench/docs/test app. Future packages (charts) land under `packages/*` and Storybook picks their stories up automatically.
+
 ---
 
 ## Package manager
