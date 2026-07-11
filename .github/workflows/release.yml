@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 concurrency: release-${{ github.ref }}
 
@@ -40,7 +41,7 @@ jobs:
 
   publish:
     needs: version
-    if: needs.version.outputs.should-publish == 'true'
+    if: needs.version.outputs.should-publish == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: npm-publish
     permissions:
@@ -57,7 +58,9 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - name: Update npm for OIDC trusted publishing
-        run: npm install -g npm@latest
+        # npm 11.5+ supports OIDC; npm 12 hard-errors (EUNKNOWNCONFIG) on the
+        # --no-git-checks flag pnpm forwards during changeset publish
+        run: npm install -g npm@11
       - name: Publish to npm (trusted publishing)
         uses: changesets/action@v1
         with:
