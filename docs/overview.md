@@ -2,7 +2,7 @@
 
 ## Problem
 
-Every NHIC enterprise project rebuilds the same UI foundation: buttons, dialogs, form controls, theming, dark mode, fonts. eRadia's `@workspace/ui` package solved this well for one repo, but it was locked inside the eRadia monorepo — other projects couldn't consume it without copy-pasting, and copies drift.
+Every National Health Intelligence Center (NHIC) enterprise project rebuilds the same UI foundation: buttons, dialogs, form controls, theming, dark mode, fonts. eRadia's `@workspace/ui` package solved this well for one repo, but it was locked inside the eRadia monorepo — other projects couldn't consume it without copy-pasting, and copies drift.
 
 ## Solution
 
