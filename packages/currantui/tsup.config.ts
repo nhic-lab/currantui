@@ -1,7 +1,11 @@
 import { defineConfig } from "tsup"
 
 export default defineConfig({
-  entry: ["src/components/*.tsx", "src/lib/*.ts"],
+  entry: [
+    "src/components/*.tsx",
+    "!src/components/*.stories.tsx",
+    "src/lib/*.ts",
+  ],
   format: ["esm"],
   dts: true,
   sourcemap: true,

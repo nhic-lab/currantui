@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@nhic/currantui/*": ["../../packages/currantui/src/*"]
+    }
+  },
+  "include": [".storybook/**/*", "docs/**/*", "vitest.config.ts"],
+  "exclude": ["node_modules", "storybook-static"]
+}

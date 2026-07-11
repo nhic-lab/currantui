@@ -1,0 +1,71 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Foundation/Getting Started" />
+
+# Getting Started
+
+CurrantUI is the National Health Intelligence Center (NHIC) React design
+system: shadcn/ui conventions on Radix primitives, styled with Tailwind CSS v4
+tokens. It ships as `@nhic/currantui` on npm and powers every NHIC enterprise
+project.
+
+## Install
+
+```bash
+pnpm add @nhic/currantui
+```
+
+Requirements: React 19 and Tailwind CSS v4 as peer dependencies.
+
+## Wire up the styles
+
+Import the design system once in your CSS entry — it already brings in
+Tailwind, the shadcn base layer, and the self-hosted fonts:
+
+```css
+@import "@nhic/currantui/globals.css";
+```
+
+The packaged `globals.css` carries an `@source` directive so Tailwind
+generates the classes used inside CurrantUI components automatically.
+
+## Use components
+
+```tsx
+import { Button } from "@nhic/currantui/components/button"
+import { cn } from "@nhic/currantui/lib/utils"
+
+export function Example() {
+  return <Button variant="outline">Save</Button>
+}
+```
+
+Every component is a subpath import — there is no barrel, so your bundle only
+carries what you use.
+
+## Dark mode
+
+Dark mode is class-based: toggle the `dark` class on a root element (the
+`ThemeToggle` component does this for you). NHIC products are designed
+dark-first; use the toolbar above to preview either palette.
+
+## Theming
+
+Re-brand a project by overriding the CSS variables after the import:
+
+```css
+@import "@nhic/currantui/globals.css";
+
+:root {
+  --primary: oklch(0.55 0.15 150);
+  --primary-deep: oklch(0.35 0.12 150);
+  --radius: 0.5rem;
+}
+```
+
+## Building your own components
+
+CurrantUI is a foundation, not a cage. Compose the primitives, reuse the
+tokens and the `cn` helper, and follow the
+[Design Standards](?path=/docs/foundation-design-standards--docs) so custom
+components sit indistinguishably beside the defaults.
