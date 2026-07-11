@@ -46,6 +46,11 @@
     "access": "public"
   },
   "packageManager": "pnpm@9.15.9",
+  "pnpm": {
+    "overrides": {
+      "esbuild@<0.28.1": ">=0.28.1"
+    }
+  },
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
