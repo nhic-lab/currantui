@@ -22,7 +22,7 @@ export function HicLogo({
   className,
 }: HicLogoProps) {
   return (
-    <span className={cn("inline-flex items-center gap-3", className)} aria-label={aria}>
+    <span role="img" className={cn("inline-flex items-center gap-3", className)} aria-label={aria}>
       <img src={src} alt="" aria-hidden="true" className="h-11 w-auto shrink-0 object-contain" />
       {!compact && (
         <>

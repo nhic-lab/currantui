@@ -67,7 +67,7 @@ All tokens live in `src/styles/globals.css` (`:root` for light, `.dark` for dark
 
 ## Adding components
 
-The repo is shadcn-compatible. From the repo root:
+The repo is shadcn-compatible. From `packages/currantui`:
 
 ```bash
 pnpm dlx shadcn@latest add <component>
@@ -88,11 +88,11 @@ pnpm lint
 
 | Doc | Contents |
 |---|---|
-| [docs/overview.md](docs/overview.md) | Problem, solution, users, non-goals |
-| [docs/design-standards.md](docs/design-standards.md) | Tokens, typography, density, states — the rules components follow |
-| [docs/architecture.md](docs/architecture.md) | Stack, package contract, tokens, integrations, CI/CD |
-| [docs/development.md](docs/development.md) | Setup, standards, git workflow, testing, security |
-| [CLAUDE.md](CLAUDE.md) | AI navigation guide + non-negotiable rules |
+| [docs/overview.md](../../docs/overview.md) | Problem, solution, users, non-goals |
+| [docs/design-standards.md](../../docs/design-standards.md) | Tokens, typography, density, states — the rules components follow |
+| [docs/architecture.md](../../docs/architecture.md) | Stack, package contract, tokens, integrations, CI/CD |
+| [docs/development.md](../../docs/development.md) | Setup, standards, git workflow, testing, security |
+| [CLAUDE.md](../../CLAUDE.md) | AI navigation guide + non-negotiable rules |
 
 ## Releasing
 
@@ -106,8 +106,8 @@ Merging to `master` opens (or updates) a release PR. Merging that release PR tri
 
 ## Community
 
-Contributions are governed by the [Code of Conduct](CODE_OF_CONDUCT.md). Report vulnerabilities privately per the [Security Policy](SECURITY.md) — never via public issues.
+Contributions are governed by the [Code of Conduct](../../CODE_OF_CONDUCT.md). Report vulnerabilities privately per the [Security Policy](../../SECURITY.md) — never via public issues.
 
 ## License
 
-Apache-2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). Copyright © 2026 National Health Intelligence Center (NHIC), Ministry of Health, Rwanda.
+Apache-2.0 — see [LICENSE](LICENSE) and [NOTICE](../../NOTICE). Copyright © 2026 National Health Intelligence Center (NHIC), Ministry of Health, Rwanda.

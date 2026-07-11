@@ -11,39 +11,51 @@ interface ErrorPageProps {
 export function ErrorPage({ code, headline = "That's an error.", detail, logo }: ErrorPageProps) {
   return (
     <main className="min-h-screen bg-background text-sm">
-      <div className="mx-auto flex max-w-[820px] items-start justify-center gap-24 px-8 pt-[210px]">
+      <div className="mx-auto flex max-w-[820px] items-center justify-center gap-16 px-8 pt-[210px]">
         {/* Left Content */}
-        <div className="max-w-[340px]">
-          <div className="mb-8 flex items-center">
+        <div className="max-w-[340px] space-y-5">
+          <div className="flex items-center">
             {logo ?? <HicLogo className="[&_img]:h-7" />}
           </div>
 
-          <div className="space-y-5">
-            <p className="flex leading-none font-normal">
-              {code && (
-                <span className="font-semibold text-foreground">{code}. </span>
-              )}
-              {headline && <span className="text-muted-foreground">{headline}</span>}
-            </p>
-
-            <div className="leading-[1.55] space-y-1">
-              {detail && <p className="text-foreground">{detail}</p>}
-              <p className="text-muted-foreground">That&apos;s all we know.</p>
-            </div>
-          </div>
+          <p className="leading-[1.55]">
+            {(code || headline) && (
+              <>
+                {code && (
+                  <span className="font-semibold text-foreground">
+                    {code}.{" "}
+                  </span>
+                )}
+                {headline && (
+                  <span className="text-foreground">{headline}</span>
+                )}
+                <br />
+              </>
+            )}
+            {detail && (
+              <>
+                <span className="text-foreground">{detail}</span>
+                <br />
+              </>
+            )}
+            <span className="text-muted-foreground">
+              That&apos;s all we know.
+            </span>
+          </p>
         </div>
 
-        {/* Robot Illustration */}
+        {/* Not-found Illustration */}
         <div className="hidden md:flex">
-          <BrokenRobotSvg size={150} />
+          <NotFoundSvg size={170} />
         </div>
       </div>
     </main>
   )
 }
 
-/* Isometric broken robot — matches the Google error page illustration style */
-function BrokenRobotSvg({ size = 220 }: { size?: number }) {
+/* Linear illustration — browser window searched by a magnifying glass;
+   neutral strokes with a single primary accent */
+function NotFoundSvg({ size = 220 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -51,74 +63,49 @@ function BrokenRobotSvg({ size = 220 }: { size?: number }) {
       viewBox="0 0 220 220"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="text-primary"
+      aria-hidden="true"
     >
       <g
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        className="text-foreground"
       >
-        {/* Antenna */}
-        <line x1="110" y1="18" x2="110" y2="38" />
-        <circle cx="110" cy="12" r="5" />
+        {/* Browser window */}
+        <rect x="28" y="46" width="130" height="110" rx="10" />
+        <path d="M28 72H158" />
+        <circle cx="42" cy="59" r="2" />
+        <circle cx="52" cy="59" r="2" />
+        <circle cx="62" cy="59" r="2" />
 
-        {/* Head */}
-        <rect x="82" y="38" width="56" height="42" rx="3" />
-        <circle cx="98" cy="55" r="3" />
-        <circle cx="122" cy="55" r="3" />
-        <path d="M96 68H124" />
+        {/* Content lines */}
+        <path d="M44 92H112" />
+        <path d="M44 106H96" />
+        <path d="M44 120H104" />
 
-        {/* Neck */}
-        <line x1="110" y1="80" x2="110" y2="92" />
+        {/* Sparkles */}
+        <path d="M178 34v12M172 40h12" />
+        <path d="M22 24v8M18 28h8" />
+        <circle cx="200" cy="120" r="2.5" />
+        <circle cx="34" cy="184" r="2.5" />
+      </g>
 
-        {/* Body */}
-        <rect x="78" y="92" width="64" height="64" rx="4" />
+      <g
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="text-primary"
+      >
+        {/* Magnifying glass */}
+        <circle cx="146" cy="130" r="36" className="fill-background" />
+        <path d="M172 155L196 179" />
+        <path d="M194 172c3 0 7 4 7 7s-4 7-7 7-7-4-7-7" />
 
-        {/* Arms */}
-        <line x1="78" y1="112" x2="58" y2="98" />
-        <line x1="58" y1="98" x2="40" y2="102" />
-        <line x1="40" y1="102" x2="28" y2="92" />
-
-        <line x1="142" y1="112" x2="160" y2="120" />
-        <line x1="160" y1="120" x2="178" y2="132" />
-
-        {/* Left claw */}
-        <line x1="22" y1="88" x2="28" y2="92" />
-        <line x1="26" y1="84" x2="28" y2="92" />
-
-        {/* Legs */}
-        <line x1="96" y1="156" x2="88" y2="182" />
-        <line x1="124" y1="156" x2="134" y2="182" />
-
-        {/* Broken parts */}
-        <rect
-          x="40"
-          y="170"
-          width="18"
-          height="8"
-          transform="rotate(-25 40 170)"
-        />
-        <rect
-          x="74"
-          y="192"
-          width="20"
-          height="8"
-          transform="rotate(20 74 192)"
-        />
-        <rect
-          x="126"
-          y="188"
-          width="20"
-          height="8"
-          transform="rotate(-18 126 188)"
-        />
-
-        {/* Nuts / debris */}
-        <circle cx="98" cy="186" r="2" />
-        <circle cx="146" cy="196" r="2" />
-        <circle cx="168" cy="182" r="2" />
-        <path d="M170 170c4-3 8-3 12 0" />
+        {/* Question mark */}
+        <path d="M138 120c0-6 4-10 9-10s9 4 9 9c0 7-9 7-9 14" />
+        <path d="M147 141v1" />
       </g>
     </svg>
   )

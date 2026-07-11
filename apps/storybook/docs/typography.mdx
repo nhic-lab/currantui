@@ -1,0 +1,47 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Foundation/Typography" />
+
+# Typography
+
+CurrantUI self-hosts two variable fonts via Fontsource — no CDN requests.
+
+<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
+  <div>
+    <p className="font-heading text-lg font-semibold">Geist — headings</p>
+    <p className="text-xs text-muted-foreground">
+      <code>--font-heading</code>, used via <code>font-heading</code>, headings only
+    </p>
+  </div>
+  <div>
+    <p className="text-sm">Source Sans 3 — body and UI text</p>
+    <p className="text-xs text-muted-foreground">
+      <code>--font-sans</code>, the default for everything else
+    </p>
+  </div>
+</div>
+
+## Scale
+
+The interface is compact by design — radiology chrome stays out of the way.
+
+| Role | Class | Notes |
+|---|---|---|
+| Default UI text | `text-xs/relaxed` | Buttons, inputs, table cells |
+| Floor | `text-[0.625rem]` | Badges, stamps — never smaller |
+| Page titles | `text-base` | Nothing in chrome exceeds this |
+| Numeric / meta | `tabular-nums` | IDs, counts, timestamps |
+
+## Density
+
+Control heights follow the compact scale: `h-5` (xs, badge), `h-6` (sm),
+`h-7` (**default** for buttons, inputs, selects), `h-8` (lg, tabs list).
+Default padding is `px-2` with `gap-1` between icon and label. shadcn's
+stock `h-9`/`h-10` sizes are always reduced when scaffolding new components.
+
+## Radius
+
+`--radius` is `0.625rem` with derived steps mapped through `@theme inline`.
+Use named utilities — `rounded-md` for controls, `rounded-sm` for xs,
+`rounded-lg` for containers, `rounded-full` for pills — never literal pixel
+values.

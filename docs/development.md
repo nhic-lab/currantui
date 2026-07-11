@@ -6,12 +6,14 @@
 git clone git@github.com:nhic-lab/currantui.git
 cd currantui
 pnpm install
-pnpm build        # dist/ — ESM + d.ts + globals.css
+pnpm storybook    # dev workbench at http://localhost:6006
+pnpm build        # packages/currantui/dist — ESM + d.ts + globals.css
 pnpm typecheck
 pnpm lint
+pnpm test         # story render + axe a11y tests (needs Playwright Chromium, see below)
 ```
 
-Node ≥ 22 and pnpm 9.15.x (pinned via `packageManager`). There is no dev server in this repo; to see components render, `pnpm pack` and install the tarball into a scratch Vite app, or `pnpm link` from a consuming project.
+Node ≥ 22 and pnpm 9.15.x (pinned via `packageManager` in the root manifest). The repo is a pnpm workspace: the published package lives in `packages/currantui`, and `apps/storybook` is the dev environment — every component is developed and reviewed against its co-located stories. One-time test setup: `pnpm --filter @nhic/storybook exec playwright install chromium`.
 
 `pnpm install` also wires `.githooks/` as the git hooks path (via the `prepare` script). The `pre-commit` hook scans staged content for supply-chain loader indicators (PolinRider-class config injections, script payloads disguised as fonts, `.vscode` auto-run persistence) and blocks the commit on a match.
 
@@ -28,7 +30,8 @@ There is deliberately no npm token: publishing uses [OIDC trusted publishing](ht
 ## Coding standards
 
 - TypeScript strict; `pnpm typecheck` must pass. ESLint config is `@tanstack/eslint-config`; `pnpm lint` must pass (it enforces import sorting, top-level `import type`, and `Array<T>` syntax).
-- Components follow shadcn conventions: one file per component in `src/components`, variants via `class-variance-authority`, class merging via `cn` from `@nhic/currantui/lib/utils`.
+- Components follow shadcn conventions: one file per component in `packages/currantui/src/components`, variants via `class-variance-authority`, class merging via `cn` from `@nhic/currantui/lib/utils`.
+- Every component ships with a co-located `<name>.stories.tsx` (CSF3, `satisfies Meta`) covering its variants, sizes, and states; stories are excluded from the published build.
 - Internal imports always use the `@nhic/currantui/*` alias, never relative paths across directories.
 - Components reference design tokens (`bg-primary`, `border-border`, …) — never hard-coded colors.
 - No app-specific logic (fetching, routing, auth) in components; slots and props only.
@@ -36,7 +39,8 @@ There is deliberately no npm token: publishing uses [OIDC trusted publishing](ht
 
 Review checklist:
 
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm build` all pass
+- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm test` all pass
+- [ ] New/changed component has stories covering its variants and states, and they pass the axe a11y gate
 - [ ] New/changed component complies with [design-standards.md](design-standards.md) (tokens, density scale, focus/disabled/invalid recipe, Phosphor icons, cva variant vocabulary)
 - [ ] Any new runtime dependency has an allow-listed license (MIT / BSD / Apache-2.0 / ISC / OFL-1.1 / 0BSD)
 - [ ] `react`, `react-dom`, `tailwindcss` remain peerDependencies
@@ -50,7 +54,9 @@ Review checklist:
 
 ## Testing strategy
 
-No unit test suite yet — the package is presentation-only and its highest-risk surface is the build/packaging contract, which CI covers via typecheck + lint + build. The pre-release bar for packaging changes: `pnpm pack`, install the tarball into a scratch Vite + Tailwind v4 app, and verify components render styled (this proves the `@source` scanning contract). Add Vitest + Testing Library when components gain behavior worth asserting (keyboard interaction, controlled state).
+Every story doubles as a test: `pnpm test` runs Vitest 3 in browser mode (Playwright Chromium) through the Storybook vitest addon — each story must render without error and pass an axe accessibility audit (`a11y.test: "error"`). Interactive flows (dialog open, select pick, tab switch, menu open) are asserted with `play` functions. The a11y gate is never weakened globally; a per-story rule scope-out requires a justifying comment.
+
+The build/packaging contract remains covered by CI (typecheck + lint + build + a guard that no story artifacts reach `dist/`). The pre-release bar for packaging changes is unchanged: `pnpm pack` from `packages/currantui`, install the tarball into a scratch Vite + Tailwind v4 app, and verify components render styled (this proves the `@source` scanning contract).
 
 ## Security
 
