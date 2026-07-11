@@ -1,9 +1,12 @@
 {
   "name": "@nhic/currantui",
   "version": "0.1.0",
-  "description": "CurrantUI — NHIC's React design system: shadcn/ui + Radix primitives with Tailwind v4 tokens.",
+  "description": "CurrantUI — the National Health Intelligence Center (NHIC) React design system: shadcn/ui + Radix primitives with Tailwind v4 tokens.",
   "type": "module",
   "license": "Apache-2.0",
+  "author": "National Health Intelligence Center (NHIC)",
+  "homepage": "https://github.com/nhic-lab/currantui#readme",
+  "bugs": "https://github.com/nhic-lab/currantui/issues",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nhic-lab/currantui.git"
@@ -27,11 +30,12 @@
     "./hooks/*": {
       "types": "./dist/hooks/*.d.ts",
       "import": "./dist/hooks/*.js"
-    }
+    },
+    "./assets/*": "./dist/assets/*"
   },
   "scripts": {
     "prepare": "git config core.hooksPath .githooks",
-    "build": "tsup && cp src/styles/globals.css dist/globals.css",
+    "build": "tsup && cp src/styles/globals.css dist/globals.css && mkdir -p dist/assets && cp src/assets/* dist/assets/",
     "typecheck": "tsc --noEmit",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",

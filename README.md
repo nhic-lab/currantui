@@ -1,6 +1,6 @@
 # CurrantUI
 
-NHIC's React design system: shadcn/ui + Radix primitives with Tailwind v4 tokens, published as `@nhic/currantui`.
+The National Health Intelligence Center (NHIC) React design system: shadcn/ui + Radix primitives with Tailwind v4 tokens, published as `@nhic/currantui`.
 
 ## Requirements
 
@@ -38,6 +38,16 @@ export function Example() {
 ```
 
 Dark mode is class-based: toggle the `dark` class on a root element (see `theme-toggle`).
+
+### Brand components
+
+`HicLogo` (and `SiteFooter`, which embeds it) renders the coat of arms from an image URL, defaulting to `/logo.svg`. The SVG ships with the package — either copy `node_modules/@nhic/currantui/dist/assets/logo.svg` into your `public/` root, or pass a bundler-imported URL:
+
+```tsx
+import logoUrl from "@nhic/currantui/assets/logo.svg"
+
+<HicLogo src={logoUrl} stamp="DOCS" />
+```
 
 ## Theming
 
@@ -79,6 +89,7 @@ pnpm lint
 | Doc | Contents |
 |---|---|
 | [docs/overview.md](docs/overview.md) | Problem, solution, users, non-goals |
+| [docs/design-standards.md](docs/design-standards.md) | Tokens, typography, density, states — the rules components follow |
 | [docs/architecture.md](docs/architecture.md) | Stack, package contract, tokens, integrations, CI/CD |
 | [docs/development.md](docs/development.md) | Setup, standards, git workflow, testing, security |
 | [CLAUDE.md](CLAUDE.md) | AI navigation guide + non-negotiable rules |
@@ -99,4 +110,4 @@ Contributions are governed by the [Code of Conduct](CODE_OF_CONDUCT.md). Report 
 
 ## License
 
-Apache-2.0 — see [LICENSE](LICENSE).
+Apache-2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). Copyright © 2026 National Health Intelligence Center (NHIC), Ministry of Health, Rwanda.
