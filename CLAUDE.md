@@ -1,6 +1,6 @@
 # CurrantUI — Claude Navigation Guide
 
-CurrantUI is the National Health Intelligence Center (NHIC) standalone React design system — shadcn/ui + Radix primitives with Tailwind v4 tokens, extracted from eRadia's `@workspace/ui` and published to npm as `@nhic/currantui` for every NHIC enterprise project.
+CurrantUI is the National Health Intelligence Center (NHIC) standalone React design system — shadcn/ui + Radix primitives with Tailwind v4 tokens, published to npm as `@nhic/currantui` for every NHIC enterprise project.
 
 The repo is a pnpm workspace: `packages/currantui` is the published package, `apps/storybook` is the private Storybook workbench/docs/test app. Future packages (charts) land under `packages/*` and Storybook picks their stories up automatically.
 
@@ -38,7 +38,7 @@ packages/currantui/src/lib/utils.ts      ─┼─ tsup ──► dist/  (ESM + 
 packages/currantui/src/styles/globals.css ─ copied ─► dist/globals.css  (@source "./")
                             │ changesets publish (CI only)
                             ▼
-                 npmjs  @nhic/currantui  ──► eRadia, Next.js apps, future NHIC apps
+                 npmjs  @nhic/currantui  ──► NHIC enterprise apps (Vite, Next.js, ...)
 
 apps/storybook  ── aggregates packages/*/src/**/*.stories.tsx ──► dev workbench,
                    GitHub Pages docs site, and Vitest browser/a11y test harness
@@ -56,7 +56,7 @@ Consumer contract: `pnpm add @nhic/currantui`, then one CSS line — `@import "@
 4. **`packages/currantui/src/styles/globals.css` is the canonical token source and consumer entry.** Its `@source "./";` directive must survive any edit — it is what makes consumer Tailwind builds scan the compiled components. It is copied verbatim to `dist/globals.css` by the build script. The Storybook app imports it unmodified via its own `preview.css` wrapper.
 5. **Internal imports use the `@nhic/currantui/*` alias** (tsconfig `paths` + shadcn `components.json`), never cross-directory relative paths.
 6. **No app-specific logic in components** — no data fetching, routing, auth, or business rules; slots and props only.
-7. **Runtime deps must hold allow-listed licenses** (MIT / BSD-2 / BSD-3 / Apache-2.0 / ISC / OFL-1.1 / 0BSD) — regulated consumers (eRadia) fail CI on banned licenses.
+7. **Runtime deps must hold allow-listed licenses** (MIT / BSD-2 / BSD-3 / Apache-2.0 / ISC / OFL-1.1 / 0BSD) — regulated consumers fail CI on banned licenses.
 8. **Every change to published output ships with a changeset.** Publishing happens only in CI via Changesets behind the `npm-publish` environment's required-reviewer approval, using **OIDC trusted publishing** — never `npm publish` locally, and never a stored npm token (2FA-bypass granular tokens are deprecated; no direct publishing from January 2027).
 9. **Registry is npmjs under the `nhic` org.** GitHub Packages cannot host this package (it requires the scope to equal the GitHub org, `@nhic-lab`).
 10. **`shadcn` stays a regular dependency** — `globals.css` imports `shadcn/tailwind.css` at runtime; it is not just a CLI.
