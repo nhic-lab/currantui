@@ -32,12 +32,12 @@ There is deliberately no npm token: publishing uses [OIDC trusted publishing](ht
 - Internal imports always use the `@nhic/currantui/*` alias, never relative paths across directories.
 - Components reference design tokens (`bg-primary`, `border-border`, …) — never hard-coded colors.
 - No app-specific logic (fetching, routing, auth) in components; slots and props only.
-- New primitives preferably via `pnpm dlx shadcn@latest add <component>`, then adjusted to house style.
+- New primitives preferably via `pnpm dlx shadcn@latest add <component>`, then adjusted to house style — house style is defined in [design-standards.md](design-standards.md) (shadcn defaults never match: density, type scale, icons, and focus recipe all need adaptation).
 
 Review checklist:
 
 - [ ] `pnpm typecheck`, `pnpm lint`, `pnpm build` all pass
-- [ ] New/changed component uses tokens, `cn`, and cva variants
+- [ ] New/changed component complies with [design-standards.md](design-standards.md) (tokens, density scale, focus/disabled/invalid recipe, Phosphor icons, cva variant vocabulary)
 - [ ] Any new runtime dependency has an allow-listed license (MIT / BSD / Apache-2.0 / ISC / OFL-1.1 / 0BSD)
 - [ ] `react`, `react-dom`, `tailwindcss` remain peerDependencies
 - [ ] PR includes a changeset (`pnpm changeset`) if the published output changes

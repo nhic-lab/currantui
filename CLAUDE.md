@@ -1,6 +1,6 @@
 # CurrantUI — Claude Navigation Guide
 
-CurrantUI is NHIC's standalone React design system — shadcn/ui + Radix primitives with Tailwind v4 tokens, extracted from eRadia's `@workspace/ui` and published to npm as `@nhic/currantui` for every NHIC enterprise project.
+CurrantUI is the National Health Intelligence Center (NHIC) standalone React design system — shadcn/ui + Radix primitives with Tailwind v4 tokens, extracted from eRadia's `@workspace/ui` and published to npm as `@nhic/currantui` for every NHIC enterprise project.
 
 ---
 
@@ -61,6 +61,7 @@ Consumer contract: `pnpm add @nhic/currantui`, then one CSS line — `@import "@
 | If you need to know... | Read... |
 |---|---|
 | Why this package exists, scope, non-goals | `docs/overview.md` |
+| The design standards every component must follow | `docs/design-standards.md` |
 | Stack, package contract, tokens, CI/CD | `docs/architecture.md` |
 | Setup, standards, git workflow, testing, security | `docs/development.md` |
 | The extraction design decisions | `docs/superpowers/specs/2026-07-10-currantui-extraction-design.md` (local only — `docs/superpowers/` is gitignored) |
