@@ -9,7 +9,7 @@
  * (sorting, selection, filtering) belongs to your app and your state library.
  * The package provides the presentation pieces; this recipe shows the wiring.
  */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -29,6 +29,11 @@ import { Badge } from "@nhic/currantui/components/badge";
 import { Button } from "@nhic/currantui/components/button";
 import { Checkbox } from "@nhic/currantui/components/checkbox";
 import {
+  FilterChip,
+  filterChipVariants,
+} from "@nhic/currantui/components/filter-chip";
+import { SearchField } from "@nhic/currantui/components/search-field";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -45,6 +50,11 @@ import {
   TableRow,
 } from "@nhic/currantui/components/table";
 import { TableEmptyState } from "@nhic/currantui/components/table-empty-state";
+import {
+  TableToolbar,
+  TableToolbarLabel,
+  TableToolbarSeparator,
+} from "@nhic/currantui/components/table-toolbar";
 import { TablePagination } from "@nhic/currantui/components/table-pagination";
 import {
   TableSelectionBar,
@@ -206,6 +216,12 @@ const REPORTS: Array<Report> = [
   },
 ];
 
+const STATUS_OPTIONS = ["draft", "submitted", "approved", "rejected"] as const;
+
+/* Static years keep the story deterministic; derive from today in an app */
+const RECENT_YEARS = ["2026", "2025"];
+const OLDER_YEARS = ["2024", "2023", "2022"];
+
 const STATUS_VARIANT = {
   draft: "outline",
   submitted: "secondary",
@@ -339,7 +355,9 @@ const COLUMNS: Array<ColumnDef<Report>> = [
       return name ? (
         <span className="text-[11px]">{name}</span>
       ) : (
-        <span className="text-[11px] text-foreground/70 italic">Unassigned</span>
+        <span className="text-[11px] text-foreground/70 italic">
+          Unassigned
+        </span>
       );
     },
     size: 110,
@@ -364,8 +382,42 @@ export function RichTable({ data, onOpen, onSetStatus }: RichTableProps) {
     pageSize: 5,
   });
 
+  /* Extension point: toolbar filters — swap these for your domain's facets */
+  const [search, setSearch] = useState("");
+  const [statuses, setStatuses] = useState<Array<Report["status"]>>([]);
+  const [year, setYear] = useState<string | undefined>(undefined);
+  const olderYearSelected = year != null && !RECENT_YEARS.includes(year);
+
+  function toggleStatus(status: Report["status"]) {
+    setStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status],
+    );
+  }
+
+  /*
+   * Plain pre-filtering keeps the wiring obvious; TanStack's columnFilters +
+   * getFilteredRowModel is the alternative when filters map 1:1 to columns.
+   */
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return data.filter((r) => {
+      if (statuses.length > 0 && !statuses.includes(r.status)) return false;
+      if (year && !r.submittedAt.startsWith(year)) return false;
+      if (
+        q &&
+        ![r.id, r.facility, r.district, r.summary].some((f) =>
+          f.toLowerCase().includes(q),
+        )
+      )
+        return false;
+      return true;
+    });
+  }, [data, search, statuses, year]);
+
   const table = useReactTable({
-    data,
+    data: filtered,
     columns: COLUMNS,
     state: { sorting, rowSelection, pagination },
     onSortingChange: setSorting,
@@ -384,6 +436,68 @@ export function RichTable({ data, onOpen, onSetStatus }: RichTableProps) {
     /* Drop the provider if your app already mounts one at the root */
     <TooltipProvider>
       <div className="flex min-h-0 flex-1 flex-col rounded-md border border-border">
+        <TableToolbar>
+          <div className="flex flex-wrap items-center gap-1">
+            {STATUS_OPTIONS.map((status) => (
+              <FilterChip
+                key={status}
+                active={statuses.includes(status)}
+                onClick={() => toggleStatus(status)}
+                className="capitalize"
+              >
+                {status}
+              </FilterChip>
+            ))}
+          </div>
+          <TableToolbarSeparator />
+          <div className="flex items-center gap-1.5">
+            <TableToolbarLabel>Year</TableToolbarLabel>
+            <div className="flex items-center gap-1">
+              <FilterChip active={!year} onClick={() => setYear(undefined)}>
+                All
+              </FilterChip>
+              {RECENT_YEARS.map((y) => (
+                <FilterChip
+                  key={y}
+                  active={year === y}
+                  onClick={() => setYear(y)}
+                >
+                  {y}
+                </FilterChip>
+              ))}
+              {/* filterChipVariants keeps a chip-shaped Select on-style */}
+              <Select
+                value={olderYearSelected && year ? year : ""}
+                onValueChange={(y) => setYear(y || undefined)}
+              >
+                <SelectTrigger
+                  size="sm"
+                  aria-label="Earlier year"
+                  className={cn(
+                    filterChipVariants({ active: olderYearSelected }),
+                    "h-[22px] gap-1",
+                  )}
+                >
+                  <SelectValue placeholder="Earlier…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {OLDER_YEARS.map((y) => (
+                    <SelectItem key={y} value={y}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <SearchField
+            className="ml-auto"
+            value={search}
+            onValueChange={setSearch}
+            placeholder="ID, facility, summary…"
+            aria-label="Search reports"
+          />
+        </TableToolbar>
         <TableSelectionBar
           count={selectedRows.length}
           onClear={() => table.resetRowSelection()}
@@ -566,7 +680,7 @@ export function RichTable({ data, onOpen, onSetStatus }: RichTableProps) {
           onPageSizeChange={table.setPageSize}
         >
           <span>
-            {data.length} reports
+            {filtered.length} of {data.length} reports
             {selectedRows.length > 0 && ` · ${selectedRows.length} selected`}
           </span>
         </TablePagination>
@@ -629,9 +743,31 @@ export const ExtensionPoints: Story = {
 
     /* pagination pages through the remaining rows */
     const pageCount = Math.ceil(REPORTS.length / PAGE_SIZE);
-    await expect(canvas.getByText(`Page 1 of ${pageCount}`)).toBeInTheDocument();
+    await expect(
+      canvas.getByText(`Page 1 of ${pageCount}`),
+    ).toBeInTheDocument();
     await userEvent.click(canvas.getByRole("button", { name: "Next page" }));
-    await expect(canvas.getByText(`Page 2 of ${pageCount}`)).toBeInTheDocument();
+    await expect(
+      canvas.getByText(`Page 2 of ${pageCount}`),
+    ).toBeInTheDocument();
+  },
+};
+
+/** Toolbar filters compose: search narrows, chips narrow further, clearing restores. */
+export const Filtering: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const search = canvas.getByRole("searchbox", { name: "Search reports" });
+    await userEvent.type(search, "Masaka");
+    await expect(canvas.getByText("2 of 12 reports")).toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole("button", { name: /rejected/i }));
+    await expect(canvas.getByText(/No reports match/)).toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole("button", { name: /rejected/i }));
+    await userEvent.clear(search);
+    await expect(canvas.getByText("12 of 12 reports")).toBeInTheDocument();
   },
 };
 
