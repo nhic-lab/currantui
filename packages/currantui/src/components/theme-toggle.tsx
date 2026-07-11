@@ -3,7 +3,7 @@ import { Moon, Sun } from "@phosphor-icons/react"
 import { useEffect, useState } from "react"
 import { cn } from "../lib/utils"
 
-const STORAGE_KEY = "eradia-theme"
+const STORAGE_KEY = "currantui-theme"
 
 export function ThemeToggle({ className }: { className?: string }) {
   const [theme, setTheme] = useState<"dark" | "light" | null>(null)

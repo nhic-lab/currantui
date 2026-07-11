@@ -11,6 +11,7 @@ const config: StorybookConfig = {
   // The packages/* glob picks up future packages (charts) with no config change
   stories: [
     "../docs/**/*.mdx",
+    "../recipes/**/*.stories.@(tsx|mdx)",
     "../../../packages/*/src/**/*.stories.@(tsx|mdx)",
   ],
   addons: [

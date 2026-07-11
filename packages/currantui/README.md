@@ -51,7 +51,7 @@ import logoUrl from "@nhic/currantui/assets/logo.svg"
 
 ## Theming
 
-The default theme is the eRadia radiology look. Re-brand a project by overriding the CSS variables after the import:
+The default theme is a clinical-dark look tuned for data-dense health applications. Re-brand a project by overriding the CSS variables after the import:
 
 ```css
 @import "@nhic/currantui/globals.css";
