@@ -60,7 +60,7 @@ The build/packaging contract remains covered by CI (typecheck + lint + build + a
 
 ## Security
 
-- No user data, no PHI, no telemetry — this package renders UI only. Compliance obligations: none directly; consuming apps (e.g. eRadia under HIPAA/GDPR/Rwanda Law 058) carry their own.
-- Supply-chain posture matters because regulated apps consume this package: runtime deps must hold allow-listed licenses (eRadia's CI fails on banned licenses), dependency bumps arrive as weekly Dependabot PRs where CI builds them, and the `.githooks/pre-commit` hook blocks known malware-loader patterns (obfuscated config injections, fake font payloads, `.vscode` auto-run tasks) from being committed.
+- No user data, no PHI, no telemetry — this package renders UI only. Compliance obligations: none directly; consuming apps (some operating under HIPAA/GDPR/Rwanda Law 058) carry their own.
+- Supply-chain posture matters because regulated apps consume this package: runtime deps must hold allow-listed licenses (regulated consumers fail CI on banned licenses), dependency bumps arrive as weekly Dependabot PRs where CI builds them, and the `.githooks/pre-commit` hook blocks known malware-loader patterns (obfuscated config injections, fake font payloads, `.vscode` auto-run tasks) from being committed.
 - Fonts are self-hosted via Fontsource — consumers make no external font/CDN requests because of this package.
 - There are no stored publish credentials: npm publishing is OIDC trusted publishing, bound to `release.yml` + the `npm-publish` environment and gated by required-reviewer approval. Nothing is read from the environment at runtime.

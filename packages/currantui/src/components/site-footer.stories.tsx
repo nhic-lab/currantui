@@ -20,7 +20,7 @@ export const Default: Story = {
       {
         title: "Products",
         links: [
-          { label: "eRadia", href: "/eradia" },
+          { label: "Overview", href: "/products" },
           { label: "Docs", href: "/docs" },
         ],
       },

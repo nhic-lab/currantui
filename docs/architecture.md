@@ -29,7 +29,7 @@ nhic-lab/currantui (this repo)
                                         │ pnpm add
         ┌───────────────────────────────┼───────────────────────────┐
         ▼                               ▼                           ▼
-   eRadia (TanStack Start)      Next.js projects            future NHIC apps
+   TanStack Start apps          Next.js projects            future NHIC apps
 ```
 
 ## Package contract
