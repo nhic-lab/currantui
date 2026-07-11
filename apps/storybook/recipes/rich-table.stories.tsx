@@ -1,7 +1,7 @@
 /**
  * Recipe: Rich Table
  *
- * The eRadia-worklist look built from CurrantUI primitives + TanStack Table.
+ * A dense worklist-style table built from CurrantUI primitives + TanStack Table.
  * This file is copy-paste ready: drop it into your app, replace the placeholder
  * data/columns with your own, and delete the Storybook block at the bottom.
  *
@@ -585,7 +585,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Copy-paste recipe for the eRadia-worklist table look. CurrantUI ships the presentation primitives (`Table`, `SortIndicator`, `TableSelectionBar`, `TableEmptyState`, `TableFooterCount`, `exportRowsToCsv`); sorting and selection state are wired with TanStack Table in your app. View this file's source for the full recipe — extension points are marked with comments.",
+          "Copy-paste recipe for a rich, data-dense table. CurrantUI ships the presentation primitives (`Table`, `SortIndicator`, `TableSelectionBar`, `TableEmptyState`, `TableFooterCount`, `exportRowsToCsv`); sorting and selection state are wired with TanStack Table in your app. View this file's source for the full recipe — extension points are marked with comments.",
       },
     },
   },
