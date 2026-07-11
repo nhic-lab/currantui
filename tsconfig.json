@@ -8,12 +8,7 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    "types": [],
-    "baseUrl": ".",
-    "paths": {
-      "@nhic/currantui/*": ["./src/*"]
-    }
+    "types": []
   },
-  "include": ["src", "tsup.config.ts", "eslint.config.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["eslint.config.ts"]
 }

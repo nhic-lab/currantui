@@ -1,0 +1,47 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Foundation/Design Standards" />
+
+# Design Standards
+
+The rules every CurrantUI component follows — and that custom components
+built on top of it should follow too. The canonical, exhaustive version lives
+in the repo at `docs/design-standards.md`.
+
+## Interaction recipe
+
+Uniform across all interactive components:
+
+- **Focus**: `focus-visible:border-ring` + `ring-2 ring-ring/30` — keyboard
+  reachable with a visible ring, always.
+- **Disabled**: `pointer-events-none opacity-50`.
+- **Invalid**: driven by `aria-invalid`, styled with `border-destructive` +
+  `ring-destructive/20` — state lives in ARIA, never in a bespoke prop.
+- **Press**: buttons nudge with `active:translate-y-px`.
+- **Motion**: `transition-all` / `transition-colors` at default duration.
+
+## Icons
+
+Phosphor (`@phosphor-icons/react`) only. Components size icons via
+`[&_svg:not([class*='size-'])]:size-*` so callers can override with an
+explicit `size-*` class; icons are decorative (`pointer-events-none`,
+`aria-hidden`) by default. Icon-only controls always carry an `aria-label`.
+
+## Authoring conventions
+
+- One component per file in `src/components/`; imports use the
+  `@nhic/currantui/*` alias, never cross-directory relative paths.
+- Variants via `cva` with the shared vocabulary: `default`, `secondary`,
+  `outline`, `ghost`, `destructive`, `link`.
+- Classes merge through `cn`; props extend `React.ComponentProps<...>`.
+- `data-slot` on every part, `group/<component>` for internal state styling,
+  Radix `Slot` + `asChild` for composition.
+- Behavior comes from Radix primitives; CurrantUI adds look, density, and
+  tokens — no data fetching, routing, auth, or business rules.
+
+## Accessibility
+
+Every interactive element is keyboard reachable with a visible focus ring;
+validation states are communicated with `aria-*` attributes; contrast is
+verified in both palettes. Every story in this Storybook runs an axe audit in
+CI — violations fail the build.

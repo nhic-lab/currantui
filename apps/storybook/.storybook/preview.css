@@ -1,0 +1,20 @@
+/* Canonical tokens + fonts, imported unmodified from the package source */
+@import "../../../packages/currantui/src/styles/globals.css";
+
+/* Tailwind auto-detection is rooted at this app; component and story sources
+   live outside it, so register them explicitly. NOTE: directory globs are not
+   expanded here — list each package's src explicitly (add charts when it lands) */
+@source "../../../packages/currantui/src";
+@source "../docs";
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Story canvases embedded in docs pages follow the active theme tokens
+   instead of the docs chrome's hard-white card */
+.docs-story {
+  background-color: var(--background);
+  color: var(--foreground);
+}

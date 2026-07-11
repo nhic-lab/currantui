@@ -1,0 +1,28 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks"
+
+import { PaletteComparison } from "./colors.helpers"
+
+<Meta title="Foundation/Colors" />
+
+# Colors
+
+Every color in CurrantUI is a semantic token defined as an oklch CSS variable
+in both `:root` (light) and `.dark`. Components use tokens exclusively —
+`bg-primary`, `border-border`, `text-muted-foreground` — never palette
+utilities or hex/oklch literals.
+
+Hover and active states shift alpha on the *same* token (`bg-primary/80`),
+never switch tokens.
+
+<Unstyled>
+  <PaletteComparison />
+</Unstyled>
+
+## Rules
+
+- **Semantic tokens only.** If a color isn't a token, it doesn't ship.
+  Inline-SVG illustrations are the exception; prefer `currentColor` there.
+- **Both palettes always.** Every token is defined in `:root` and `.dark`;
+  design dark-first and verify in light.
+- **Theming is token override.** Consumers re-brand by overriding variables
+  after importing `globals.css` — components never change.
