@@ -4,8 +4,6 @@ CurrantUI is the National Health Intelligence Center (NHIC) standalone React des
 
 The repo is a pnpm workspace: `packages/currantui` is the published package, `apps/storybook` is the private Storybook workbench/docs/test app. Future packages (charts) land under `packages/*` and Storybook picks their stories up automatically.
 
-The repo is a pnpm workspace: `packages/currantui` is the published package, `apps/storybook` is the private Storybook workbench/docs/test app. Future packages (charts) land under `packages/*` and Storybook picks their stories up automatically.
-
 ---
 
 ## Package manager
@@ -91,8 +89,9 @@ Consumer contract: `pnpm add @nhic/currantui`, then one CSS line — `@import "@
 | `packages/currantui/src/components/` | One file per component + co-located `*.stories.tsx` |
 | `packages/currantui/src/lib/utils.ts` | `cn` helper |
 | `packages/currantui/components.json` | shadcn CLI config (aliases → `@nhic/currantui/*`) |
-| `apps/storybook/.storybook/` | Storybook config: main.ts, preview.tsx/css, vitest.setup.ts |
-| `apps/storybook/docs/` | Foundation MDX pages (Getting Started, Colors, Typography, Design Standards) |
+| `apps/storybook/.storybook/` | Storybook config: main.ts, preview.tsx/css, manager.ts + nhic-theme.ts (NHIC branding), vitest.setup.ts |
+| `apps/storybook/docs/` | Welcome cover page + Foundation MDX pages (Getting Started, Colors, Typography, Design Standards) |
+| `apps/storybook/public/nhic-brand.svg` | Sidebar brand lockup (generated: emblem data-URI + wordmark) |
 | `.changeset/` | Changesets config (`@nhic/storybook` ignored) + pending changesets |
 | `.github/workflows/` | `ci.yml` (verify/test/build-storybook) + `release.yml` (publish) + `deploy-storybook.yml` (Pages) |
 | `.githooks/pre-commit` | Blocks PolinRider-class supply-chain loader patterns (wired by root `prepare`) |
