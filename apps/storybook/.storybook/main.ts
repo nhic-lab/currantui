@@ -29,13 +29,22 @@ const config: StorybookConfig = {
     "@storybook/addon-a11y",
     "@storybook/addon-themes",
     "@storybook/addon-vitest",
+    "storybook-addon-tag-badges",
   ],
   framework: {
     name: "@storybook/react-vite",
     options: {},
   },
-  // Serves logo.svg at "/logo.svg", the HicLogo default src
-  staticDirs: ["../../../packages/currantui/src/assets"],
+  // Serves logo.svg at "/logo.svg" (HicLogo default src + favicon), the
+  // brand lockup, and the variable font for the manager UI
+  staticDirs: [
+    "../../../packages/currantui/src/assets",
+    "../public",
+    {
+      from: "../../../node_modules/@fontsource-variable/source-sans-3/files",
+      to: "/fonts/source-sans-3",
+    },
+  ],
   core: {
     disableTelemetry: true,
   },

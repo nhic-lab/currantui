@@ -8,14 +8,21 @@ const STORAGE_KEY = "currantui-theme"
 export function ThemeToggle({ className }: { className?: string }) {
   const [theme, setTheme] = useState<"dark" | "light" | null>(null)
 
+  /* The dark class on <html> is the source of truth (anything may set it:
+     the pre-paint script, this toggle, a Storybook toolbar) — mirror it
+     instead of trusting localStorage, which can go stale and make the
+     first click a no-op */
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    setTheme(stored === "light" ? "light" : "dark")
+    const el = document.documentElement
+    const read = () => setTheme(el.classList.contains("dark") ? "dark" : "light")
+    read()
+    const obs = new MutationObserver(read)
+    obs.observe(el, { attributes: true, attributeFilter: ["class"] })
+    return () => obs.disconnect()
   }, [])
 
   function toggle() {
     const next = theme === "dark" ? "light" : "dark"
-    setTheme(next)
     localStorage.setItem(STORAGE_KEY, next)
     document.documentElement.classList.toggle("dark", next === "dark")
     document.documentElement.style.colorScheme = next

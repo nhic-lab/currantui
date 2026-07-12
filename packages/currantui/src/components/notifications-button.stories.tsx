@@ -12,6 +12,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 const meta = {
   title: "Components/NotificationsButton",
   component: NotificationsButton,
+  // Sidebar badge: the panel/list API is new in 0.3.0
+  tags: ["new"],
 } satisfies Meta<typeof NotificationsButton>
 
 export default meta
