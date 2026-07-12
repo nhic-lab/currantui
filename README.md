@@ -30,6 +30,7 @@ pnpm changeset        # add a changeset to your PR
 | [docs/architecture.md](docs/architecture.md) | Stack, package contract, CI/CD |
 | [docs/development.md](docs/development.md) | Setup, standards, git workflow, testing, security |
 | [packages/currantui/README.md](packages/currantui/README.md) | Consumer install and usage guide |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to file issues and send pull requests |
 
 ## Releasing
 
