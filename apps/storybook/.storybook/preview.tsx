@@ -1,4 +1,7 @@
 import { withThemeByClassName } from "@storybook/addon-themes"
+import { useEffect, useGlobals } from "storybook/preview-api"
+
+import { NhicDocsContainer } from "./docs-container"
 
 import "./preview.css"
 
@@ -14,6 +17,27 @@ const withDirection: Decorator = (Story, context) => {
   )
 }
 
+/* Components like ThemeToggle flip the dark class on <html> directly;
+   mirror that back into the theme global so the toolbar, the manager, and
+   every other story follow the in-story toggle. Story view only — docs
+   pages render many stories at staggered times, and a late render with
+   stale globals would bounce the class back through this observer */
+const withThemeSync: Decorator = (Story, context) => {
+  const [globals, updateGlobals] = useGlobals()
+  const enabled = context.viewMode === "story"
+  useEffect(() => {
+    if (!enabled) return
+    const el = document.documentElement
+    const observer = new MutationObserver(() => {
+      const next = el.classList.contains("dark") ? "dark" : "light"
+      if ((globals.theme ?? "dark") !== next) updateGlobals({ theme: next })
+    })
+    observer.observe(el, { attributes: true, attributeFilter: ["class"] })
+    return () => observer.disconnect()
+  })
+  return <Story />
+}
+
 const preview: Preview = {
   decorators: [
     // Class applied to <html>, matching the @custom-variant dark selector;
@@ -23,6 +47,7 @@ const preview: Preview = {
       defaultTheme: "dark",
     }),
     withDirection,
+    withThemeSync,
   ],
   globalTypes: {
     direction: {
@@ -42,9 +67,35 @@ const preview: Preview = {
   parameters: {
     a11y: { test: "error" },
     backgrounds: { disable: true },
+    docs: { container: NhicDocsContainer },
+    viewport: {
+      options: {
+        mobile: {
+          name: "Mobile",
+          styles: { width: "390px", height: "844px" },
+          type: "mobile",
+        },
+        tablet: {
+          name: "Tablet",
+          styles: { width: "820px", height: "1180px" },
+          type: "tablet",
+        },
+        laptop: {
+          name: "Laptop",
+          styles: { width: "1440px", height: "900px" },
+          type: "desktop",
+        },
+        workstation: {
+          name: "Workstation",
+          styles: { width: "1920px", height: "1080px" },
+          type: "desktop",
+        },
+      },
+    },
     options: {
       storySort: {
         order: [
+          "Welcome",
           "Foundation",
           ["Getting Started", "Colors", "Typography", "Design Standards"],
           "Components",

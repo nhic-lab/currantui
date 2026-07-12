@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Clicking the toggle changes the real `dark` class on the preview document, the same class the Storybook theme toolbar manages.",
+          "Toggles the `dark` class on the preview document — the Storybook toolbar, the manager shell, and this component all stay in sync.",
       },
     },
   },
@@ -18,8 +18,4 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-// Theme pinned so the toolbar and the component never fight over the class;
-// no play interaction to keep browser tests free of localStorage bleed
-export const Default: Story = {
-  globals: { theme: "dark" },
-}
+export const Default: Story = {}

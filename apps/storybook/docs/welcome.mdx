@@ -1,0 +1,66 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks"
+
+<Meta title="Welcome" />
+
+<Unstyled>
+  <div className="mb-5 flex flex-col gap-6 rounded-lg border border-border bg-background p-8 text-foreground">
+    <div className="flex items-center gap-4">
+      <img src="./logo.svg" alt="" aria-hidden="true" className="h-14 w-auto" />
+      <div>
+        <h1 className="font-heading text-2xl font-semibold tracking-tight">
+          CurrantUI
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          The National Health Intelligence Center design system
+        </p>
+      </div>
+    </div>
+    <p className="max-w-xl text-sm/relaxed text-foreground">
+      A compact, dark-first React component library — shadcn/ui conventions on
+      Radix primitives, styled entirely with semantic design tokens. Every
+      component here is the exact code published to npm as{" "}
+      <code className="rounded-sm bg-muted px-1 text-xs">@nhic/currantui</code>,
+      rendered live, documented, and audited for accessibility on every commit.
+    </p>
+    <div className="flex flex-wrap gap-2">
+      <a
+        href="?path=/docs/foundation-getting-started--docs"
+        target="_top"
+        className="inline-flex h-8 items-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground no-underline hover:bg-primary/80"
+      >
+        Getting started
+      </a>
+      <a
+        href="?path=/docs/foundation-colors--docs"
+        target="_top"
+        className="inline-flex h-8 items-center rounded-md border border-border px-3 text-xs font-medium text-foreground no-underline hover:bg-muted"
+      >
+        Colors
+      </a>
+      <a
+        href="?path=/docs/foundation-design-standards--docs"
+        target="_top"
+        className="inline-flex h-8 items-center rounded-md border border-border px-3 text-xs font-medium text-foreground no-underline hover:bg-muted"
+      >
+        Design standards
+      </a>
+      <a
+        href="?path=/docs/components-button--docs"
+        target="_top"
+        className="inline-flex h-8 items-center rounded-md border border-border px-3 text-xs font-medium text-foreground no-underline hover:bg-muted"
+      >
+        Components
+      </a>
+    </div>
+  </div>
+</Unstyled>
+
+## What's inside
+
+- **Foundation** — the design language: tokens, typography, density, and the
+  interaction recipe every component follows.
+- **Components** — 22 primitives and chrome pieces, each with live variants,
+  props tables, and states.
+- **Built-in quality gate** — every story runs as a browser render test plus
+  an axe accessibility audit in CI. What you see here is verified, not
+  aspirational.
