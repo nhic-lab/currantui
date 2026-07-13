@@ -18,6 +18,14 @@ never switch tokens.
   <PaletteComparison />
 </Unstyled>
 
+## Status colors
+
+`destructive`, `success`, `warning`, and `info` share one recipe: the token is
+the text color, backgrounds are alpha tints of the same token — `bg-success/10`
+resting, `/20` hover (dark: `/20` → `/30`). All four are AA-checked for exactly
+that pairing in both palettes. Components expose them as variants under the
+same names (`success`, `warning`, `info`) — never synonyms.
+
 ## Rules
 
 - **Semantic tokens only.** If a color isn't a token, it doesn't ship.
