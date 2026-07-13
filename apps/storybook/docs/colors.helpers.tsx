@@ -30,7 +30,7 @@ const GROUPS: Array<TokenGroup> = [
   },
   {
     title: "Feedback & lines",
-    tokens: ["destructive", "border", "input", "ring"],
+    tokens: ["destructive", "success", "warning", "info", "border", "input", "ring"],
   },
   {
     title: "Charts",
@@ -84,6 +84,9 @@ const LIGHT_TOKENS: Record<string, string> = {
   "--accent": "oklch(0.97 0 0)",
   "--accent-foreground": "oklch(0.205 0 0)",
   "--destructive": "oklch(0.52 0.245 27.325)",
+  "--success": "oklch(0.50 0.13 155)",
+  "--warning": "oklch(0.50 0.12 65)",
+  "--info": "oklch(0.52 0.13 245)",
   "--border": "oklch(0.922 0 0)",
   "--input": "oklch(0.922 0 0)",
   "--ring": "oklch(0.708 0 0)",
