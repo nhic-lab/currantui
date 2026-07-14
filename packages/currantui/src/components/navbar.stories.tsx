@@ -8,8 +8,12 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 const meta = {
   title: "Components/Navbar",
+  tags: ["deprecated"],
   component: Navbar,
-  parameters: { layout: "fullscreen" },
+  parameters: {
+    layout: "fullscreen",
+    docs: { description: { component: "Deprecated — use `ShellHeader` from the Shell family instead; removal planned for the next major." } },
+  },
 } satisfies Meta<typeof Navbar>
 
 export default meta
