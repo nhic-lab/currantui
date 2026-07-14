@@ -97,7 +97,7 @@ const preview: Preview = {
         order: [
           "Welcome",
           "Foundation",
-          ["Getting Started", "Colors", "Typography", "Design Standards"],
+          ["Getting Started", "Colors", "Typography", "Design Standards", "Shell"],
           "Components",
         ],
       },
