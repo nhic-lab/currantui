@@ -3,7 +3,7 @@ import { Switch } from "@nhic/currantui/components/switch"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 const meta = {
-  title: "Components/Switch",
+  title: "Components/Forms/Switch",
   component: Switch,
   args: {
     "aria-label": "Enable notifications",
