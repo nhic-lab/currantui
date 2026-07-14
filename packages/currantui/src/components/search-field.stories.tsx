@@ -6,7 +6,7 @@ import { SearchField } from "@nhic/currantui/components/search-field"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 const meta = {
-  title: "Components/SearchField",
+  title: "Components/Forms/SearchField",
   component: SearchField,
   args: {
     value: "",

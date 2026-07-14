@@ -3,7 +3,7 @@ import { Checkbox } from "@nhic/currantui/components/checkbox"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 const meta = {
-  title: "Components/Checkbox",
+  title: "Components/Forms/Checkbox",
   component: Checkbox,
   args: {
     "aria-label": "Accept terms",

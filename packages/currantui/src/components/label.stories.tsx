@@ -5,7 +5,7 @@ import { Input } from "@nhic/currantui/components/input"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 const meta = {
-  title: "Components/Label",
+  title: "Components/Forms/Label",
   component: Label,
   args: {
     children: "Facility name",

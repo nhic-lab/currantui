@@ -3,7 +3,7 @@ import { Input } from "@nhic/currantui/components/input"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 const meta = {
-  title: "Components/Input",
+  title: "Components/Forms/Input",
   component: Input,
   args: {
     placeholder: "Patient identifier",
