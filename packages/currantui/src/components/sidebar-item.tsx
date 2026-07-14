@@ -6,6 +6,7 @@ interface SidebarItemProps {
   children: ReactElement
 }
 
+/** @deprecated Use `ShellSideNavLink` from `@nhic/currantui/components/shell-side-nav` (the rail variant reveals labels by expansion instead of tooltips) — removal planned for the next major. */
 export function SidebarItem({ label, children }: SidebarItemProps) {
   return (
     <Tooltip.Provider delayDuration={300}>

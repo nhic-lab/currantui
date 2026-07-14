@@ -7,7 +7,11 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 const meta = {
   title: "Components/SidebarItem",
+  tags: ["deprecated"],
   component: SidebarItem,
+  parameters: {
+    docs: { description: { component: "Deprecated — use `ShellSideNavLink` (the Shell rail variant reveals labels by expansion); removal planned for the next major." } },
+  },
 } satisfies Meta<typeof SidebarItem>
 
 export default meta

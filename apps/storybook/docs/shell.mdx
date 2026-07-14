@@ -1,0 +1,136 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Foundation/Shell" />
+
+# Shell
+
+The Shell is CurrantUI's application chassis — a Carbon-style header, side
+navigation, exclusive right panels, and content area — so NHIC apps never
+rewrite navbar/sidebar code. Everything hangs off `ShellProvider`, which owns
+the layout grid and the state (`useShell()`).
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│ ShellHeader: ☰  Name   Nav links…        🔍 🔔 ◐ 👤 ▦        │
+├──────────────┬───────────────────────────────────┬───────────┤
+│ ShellSideNav │ ShellContent (<main>)             │ ShellPanel│
+│  links       │                                   │ (opens    │
+│  menus       │   PageHeader + page content       │  from a   │
+│  footer      │                                   │  global   │
+│              │                                   │  action)  │
+└──────────────┴───────────────────────────────────┴───────────┘
+```
+
+## Anatomy
+
+```tsx
+<ShellProvider>
+  <ShellSkipToContent />
+  <ShellHeader>
+    <ShellHeaderMenuButton />              {/* only for expandable side nav */}
+    <ShellHeaderName href="/">           {/* HicLogo, plain text, or any custom lockup */}
+      <HicLogo />
+    </ShellHeaderName>
+    <ShellHeaderNav>
+      <ShellHeaderNavLink href="/surveillance" isActive>Surveillance</ShellHeaderNavLink>
+      <ShellHeaderNavMenu label="Analytics">
+        <ShellHeaderNavMenuItem asChild><a href="/dashboards">Dashboards</a></ShellHeaderNavMenuItem>
+      </ShellHeaderNavMenu>
+    </ShellHeaderNav>
+    <ShellGlobalBar>
+      <NotificationsButton />              {/* existing chrome buttons drop in */}
+      <ThemeToggle />
+      <ShellGlobalAction label="Switch product" panelId="switcher">
+        <SquaresFourIcon />
+      </ShellGlobalAction>
+    </ShellGlobalBar>
+    <ShellPanel id="switcher" label="Switch product">
+      <ShellSwitcher>
+        <ShellSwitcherItem href="/surveillance" isActive>Surveillance</ShellSwitcherItem>
+        <ShellSwitcherDivider />
+        <ShellSwitcherItem href="/admin">Admin console</ShellSwitcherItem>
+      </ShellSwitcher>
+    </ShellPanel>
+  </ShellHeader>
+  <ShellSideNav>
+    <ShellSideNavItems>
+      <ShellSideNavLink href="/" icon={<HouseIcon />} isActive>Overview</ShellSideNavLink>
+      <ShellSideNavMenu label="Reports" icon={<TableIcon />}>
+        <ShellSideNavMenuItem href="/reports/weekly">Weekly submissions</ShellSideNavMenuItem>
+      </ShellSideNavMenu>
+      <ShellSideNavDivider />
+      <ShellSideNavLink href="/admin" icon={<GearIcon />}>Administration</ShellSideNavLink>
+    </ShellSideNavItems>
+    <ShellSideNavFooter>…</ShellSideNavFooter>
+  </ShellSideNav>
+  <ShellContent>…page content…</ShellContent>
+</ShellProvider>
+```
+
+## Side nav variants
+
+| Variant | Behavior | Use for |
+|---|---|---|
+| `expandable` (default) | Hamburger-controlled; ≥`lg` pushes content, below `lg` opens as a modal overlay sheet | Most apps |
+| `rail` | Always-visible 3rem icon rail; expands to 16rem on hover / keyboard focus (pure CSS) | Desktop-first workstation tools |
+| `fixed` | Always-visible 16rem, no hamburger | Kiosk / desktop-only tools |
+
+The breakpoint is Tailwind's `lg` (1024px); `useIsMobile()` from
+`@nhic/currantui/hooks/use-mobile` matches it exactly. `Mod+B` toggles the
+side nav (disable with `keyboardShortcut={false}` on the provider).
+
+## Right panels
+
+A `ShellPanel` opens from the `ShellGlobalAction` carrying the same
+`panelId`. Panels are exclusive (one at a time), non-modal, and close on
+Escape or outside click. The switcher panel (`ShellSwitcher`) is the
+Carbon-style product switcher — keep its action far right in the global bar.
+
+## Routing
+
+Every link component takes `asChild`, so pass your router's link and drive
+the active state yourself — the shell never inspects routes:
+
+```tsx
+<ShellSideNavLink asChild isActive={pathname === "/reports"} icon={<TableIcon />}>
+  <Link to="/reports">Reports</Link>
+</ShellSideNavLink>
+```
+
+## SSR persistence
+
+`ShellProvider` writes the desktop side-nav state to the
+`currantui_shell_sidenav` cookie. Server-rendered apps read it and pass
+`defaultOpen` so the first paint matches:
+
+```tsx
+// Next.js App Router layout
+const cookieStore = await cookies()
+const defaultOpen =
+  cookieStore.get("currantui_shell_sidenav")?.value !== "false"
+return <ShellProvider defaultOpen={defaultOpen}>…</ShellProvider>
+```
+
+## Theming
+
+Chrome colors come from the `sidebar-*` tokens. Dimensions are CSS variables
+on the provider, overridable per app:
+
+```tsx
+<ShellProvider style={{ "--shell-header-h": "3.5rem", "--shell-sidenav-w": "18rem" }}>
+```
+
+Z-index ladder: content `auto` → side-nav rail overlay `z-30` → header and
+panels `z-40` → dialogs/sheets/popovers `z-50` → skip link `z-60`.
+
+## Migrating from Navbar / SidebarItem
+
+Both are deprecated (still exported; removal in the next major):
+
+| Before | After |
+|---|---|
+| `<Navbar leftSlot={…} rightSlot={…} />` | `<ShellHeader>` with `ShellHeaderName`/`ShellHeaderNav` + `ShellGlobalBar` |
+| `<SidebarItem label="…"><a/></SidebarItem>` | `<ShellSideNavLink asChild icon={…}>` — the rail reveals labels by expanding, no tooltip needed |
+
+`PageHeader` and `SiteFooter` are unchanged — render them inside
+`ShellContent`. See the **Recipes/App Shell** story for a copy-paste layout.

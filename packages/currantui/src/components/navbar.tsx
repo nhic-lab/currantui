@@ -7,6 +7,7 @@ interface NavbarProps {
   className?: string
 }
 
+/** @deprecated Use `ShellHeader` from `@nhic/currantui/components/shell-header` — removal planned for the next major. */
 export function Navbar({ leftSlot, rightSlot, className }: NavbarProps) {
   return (
     <header
