@@ -4,7 +4,7 @@ import { Textarea } from "@nhic/currantui/components/textarea"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 const meta = {
-  title: "Components/Textarea",
+  title: "Components/Forms/Textarea",
   component: Textarea,
   args: {
     "aria-label": "Notes",
