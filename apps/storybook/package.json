@@ -19,7 +19,7 @@
   "devDependencies": {
     "@phosphor-icons/react": "^2.1.10",
     "@storybook/addon-a11y": "^9.1.20",
-    "@storybook/addon-docs": "^9.1.20",
+    "@storybook/addon-docs": "^10.5.0",
     "@storybook/addon-themes": "^9.1.20",
     "@storybook/addon-vitest": "^9.1.20",
     "@storybook/react-vite": "^9.1.20",
