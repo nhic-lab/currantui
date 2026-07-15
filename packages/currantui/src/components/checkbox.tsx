@@ -4,6 +4,11 @@ import { Checkbox as CheckboxPrimitive } from "radix-ui"
 import { CheckIcon } from "@phosphor-icons/react";
 import { cn } from "@nhic/currantui/lib/utils"
 
+/* Visual box recipe, shared with the collection selection checkboxes
+   (list-view, card-view) whose selection slot can't host this control */
+const checkboxBoxClasses =
+  "flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-input transition-shadow dark:bg-input/30"
+
 function Checkbox({
   className,
   ...props
@@ -12,7 +17,8 @@ function Checkbox({
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        "peer relative flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-input transition-shadow outline-none group-has-disabled/field:opacity-50 after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 aria-invalid:aria-checked:border-primary dark:bg-input/30 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground dark:data-checked:bg-primary",
+        checkboxBoxClasses,
+        "peer relative outline-none group-has-disabled/field:opacity-50 after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 aria-invalid:aria-checked:border-primary dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground dark:data-checked:bg-primary",
         className
       )}
       {...props}
@@ -28,4 +34,4 @@ function Checkbox({
   )
 }
 
-export { Checkbox }
+export { Checkbox, checkboxBoxClasses }
