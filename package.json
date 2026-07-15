@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "prepare": "git config core.hooksPath .githooks",
-    "build": "pnpm --filter @nhic/currantui build",
+    "build": "pnpm --filter @nhic/currantui build && pnpm --filter @nhic/currantui-charts build",
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx,css,md,mdx}\"",

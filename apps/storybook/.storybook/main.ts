@@ -69,6 +69,7 @@ const config: StorybookConfig = {
       resolve: {
         alias: {
           // Stories import like consumers; CSS must not go through this alias
+          "@nhic/currantui-charts": resolve(here, "../../../packages/charts/src"),
           "@nhic/currantui": resolve(here, "../../../packages/currantui/src"),
         },
       },

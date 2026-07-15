@@ -33,7 +33,7 @@ jobs:
       - name: Check whether this push bumped the package version
         id: gate
         run: |
-          if git diff HEAD^ HEAD -- packages/currantui/package.json | grep -q '"version"'; then
+          if git diff HEAD^ HEAD -- packages/currantui/package.json packages/charts/package.json | grep -q '"version"'; then
             echo "should-publish=true" >> "$GITHUB_OUTPUT"
           else
             echo "should-publish=false" >> "$GITHUB_OUTPUT"
