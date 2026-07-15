@@ -36,10 +36,11 @@ export function valuesByGroup(
 export function baseGrid(axisNames?: {
   left?: boolean
   bottom?: boolean
+  right?: boolean
 }): Record<string, unknown> {
   return {
     top: 12,
-    right: 24,
+    right: axisNames?.right ? 30 : 24,
     bottom: axisNames?.bottom ? 34 : 4,
     left: axisNames?.left ? 30 : 4,
     containLabel: true,
