@@ -1,64 +1,43 @@
 import * as React from "react"
 
+import { ProgressCircle } from "@nhic/currantui/components/progress-circle"
 import { cn } from "@nhic/currantui/lib/utils"
 
-/* orbitR = circle/2 - border - dot/2 - gap */
-const SIZES = {
-  xs: { circle: 20, dot: 3, border: 2,   orbitR: 3.5 },
-  sm: { circle: 28, dot: 4, border: 2.5, orbitR: 6   },
-  md: { circle: 36, dot: 5, border: 3,   orbitR: 10  },
-  lg: { circle: 48, dot: 6, border: 3.5, orbitR: 15  },
-  xl: { circle: 60, dot: 8, border: 4,   orbitR: 20  },
+/* Pixel sizes preserved from the original orbit spinner */
+const LOADER_SIZES = {
+  xs: 20,
+  sm: 28,
+  md: 36,
+  lg: 48,
+  xl: 60,
 } as const
 
-type LoaderSize = keyof typeof SIZES
-
-/* Three dots evenly spaced at 0°, 120°, 240° on the orbit ring */
-const DOT_ANGLES = [0, 120, 240]
-
-function dotStyle(angleDeg: number, orbitR: number, dotSize: number): React.CSSProperties {
-  const rad = (angleDeg * Math.PI) / 180
-  /* angle 0 = top, clockwise — x = sin(θ), y = -cos(θ) */
-  const x = orbitR * Math.sin(rad)
-  const y = -orbitR * Math.cos(rad)
-  return {
-    position: "absolute",
-    width: dotSize,
-    height: dotSize,
-    left: `calc(50% + ${x}px)`,
-    top: `calc(50% + ${y}px)`,
-    transform: "translate(-50%, -50%)",
-  }
-}
+type LoaderSize = keyof typeof LOADER_SIZES
 
 interface LoaderProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: LoaderSize
   label?: string
 }
 
-function Loader({ size = "md", label = "Loading", className, ...props }: LoaderProps) {
-  const { circle, dot, border, orbitR } = SIZES[size]
-
+/** @deprecated Use `ProgressCircle` from `@nhic/currantui/components/progress-circle` — removal planned for the next major. */
+function Loader({
+  size = "md",
+  label = "Loading",
+  className,
+  style,
+  ...props
+}: LoaderProps) {
   return (
-    <div
-      role="status"
+    <ProgressCircle
       aria-label={label}
-      className={cn("relative shrink-0 rounded-full border-foreground/65", className)}
-      style={{ width: circle, height: circle, borderWidth: border }}
+      className={cn("text-foreground/65", className)}
+      style={{
+        width: LOADER_SIZES[size],
+        height: LOADER_SIZES[size],
+        ...style,
+      }}
       {...props}
-    >
-      {/* Rotating wrapper — all 3 dots are fixed on this and spin together */}
-      <div className="absolute inset-0 animate-orbit-spin" style={{ transformOrigin: "center center" }}>
-        {DOT_ANGLES.map((angle, i) => (
-          <div
-            key={i}
-            className="rounded-full bg-foreground/65"
-            style={dotStyle(angle, orbitR, dot)}
-          />
-        ))}
-      </div>
-      <span className="sr-only">{label}</span>
-    </div>
+    />
   )
 }
 
@@ -75,7 +54,7 @@ function LoaderOverlay({ label = "Loading", className }: LoaderOverlayProps) {
         className
       )}
     >
-      <Loader size="xl" label={label} />
+      <ProgressCircle aria-label={label} size="lg" />
     </div>
   )
 }
