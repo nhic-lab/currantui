@@ -21,6 +21,23 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 
 export const Typing: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `function PatientSearch() {
+  const [value, setValue] = useState("")
+  return (
+    <SearchField
+      aria-label="Search"
+      placeholder="Patient, ID, accession…"
+      value={value}
+      onValueChange={setValue}
+    />
+  )
+}`,
+      },
+    },
+  },
   render: function TypingStory(args) {
     const [value, setValue] = useState("")
     return <SearchField {...args} value={value} onValueChange={setValue} />

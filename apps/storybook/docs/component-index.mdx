@@ -1,0 +1,121 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Foundation/Component Index" />
+
+# Component Index
+
+Every component in `@nhic/currantui`, grouped by job. Import paths follow the
+file name: `@nhic/currantui/components/<kebab-name>`.
+
+## Actions
+
+| Component | Use it for |
+|---|---|
+| `Button` | Every press action; `variant="ghost"`/`outline` + `size="icon"` for toolbar and overflow triggers, `asChild` for link-shaped buttons |
+| `ButtonGroup` | Attached cluster of related buttons |
+| `Link` | Inline navigation text; `asChild` for router links |
+| `DropdownMenu` | Every press-triggered menu — action menus, overflow menus, menu buttons |
+| `Command` | Command palette / searchable action list (`CommandDialog` for the overlay) |
+| `ActionBar` | Bulk actions over a selection in ListView, CardView, TreeView, or tables |
+
+## Forms
+
+| Component | Use it for |
+|---|---|
+| `Field` family | Field chrome: label, description, error, sets and groups |
+| `Input` / `Textarea` / `Label` | Text entry |
+| `SearchField` | Text search with clear affordance |
+| `NumberField` | Numeric entry with steppers and locale formatting |
+| `Checkbox` / `RadioGroup` / `Switch` | Binary and single-choice controls |
+| `Select` | Single choice from a closed list |
+| `Combobox` | Searchable single choice; async/multi variants are recipes |
+| `Slider` | One value or a range (multi-thumb is a prop) |
+| `Toggle` / `ToggleGroup` | Pressed-state buttons, single or multiple |
+| `SegmentedControl` | Exclusive view switch styled like a tabs list |
+| `SelectBoxGroup` | Selectable cards with radio (`single`) or checkbox (`multiple`) semantics |
+| `TagGroup` | Removable/selectable token collection |
+| `DateField` / `TimeField` | Segmented date and time entry |
+| `Calendar` / `RangeCalendar` | Inline month grids |
+| `DatePicker` / `DateRangePicker` | Field + popover calendar |
+| `DropZone` | Drag-and-drop file target with a browse trigger |
+| `FileUploader` | DropZone plus a managed file list (no network logic) |
+
+## Overlays
+
+| Component | Use it for |
+|---|---|
+| `Dialog` | Modal confirmation or focused task |
+| `Sheet` | Side-anchored panel/tray/drawer |
+| `Popover` | Anchored floating surface for arbitrary content |
+| `Tooltip` | Hover-only text hint |
+| `Toggletip` | Click-triggered bubble that can hold links and rich content |
+| `ContextualHelp` | Toggletip preset: info/question icon explaining a nearby field |
+
+## Collections & data
+
+| Component | Use it for |
+|---|---|
+| `Table` family | Data tables: toolbar, selection bar, pagination, footer count, sort indicator, empty state |
+| Rich table recipe | Copy-paste sortable/selectable table wiring — see Recipes; apps own their data layer |
+| `ListView` | Keyboard-navigable row collection with selection |
+| `CardView` | Card grid with two-dimensional keyboard navigation and selection |
+| `TreeView` | Hierarchy with expandable branches and selection |
+| `StructuredList` | Lightweight read-only rows (`contained` variant for the boxed look) |
+| `Pagination` / `TablePagination` | Page navigation, generic and table-attached |
+
+## Status & feedback
+
+| Component | Use it for |
+|---|---|
+| `Alert` | Inline status message that stays on the page |
+| `toast` / `Toaster` | Transient notifications; `toast.info/success/warning/error/loading` render the status anatomy with description + action |
+| `Badge` | Static count or label |
+| `FilterChip` | Toggleable filter token |
+| `StatusLight` | Colored dot + label for a state that isn't a count or an alert |
+| `Progress` / `Meter` | Linear completion / measured value |
+| `ProgressCircle` | Ring spinner, determinate or indeterminate |
+| `InlineLoading` | Spinner + text for a short inline operation |
+| `Stepper` | Multi-step progress through a flow |
+| `Skeleton` | Loading placeholders composed per layout |
+| `EmptyState` | Nothing-to-show placeholder with icon/title/description/actions |
+| `ErrorPage` | Full-page failure |
+
+## Content & structure
+
+| Component | Use it for |
+|---|---|
+| `Card` (+ `CardCover`) | Contained content block, optionally with full-bleed media |
+| `Avatar` / `AvatarGroup` | People and identity, with overflow count |
+| `LabeledValue` | Term/value pair |
+| `Separator` | Dividing line |
+| `Accordion` / `Collapsible` | Multiple stacked disclosures / a single one |
+| `Tabs` | Content panels behind a tab list |
+| `Breadcrumb` | Location trail |
+| `CodeSnippet` / `CodeSnippetInline` | Code block with copy + expand / inline code pill |
+
+## Shell & app chrome
+
+| Component | Use it for |
+|---|---|
+| `ShellProvider` + `ShellHeader` / `ShellSideNav` / `ShellPanel` | The application chassis — see Foundation → Shell |
+| `PageHeader` / `SiteFooter` | Page-level chrome inside the content area |
+| `HicLogo` / `ThemeToggle` / `AvatarButton` / `NotificationsButton` | Brand and global-bar pieces |
+| `Navbar` / `SidebarItem` | Deprecated — migrate to ShellHeader / ShellSideNavLink |
+
+## Help & AI
+
+| Component | Use it for |
+|---|---|
+| `ContextualHelp` | Explaining a nearby field or heading |
+| `AiLabel` | Marking AI-generated content, with caller-supplied provenance |
+
+## Not included, on purpose
+
+| Instead of a… | Use |
+|---|---|
+| Color picker suite | Out of scope for NHIC products |
+| Theme provider | CSS variables on `:root`/`.dark` — no provider needed |
+| Icon set | `@phosphor-icons/react` |
+| Layout grid | Tailwind utilities |
+| Prose list component | The class recipe in Foundation → Typography → Lists |
+| Data-table component | The rich-table recipe, so apps own their data layer |

@@ -4,7 +4,7 @@ import { Meta } from "@storybook/addon-docs/blocks"
 
 # Shell
 
-The Shell is CurrantUI's application chassis — a Carbon-style header, side
+The Shell is CurrantUI's application chassis — a header, side
 navigation, exclusive right panels, and content area — so NHIC apps never
 rewrite navbar/sidebar code. Everything hangs off `ShellProvider`, which owns
 the layout grid and the state (`useShell()`).
@@ -84,7 +84,7 @@ side nav (disable with `keyboardShortcut={false}` on the provider).
 A `ShellPanel` opens from the `ShellGlobalAction` carrying the same
 `panelId`. Panels are exclusive (one at a time), non-modal, and close on
 Escape or outside click. The switcher panel (`ShellSwitcher`) is the
-Carbon-style product switcher — keep its action far right in the global bar.
+product switcher — keep its action far right in the global bar.
 
 ## Routing
 

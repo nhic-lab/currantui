@@ -48,36 +48,35 @@ const CADENCES = [
   },
 ]
 
-function CadenceRows() {
-  return (
-    <>
-      <StructuredListHead>
-        <StructuredListRow>
-          <StructuredListCell head>Report</StructuredListCell>
-          <StructuredListCell head>Due</StructuredListCell>
-          <StructuredListCell head>Scope</StructuredListCell>
+/* Element constant (not a component) so docs snippets expand the rows */
+const cadenceRows = (
+  <>
+    <StructuredListHead>
+      <StructuredListRow>
+        <StructuredListCell head>Report</StructuredListCell>
+        <StructuredListCell head>Due</StructuredListCell>
+        <StructuredListCell head>Scope</StructuredListCell>
+      </StructuredListRow>
+    </StructuredListHead>
+    <StructuredListBody>
+      {CADENCES.map((cadence) => (
+        <StructuredListRow key={cadence.name}>
+          <StructuredListCell>{cadence.name}</StructuredListCell>
+          <StructuredListCell>{cadence.due}</StructuredListCell>
+          <StructuredListCell className="text-muted-foreground">
+            {cadence.scope}
+          </StructuredListCell>
         </StructuredListRow>
-      </StructuredListHead>
-      <StructuredListBody>
-        {CADENCES.map((cadence) => (
-          <StructuredListRow key={cadence.name}>
-            <StructuredListCell>{cadence.name}</StructuredListCell>
-            <StructuredListCell>{cadence.due}</StructuredListCell>
-            <StructuredListCell className="text-muted-foreground">
-              {cadence.scope}
-            </StructuredListCell>
-          </StructuredListRow>
-        ))}
-      </StructuredListBody>
-    </>
-  )
-}
+      ))}
+    </StructuredListBody>
+  </>
+)
 
 export const Default: Story = {
   render: (args) => (
     <div className="w-2xl">
       <StructuredList {...args}>
-        <CadenceRows />
+        {cadenceRows}
       </StructuredList>
     </div>
   ),
@@ -90,7 +89,7 @@ export const Contained: Story = {
   render: (args) => (
     <div className="w-2xl">
       <StructuredList {...args}>
-        <CadenceRows />
+        {cadenceRows}
       </StructuredList>
     </div>
   ),

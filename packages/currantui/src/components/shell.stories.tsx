@@ -53,7 +53,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Carbon-style application chassis: header, side navigation (expandable / rail / fixed), exclusive right panels, and content area. State lives in ShellProvider (`useShell()`); Mod+B toggles the side nav.",
+          "Application chassis: header, side navigation (expandable / rail / fixed), exclusive right panels, and content area. State lives in ShellProvider (`useShell()`); Mod+B toggles the side nav.",
       },
     },
   },
@@ -66,40 +66,37 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-function DemoSideNavContent() {
-  return (
-    <ShellSideNavItems>
-      <ShellSideNavLink href="#" icon={<HouseIcon />} isActive>
-        Overview
-      </ShellSideNavLink>
-      <ShellSideNavLink href="#" icon={<ChartBarIcon />}>
-        Indicators
-      </ShellSideNavLink>
-      <ShellSideNavMenu label="Reports" icon={<TableIcon />} defaultOpen>
-        <ShellSideNavMenuItem href="#">Weekly submissions</ShellSideNavMenuItem>
-        <ShellSideNavMenuItem href="#">Data quality</ShellSideNavMenuItem>
-      </ShellSideNavMenu>
-      <ShellSideNavDivider />
-      <ShellSideNavLink href="#" icon={<GearIcon />}>
-        Administration
-      </ShellSideNavLink>
-    </ShellSideNavItems>
-  )
-}
+/* Element constants (not components) so docs snippets expand their trees */
+const demoSideNavContent = (
+  <ShellSideNavItems>
+    <ShellSideNavLink href="#" icon={<HouseIcon />} isActive>
+      Overview
+    </ShellSideNavLink>
+    <ShellSideNavLink href="#" icon={<ChartBarIcon />}>
+      Indicators
+    </ShellSideNavLink>
+    <ShellSideNavMenu label="Reports" icon={<TableIcon />} defaultOpen>
+      <ShellSideNavMenuItem href="#">Weekly submissions</ShellSideNavMenuItem>
+      <ShellSideNavMenuItem href="#">Data quality</ShellSideNavMenuItem>
+    </ShellSideNavMenu>
+    <ShellSideNavDivider />
+    <ShellSideNavLink href="#" icon={<GearIcon />}>
+      Administration
+    </ShellSideNavLink>
+  </ShellSideNavItems>
+)
 
-function DemoContent() {
-  return (
-    <ShellContent>
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 p-4">
-        <PageHeader
-          title="Facility coverage"
-          subtitle="Weekly reporting across all districts"
-        />
-        <div className="h-64 rounded-lg border border-dashed border-border" />
-      </div>
-    </ShellContent>
-  )
-}
+const demoContent = (
+  <ShellContent>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 p-4">
+      <PageHeader
+        title="Facility coverage"
+        subtitle="Weekly reporting across all districts"
+      />
+      <div className="h-64 rounded-lg border border-dashed border-border" />
+    </div>
+  </ShellContent>
+)
 
 const fullChassis = (
   <ShellProvider>
@@ -144,14 +141,14 @@ const fullChassis = (
       </ShellPanel>
     </ShellHeader>
     <ShellSideNav>
-      <DemoSideNavContent />
+      {demoSideNavContent}
       <ShellSideNavFooter>
         <p className="px-2 pb-1 text-[0.625rem] text-sidebar-foreground/70 tabular-nums">
           CurrantUI v0.3.0
         </p>
       </ShellSideNavFooter>
     </ShellSideNav>
-    <DemoContent />
+    {demoContent}
   </ShellProvider>
 )
 
@@ -186,9 +183,9 @@ export const Rail: Story = {
         </ShellGlobalBar>
       </ShellHeader>
       <ShellSideNav variant="rail">
-        <DemoSideNavContent />
+        {demoSideNavContent}
       </ShellSideNav>
-      <DemoContent />
+      {demoContent}
     </ShellProvider>
   ),
   play: async ({ canvasElement }) => {
@@ -213,9 +210,9 @@ export const Fixed: Story = {
         </ShellHeaderName>
       </ShellHeader>
       <ShellSideNav variant="fixed">
-        <DemoSideNavContent />
+        {demoSideNavContent}
       </ShellSideNav>
-      <DemoContent />
+      {demoContent}
     </ShellProvider>
   ),
 }
@@ -259,7 +256,7 @@ export const PanelExclusivity: Story = {
           </ShellSwitcher>
         </ShellPanel>
       </ShellHeader>
-      <DemoContent />
+      {demoContent}
     </ShellProvider>
   ),
   play: async ({ canvasElement }) => {
