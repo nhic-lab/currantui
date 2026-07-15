@@ -20,6 +20,26 @@ function Card({
   )
 }
 
+/**
+ * Full-bleed media area at the top of a Card: an image, a token gradient
+ * (`from-primary-deep via-primary …`), or any visual. Cancels the card's top
+ * padding; place it as the first child. Siblings that overlap it (avatars,
+ * icon tiles) must be positioned (`relative`) or this positioned cover
+ * paints over them.
+ */
+function CardCover({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-cover"
+      className={cn(
+        "relative -mt-(--card-spacing) h-36 w-full overflow-hidden bg-muted *:[img]:size-full *:[img]:object-cover",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -91,6 +111,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 export {
   Card,
+  CardCover,
   CardHeader,
   CardFooter,
   CardTitle,
