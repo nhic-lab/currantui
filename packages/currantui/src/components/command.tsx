@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Command as CommandPrimitive, useCommandState } from "cmdk"
 
+import { CheckIcon, MagnifyingGlassIcon } from "@phosphor-icons/react"
 import { cn } from "@nhic/currantui/lib/utils"
 import {
   Dialog,
@@ -9,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@nhic/currantui/components/dialog"
-import { CheckIcon, MagnifyingGlassIcon } from "@phosphor-icons/react"
 
 function Command({
   className,
