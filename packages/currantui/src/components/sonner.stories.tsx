@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Toast queue on sonner. `toast.info/success/warning/error(title, { description, action })` renders React Spectrum's Toast anatomy — solid status fill, filled icon, outlined action button, divider, close button — on the status tokens with `--background` as the ink (the AA-checked inverted pairing in both palettes). Neutral `toast()` keeps the glass treatment.",
+          "Toast queue on sonner. `toast.info/success/warning/error(title, { description, action })` renders the status toast anatomy — solid status fill, filled icon, outlined action button, divider, close button — on the status tokens with `--background` as the ink (the AA-checked inverted pairing in both palettes). Neutral `toast()` keeps the glass treatment.",
       },
       // Roomy docs canvases; keep stories inline — iframe rendering
       // (inline: false) feedback-loops with the theme-synced docs container

@@ -62,6 +62,38 @@ function RemovableDemo() {
 
 export const Removable: Story = {
   render: () => <RemovableDemo />,
+  parameters: {
+    docs: {
+      source: {
+        code: `function ReportSections() {
+  const [sections, setSections] = React.useState([
+    { id: "cases", label: "Case counts" },
+    { id: "stock", label: "Stock levels" },
+    { id: "staffing", label: "Staffing" },
+  ])
+
+  return (
+    <TagGroup
+      label="Report sections"
+      items={sections}
+      renderEmptyState={() => (
+        <span className="text-xs/relaxed text-muted-foreground">
+          All sections removed.
+        </span>
+      )}
+      onRemove={(keys) =>
+        setSections((prev) => prev.filter((section) => !keys.has(section.id)))
+      }
+    >
+      {(section: { id: string; label: string }) => (
+        <Tag id={section.id}>{section.label}</Tag>
+      )}
+    </TagGroup>
+  )
+}`,
+      },
+    },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole("row", { name: /stock levels/i })).toBeVisible()

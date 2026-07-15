@@ -33,7 +33,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "One menu primitive covering Spectrum's Menu/ActionMenu/MenuButton and Carbon's OverflowMenu/Menu buttons: compose any trigger via `asChild`.",
+          "One primitive for every press-triggered menu — action menus, overflow menus, menu buttons: compose any trigger via `asChild`.",
       },
     },
   },

@@ -25,6 +25,32 @@ export const Active: Story = {
 }
 
 export const ChipGroup: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `function ModalityFilters() {
+  const [selected, setSelected] = useState<Array<string>>(["MR"])
+  const toggle = (value: string) =>
+    setSelected((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
+    )
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      {["CT", "MR", "US", "CR", "PT", "DX"].map((value) => (
+        <FilterChip
+          key={value}
+          active={selected.includes(value)}
+          onClick={() => toggle(value)}
+        >
+          {value}
+        </FilterChip>
+      ))}
+    </div>
+  )
+}`,
+      },
+    },
+  },
   render: function ChipGroupStory() {
     const [selected, setSelected] = useState<Array<string>>(["MR"])
     const toggle = (value: string) =>

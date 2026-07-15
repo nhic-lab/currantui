@@ -86,6 +86,48 @@ function ListViewDemo() {
 
 export const WithListView: Story = {
   render: () => <ListViewDemo />,
+  parameters: {
+    docs: {
+      source: {
+        code: `function FacilityList() {
+  const [selected, setSelected] = React.useState<Selection>(new Set())
+  const count = selected === "all" ? FACILITIES.length : selected.size
+
+  return (
+    <div className="w-80">
+      <ListView
+        aria-label="Facilities"
+        selectionMode="multiple"
+        selectedKeys={selected}
+        onSelectionChange={setSelected}
+      >
+        {FACILITIES.map((facility) => (
+          <ListViewItem key={facility.id} id={facility.id} textValue={facility.name}>
+            {facility.name}
+          </ListViewItem>
+        ))}
+      </ListView>
+      {count > 0 && <Separator className="mt-2" />}
+      <ActionBar
+        count={count}
+        onClearSelection={() => setSelected(new Set())}
+        className="static mt-2"
+      >
+        <Button variant="ghost" size="sm">
+          <DownloadSimpleIcon data-icon="inline-start" />
+          Export
+        </Button>
+        <Button variant="destructive" size="sm">
+          <TrashIcon data-icon="inline-start" />
+          Delete
+        </Button>
+      </ActionBar>
+    </div>
+  )
+}`,
+      },
+    },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
@@ -151,6 +193,46 @@ function TreeViewDemo() {
 
 export const WithTreeView: Story = {
   render: () => <TreeViewDemo />,
+  parameters: {
+    docs: {
+      source: {
+        code: `function ReportFolders() {
+  const [selected, setSelected] = React.useState<Selection>(new Set())
+  const count = selected === "all" ? 5 : selected.size
+
+  return (
+    <div className="w-80">
+      <TreeView
+        aria-label="Report folders"
+        selectionMode="multiple"
+        selectedKeys={selected}
+        onSelectionChange={setSelected}
+        defaultExpandedKeys={["kigali", "gasabo"]}
+      >
+        <TreeViewItem id="kigali" title="Kigali City" icon={<FolderIcon />}>
+          <TreeViewItem id="gasabo" title="Gasabo" icon={<FolderIcon />}>
+            <TreeViewItem id="gasabo-weekly" title="Weekly submissions" icon={<TableIcon />} />
+            <TreeViewItem id="gasabo-quality" title="Data quality" icon={<TableIcon />} />
+          </TreeViewItem>
+          <TreeViewItem id="kicukiro-weekly" title="Kicukiro weekly" icon={<TableIcon />} />
+        </TreeViewItem>
+      </TreeView>
+      <ActionBar
+        count={count}
+        onClearSelection={() => setSelected(new Set())}
+        className="static mt-3"
+      >
+        <Button variant="ghost" size="sm">
+          <DownloadSimpleIcon data-icon="inline-start" />
+          Export
+        </Button>
+      </ActionBar>
+    </div>
+  )
+}`,
+      },
+    },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 

@@ -68,6 +68,33 @@ function SubmitDemo() {
 
 export const ReplacingAButton: Story = {
   render: () => <SubmitDemo />,
+  parameters: {
+    docs: {
+      source: {
+        code: `function SubmitRow() {
+  const [status, setStatus] = React.useState<"idle" | "loading" | "success">("idle")
+
+  React.useEffect(() => {
+    if (status !== "loading") return
+    const timer = setTimeout(() => setStatus("success"), 1200)
+    return () => clearTimeout(timer)
+  }, [status])
+
+  return (
+    <div className="flex h-7 items-center gap-3">
+      {status === "idle" ? (
+        <Button onClick={() => setStatus("loading")}>Submit</Button>
+      ) : (
+        <InlineLoading status={status === "loading" ? "loading" : "success"}>
+          {status === "loading" ? "Submitting…" : "Submitted"}
+        </InlineLoading>
+      )}
+    </div>
+  )
+}`,
+      },
+    },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 

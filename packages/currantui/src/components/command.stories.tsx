@@ -108,6 +108,30 @@ function DialogDemo() {
 export const Dialog: Story = {
   render: () => <DialogDemo />,
   parameters: {
+    docs: {
+      source: {
+        code: `function CommandPalette() {
+  const [open, setOpen] = React.useState(false)
+  return (
+    <>
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        Open command palette
+      </Button>
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="Search…" />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup heading="Reports">
+            <CommandItem>Weekly reports</CommandItem>
+            <CommandItem>Export CSV</CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </>
+  )
+}`,
+      },
+    },
     a11y: {
       config: {
         // Radix Dialog marks the page background aria-hidden while open,

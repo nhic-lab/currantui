@@ -46,6 +46,22 @@ export const BoundsDisabled: Story = {
 }
 
 export const PageInteraction: Story = {
+  parameters: {
+    docs: {
+      source: {
+        code: `function ReportPages() {
+  const [pageIndex, setPageIndex] = useState(0)
+  return (
+    <TablePagination
+      pageIndex={pageIndex}
+      pageCount={8}
+      onPageChange={setPageIndex}
+    />
+  )
+}`,
+      },
+    },
+  },
   render: function PageInteractionStory(args) {
     const [pageIndex, setPageIndex] = useState(0)
     return <TablePagination {...args} pageIndex={pageIndex} onPageChange={setPageIndex} />
