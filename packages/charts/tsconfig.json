@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@nhic/currantui-charts/*": ["./src/*"],
+      "@nhic/currantui/*": ["../currantui/src/*"]
+    }
+  },
+  "include": ["src", "tsup.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

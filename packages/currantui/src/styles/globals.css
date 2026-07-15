@@ -41,11 +41,22 @@
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
     --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
+    /* CurrantUI dataviz palette — 14-step categorical scale, assigned to series
+       in fixed order. Validated for CVD separation and >=3:1 contrast on card. */
+    --chart-1: oklch(0.47 0.2 295);
+    --chart-2: oklch(0.62 0.14 240);
+    --chart-3: oklch(0.57 0.11 170);
+    --chart-4: oklch(0.47 0.19 0);
+    --chart-5: oklch(0.64 0.2 22);
+    --chart-6: oklch(0.46 0.15 28);
+    --chart-7: oklch(0.53 0.14 150);
+    --chart-8: oklch(0.44 0.22 265);
+    --chart-9: oklch(0.66 0.19 356);
+    --chart-10: oklch(0.63 0.12 92);
+    --chart-11: oklch(0.62 0.105 192);
+    --chart-12: oklch(0.45 0.11 250);
+    --chart-13: oklch(0.45 0.11 55);
+    --chart-14: oklch(0.62 0.2 296);
     --radius: 0.625rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
@@ -85,11 +96,22 @@
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
     --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
+    /* Dataviz palette, dark: same hue order, re-tuned per step for the dark
+       card surface (not a lightness flip) and re-validated there. */
+    --chart-1: oklch(0.56 0.24 297);
+    --chart-2: oklch(0.63 0.14 240);
+    --chart-3: oklch(0.52 0.1 170);
+    --chart-4: oklch(0.65 0.18 356);
+    --chart-5: oklch(0.64 0.21 22);
+    --chart-6: oklch(0.52 0.16 28);
+    --chart-7: oklch(0.66 0.15 152);
+    --chart-8: oklch(0.58 0.19 262);
+    --chart-9: oklch(0.55 0.2 0);
+    --chart-10: oklch(0.66 0.13 90);
+    --chart-11: oklch(0.65 0.11 185);
+    --chart-12: oklch(0.53 0.1 250);
+    --chart-13: oklch(0.58 0.15 50);
+    --chart-14: oklch(0.66 0.16 300);
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
     --sidebar-primary: oklch(0.715 0.143 215.221);
@@ -128,6 +150,15 @@
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
+    --color-chart-6: var(--chart-6);
+    --color-chart-7: var(--chart-7);
+    --color-chart-8: var(--chart-8);
+    --color-chart-9: var(--chart-9);
+    --color-chart-10: var(--chart-10);
+    --color-chart-11: var(--chart-11);
+    --color-chart-12: var(--chart-12);
+    --color-chart-13: var(--chart-13);
+    --color-chart-14: var(--chart-14);
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);

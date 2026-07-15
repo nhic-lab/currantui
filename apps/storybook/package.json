@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@nhic/currantui": "workspace:*",
+    "@nhic/currantui-charts": "workspace:*",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

@@ -5,6 +5,7 @@
    live outside it, so register them explicitly. NOTE: directory globs are not
    expanded here — list each package's src explicitly (add charts when it lands) */
 @source "../../../packages/currantui/src";
+@source "../../../packages/charts/src";
 @source "../docs";
 
 body {

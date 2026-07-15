@@ -4,7 +4,8 @@
     "types": ["vite/client"],
     "baseUrl": ".",
     "paths": {
-      "@nhic/currantui/*": ["../../packages/currantui/src/*"]
+      "@nhic/currantui/*": ["../../packages/currantui/src/*"],
+      "@nhic/currantui-charts/*": ["../../packages/charts/src/*"]
     }
   },
   "include": [".storybook/**/*", "docs/**/*", "recipes/**/*", "vitest.config.ts"],

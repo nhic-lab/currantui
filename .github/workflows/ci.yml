@@ -28,7 +28,7 @@ jobs:
       - run: pnpm build
       - name: Guard — no story artifacts in published dist
         run: |
-          if find packages/currantui/dist -name "*.stories.*" | grep -q .; then
+          if find packages/*/dist -name "*.stories.*" | grep -q .; then
             echo "dist/ contains story artifacts" >&2
             exit 1
           fi
