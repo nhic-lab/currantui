@@ -4,12 +4,16 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 const meta = {
   title: "Components/Loader",
+  tags: ["deprecated"],
   component: Loader,
   argTypes: {
     size: {
       control: "select",
       options: ["xs", "sm", "md", "lg", "xl"],
     },
+  },
+  parameters: {
+    docs: { description: { component: "Deprecated — use `ProgressCircle`; Loader now delegates to it and will be removed in the next major." } },
   },
 } satisfies Meta<typeof Loader>
 

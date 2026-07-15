@@ -3,11 +3,11 @@ import { Toaster as Sonner, toast as sonnerToast } from "sonner"
 import {
   CheckCircleIcon,
   InfoIcon,
-  SpinnerIcon,
   WarningIcon,
   XCircleIcon,
   XIcon,
 } from "@phosphor-icons/react"
+import { ProgressCircle } from "@nhic/currantui/components/progress-circle"
 import { cn } from "@nhic/currantui/lib/utils"
 import type { ExternalToast, ToasterProps } from "sonner"
 
@@ -31,14 +31,14 @@ type StatusVariant = "info" | "success" | "warning" | "error" | "loading"
 
 const STATUS_TOAST: Record<
   StatusVariant,
-  { icon: typeof InfoIcon; className: string; spin?: boolean }
+  { icon?: typeof InfoIcon; className: string; spin?: boolean }
 > = {
   info: { icon: InfoIcon, className: "bg-info" },
   success: { icon: CheckCircleIcon, className: "bg-success" },
   warning: { icon: WarningIcon, className: "bg-warning" },
   error: { icon: XCircleIcon, className: "bg-destructive" },
   // Spectrum-neutral inverted fill while work is in flight
-  loading: { icon: SpinnerIcon, className: "bg-foreground", spin: true },
+  loading: { className: "bg-foreground", spin: true },
 }
 
 function isActionObject(
@@ -80,11 +80,17 @@ function StatusToast({
         className
       )}
     >
-      <Icon
-        weight={spin ? "regular" : "fill"}
-        aria-hidden="true"
-        className={cn("size-4 shrink-0", spin && "animate-spin")}
-      />
+      {spin ? (
+        <ProgressCircle
+          aria-hidden="true"
+          size="sm"
+          className="shrink-0 text-current"
+        />
+      ) : (
+        Icon != null && (
+          <Icon weight="fill" aria-hidden="true" className="size-4 shrink-0" />
+        )
+      )}
       <div className="flex min-w-0 flex-1 flex-col py-0.5 text-xs/relaxed">
         <p data-slot="toast-title" className="font-medium">
           {title}
@@ -199,7 +205,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
         error: <XCircleIcon className="size-4 text-destructive" />,
         info: <InfoIcon className="size-4" />,
         warning: <WarningIcon className="size-4" />,
-        loading: <SpinnerIcon className="size-4 animate-spin" />,
+        loading: (
+          <ProgressCircle
+            aria-hidden="true"
+            size="sm"
+            className="text-current"
+          />
+        ),
       }}
       style={
         {
