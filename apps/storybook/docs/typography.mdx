@@ -39,6 +39,37 @@ Control heights follow the compact scale: `h-5` (xs, badge), `h-6` (sm),
 Default padding is `px-2` with `gap-1` between icon and label. shadcn's
 stock `h-9`/`h-10` sizes are always reduced when scaffolding new components.
 
+## Lists
+
+There is no List component — prose lists are a class recipe on native
+elements:
+
+```tsx
+<ul className="list-disc ps-4 text-xs/relaxed marker:text-muted-foreground [&_li]:mt-1">
+  <li>Weekly surveillance</li>
+  <li>
+    Monthly service report
+    <ul className="list-[circle] ps-4">
+      <li>OPD visits</li>
+    </ul>
+  </li>
+</ul>
+```
+
+<ul className="list-disc ps-4 text-xs/relaxed marker:text-muted-foreground [&_li]:mt-1">
+  <li>Weekly surveillance</li>
+  <li>
+    Monthly service report
+    <ul className="list-[circle] ps-4">
+      <li>OPD visits</li>
+    </ul>
+  </li>
+</ul>
+
+Ordered lists swap `list-disc` for `list-decimal` (numbers stay
+`tabular-nums` automatically via the token setup). For data rows use
+`StructuredList`; for term/value pairs use `LabeledValue`.
+
 ## Radius
 
 `--radius` is `0.625rem` with derived steps mapped through `@theme inline`.

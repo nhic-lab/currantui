@@ -37,7 +37,7 @@ const STATUS_TOAST: Record<
   success: { icon: CheckCircleIcon, className: "bg-success" },
   warning: { icon: WarningIcon, className: "bg-warning" },
   error: { icon: XCircleIcon, className: "bg-destructive" },
-  // Spectrum-neutral inverted fill while work is in flight
+  // Neutral inverted fill while work is in flight
   loading: { className: "bg-foreground", spin: true },
 }
 
@@ -52,7 +52,7 @@ function isActionObject(
   )
 }
 
-/* React Spectrum Toast anatomy on house tokens: solid status fill, filled
+/* Status toast anatomy on house tokens: solid status fill, filled
    icon, single-row content, outlined action button, divider, close button.
    The ink is --background — white on the deep fills in light, near-black on
    the bright fills in dark; both AA-checked pairings. */
@@ -171,7 +171,7 @@ function statusToast(variant: StatusVariant) {
     )
 }
 
-/* Drop-in sonner API with Spectrum-styled status toasts: toast() stays the
+/* Drop-in sonner API with styled status toasts: toast() stays the
    neutral glass toast; toast.info/success/warning/error/loading render
    StatusToast. loading is custom too so updating it by id swaps content
    inside one consistent shell instead of jumping between sonner chrome and

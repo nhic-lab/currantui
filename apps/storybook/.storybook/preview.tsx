@@ -67,7 +67,33 @@ const preview: Preview = {
   parameters: {
     a11y: { test: "error" },
     backgrounds: { disable: true },
-    docs: { container: NhicDocsContainer },
+    docs: {
+      container: NhicDocsContainer,
+      // "Show code" renders the story's actual JSX (args resolved, play
+      // functions and story-object chrome stripped) instead of the raw CSF
+      // source. Stateful demos wrapped in a local component override this
+      // per-story with docs.source.code.
+      source: {
+        type: "dynamic",
+        excludeDecorators: true,
+        // Date/time values serialize via toString ({2026-03-14}, {18:00}) —
+        // rewrite them to the @nhic/currantui/lib/date parse calls so the
+        // snippet is valid, runnable code
+        transform: (code: string) =>
+          code
+            .replace(/<React\.Fragment(?:\s+key="[^"]*")?\s*>/g, "<>")
+            .replace(/<\/React\.Fragment>/g, "</>")
+            .replace(
+              /=\{(\d{4}-\d{2}-\d{2}T[^}]+)\}/g,
+              '={parseDateTime("$1")}'
+            )
+            .replace(/=\{(\d{4}-\d{2}-\d{2})\}/g, '={parseDate("$1")}')
+            .replace(
+              /=\{(\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?)\}/g,
+              '={parseTime("$1")}'
+            ),
+      },
+    },
     viewport: {
       options: {
         mobile: {
@@ -97,7 +123,7 @@ const preview: Preview = {
         order: [
           "Welcome",
           "Foundation",
-          ["Getting Started", "Colors", "Typography", "Design Standards", "Shell"],
+          ["Getting Started", "Colors", "Typography", "Design Standards", "Shell", "Component Index"],
           "Components",
         ],
       },
