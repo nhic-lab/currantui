@@ -9,18 +9,6 @@ navigation, exclusive right panels, and content area — so NHIC apps never
 rewrite navbar/sidebar code. Everything hangs off `ShellProvider`, which owns
 the layout grid and the state (`useShell()`).
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│ ShellHeader: ☰  Name   Nav links…        🔍 🔔 ◐ 👤 ▦        │
-├──────────────┬───────────────────────────────────┬───────────┤
-│ ShellSideNav │ ShellContent (<main>)             │ ShellPanel│
-│  links       │                                   │ (opens    │
-│  menus       │   PageHeader + page content       │  from a   │
-│  footer      │                                   │  global   │
-│              │                                   │  action)  │
-└──────────────┴───────────────────────────────────┴───────────┘
-```
-
 ## Anatomy
 
 ```tsx
