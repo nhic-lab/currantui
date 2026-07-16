@@ -9,6 +9,7 @@ import { baseGrid, valueAxis } from "@nhic/currantui-charts/lib/option-base"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type { ChartTableColumn } from "@nhic/currantui-charts/lib/table-columns"
 import type {
   AxisChartOptions,
@@ -35,7 +36,7 @@ function scatterGroups(rows: ReadonlyArray<ScatterDataRow>): Array<string> {
 }
 
 function ScatterChart({ data, options, className }: ScatterChartProps) {
-  const buildOption = React.useCallback((): EChartsCoreOption => {
+  const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const groups = scatterGroups(data)
     const format = options.valueFormatter ?? formatNumber
     return {
@@ -60,9 +61,11 @@ function ScatterChart({ data, options, className }: ScatterChartProps) {
         name: group,
         type: "scatter" as const,
         symbolSize: options.pointSize ?? 9,
-        data: data
-          .filter((row) => row.group === group)
-          .map((row) => [row.x, row.y]),
+        data: context.hiddenGroups.has(group)
+          ? []
+          : data
+              .filter((row) => row.group === group)
+              .map((row) => [row.x, row.y]),
       })),
     }
   }, [data, options])

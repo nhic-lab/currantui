@@ -40,7 +40,7 @@ import {
 import { formatCell } from "@nhic/currantui-charts/lib/format"
 import { useEChart } from "@nhic/currantui-charts/lib/use-echart"
 
-import type { EChartsCoreOption } from "echarts/core"
+import type { EChartsCoreOption, EChartsType } from "echarts/core"
 import type { ChartLegendItem } from "@nhic/currantui-charts/components/chart-legend"
 import type { ChartTableColumn } from "@nhic/currantui-charts/lib/table-columns"
 import type { BaseChartOptions } from "@nhic/currantui-charts/lib/types"
@@ -63,6 +63,12 @@ export interface ChartShellProps<TRow> {
   buildOption: (context: ChartBuildContext) => EChartsCoreOption
   /** HTML centered over the canvas (donut/gauge value labels); ignores pointer events */
   overlay?: React.ReactNode
+  /**
+   * Fires with each created canvas instance (inline and fullscreen, including
+   * theme re-inits) and null on unmount — for charts that drive frames
+   * imperatively (bar race). Prune disposed instances via `isDisposed()`.
+   */
+  onCanvasInstance?: (chart: EChartsType | null) => void
   className?: string
 }
 
@@ -73,13 +79,15 @@ interface ChartCanvasHandle {
 function ChartCanvas({
   build,
   label,
+  onInstance,
   ref,
 }: {
   build: () => EChartsCoreOption
   label: string
+  onInstance?: (chart: EChartsType | null) => void
   ref?: React.Ref<ChartCanvasHandle>
 }) {
-  const { containerRef, getDataURL } = useEChart(build)
+  const { containerRef, getDataURL } = useEChart(build, onInstance)
   React.useImperativeHandle(ref, () => ({ getDataURL }), [getDataURL])
   return (
     // The canvas is opaque to assistive tech; expose it as a labelled image
@@ -135,15 +143,20 @@ function ChartFrame<TRow>({
   legendContent,
   buildOption,
   overlay,
+  onCanvasInstance,
   className,
   view,
   onViewChange,
+  hiddenGroups,
+  onToggleGroup,
   fullscreen = false,
   onFullscreenChange,
   fill = false,
 }: ChartShellProps<TRow> & {
   view: "chart" | "table"
   onViewChange: (view: "chart" | "table") => void
+  hiddenGroups: ReadonlySet<string>
+  onToggleGroup: (group: string) => void
   fullscreen?: boolean
   onFullscreenChange?: (open: boolean) => void
   /** Fill the parent height (fullscreen dialog) instead of options.height */
@@ -163,8 +176,8 @@ function ChartFrame<TRow>({
 
   const canvasRef = React.useRef<ChartCanvasHandle>(null)
   const build = React.useMemo(
-    () => () => buildOption({ hiddenGroups: new Set<string>() }),
-    [buildOption]
+    () => () => buildOption({ hiddenGroups }),
+    [buildOption, hiddenGroups]
   )
   const empty = rows.length === 0
   const tableView = view === "table"
@@ -290,6 +303,7 @@ function ChartFrame<TRow>({
               ref={canvasRef}
               build={build}
               label={description ? `${title}. ${description}` : title}
+              onInstance={onCanvasInstance}
             />
             {overlay && (
               <div
@@ -307,7 +321,11 @@ function ChartFrame<TRow>({
         !empty &&
         (legendContent ??
           (legendItems && legendItems.length > 1 && (
-            <ChartLegend items={legendItems} />
+            <ChartLegend
+              items={legendItems}
+              hiddenLabels={hiddenGroups}
+              onToggleItem={onToggleGroup}
+            />
           )))}
       <div
         data-slot="chart-footer"
@@ -330,6 +348,18 @@ function ChartFrame<TRow>({
 function ChartShell<TRow>(props: ChartShellProps<TRow>) {
   const [view, setView] = React.useState<"chart" | "table">("chart")
   const [fullscreen, setFullscreen] = React.useState(false)
+  const [hiddenGroups, setHiddenGroups] = React.useState<ReadonlySet<string>>(
+    new Set()
+  )
+
+  const toggleGroup = React.useCallback((group: string) => {
+    setHiddenGroups((current) => {
+      const next = new Set(current)
+      if (next.has(group)) next.delete(group)
+      else next.add(group)
+      return next
+    })
+  }, [])
 
   return (
     <>
@@ -337,6 +367,8 @@ function ChartShell<TRow>(props: ChartShellProps<TRow>) {
         {...props}
         view={view}
         onViewChange={setView}
+        hiddenGroups={hiddenGroups}
+        onToggleGroup={toggleGroup}
         onFullscreenChange={setFullscreen}
       />
       <Dialog open={fullscreen} onOpenChange={setFullscreen}>
@@ -350,6 +382,8 @@ function ChartShell<TRow>(props: ChartShellProps<TRow>) {
             {...props}
             view={view}
             onViewChange={setView}
+            hiddenGroups={hiddenGroups}
+            onToggleGroup={toggleGroup}
             fullscreen
             onFullscreenChange={setFullscreen}
             fill

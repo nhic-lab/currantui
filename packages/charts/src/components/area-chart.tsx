@@ -17,6 +17,7 @@ import { groupedRowColumns } from "@nhic/currantui-charts/lib/table-columns"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type {
   AxisChartOptions,
   ChartDataRow,
@@ -38,7 +39,7 @@ export interface AreaChartProps {
 }
 
 function AreaChart({ data, options, className }: AreaChartProps) {
-  const buildOption = React.useCallback((): EChartsCoreOption => {
+  const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const groups = groupsOf(data)
     const keys = keysOf(data)
     const values = valuesByGroup(data, groups, keys)
@@ -61,7 +62,7 @@ function AreaChart({ data, options, className }: AreaChartProps) {
         // overlapping fills stay light to keep every series readable
         areaStyle: { opacity: stacked ? 0.5 : 0.2 },
         emphasis: { focus: "series" as const },
-        data: values.get(group) ?? [],
+        data: context.hiddenGroups.has(group) ? [] : (values.get(group) ?? []),
       })),
     }
   }, [data, options])

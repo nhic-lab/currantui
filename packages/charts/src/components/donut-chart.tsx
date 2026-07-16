@@ -9,6 +9,7 @@ import { partRowColumns } from "@nhic/currantui-charts/lib/table-columns"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type {
   BaseChartOptions,
   PartDataRow,
@@ -35,7 +36,7 @@ export interface DonutChartProps {
 
 function DonutChart({ data, options, className }: DonutChartProps) {
   const buildOption = React.useCallback(
-    (): EChartsCoreOption => ({
+    (context: ChartBuildContext): EChartsCoreOption => ({
       tooltip: { trigger: "item", ...baseTooltip(options.valueFormatter) },
       series: [
         {
@@ -43,7 +44,12 @@ function DonutChart({ data, options, className }: DonutChartProps) {
           radius: ["55%", "75%"],
           label: { show: false },
           labelLine: { show: false },
-          data: data.map((row) => ({ name: row.group, value: row.value })),
+          // Hidden slices keep their data slot (zero value) so colors stay
+          // bound to their group instead of shifting onto the survivors
+          data: data.map((row) => ({
+            name: row.group,
+            value: context.hiddenGroups.has(row.group) ? 0 : row.value,
+          })),
         },
       ],
     }),

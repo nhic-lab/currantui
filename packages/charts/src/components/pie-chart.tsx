@@ -9,6 +9,7 @@ import { partRowColumns } from "@nhic/currantui-charts/lib/table-columns"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type {
   BaseChartOptions,
   PartDataRow,
@@ -30,7 +31,7 @@ export interface PieChartProps {
 
 function PieChart({ data, options, className }: PieChartProps) {
   const buildOption = React.useCallback(
-    (): EChartsCoreOption => ({
+    (context: ChartBuildContext): EChartsCoreOption => ({
       tooltip: { trigger: "item", ...baseTooltip(options.valueFormatter) },
       series: [
         {
@@ -39,7 +40,12 @@ function PieChart({ data, options, className }: PieChartProps) {
           // Names live in the HTML legend; canvas labels stay off
           label: { show: false },
           labelLine: { show: false },
-          data: data.map((row) => ({ name: row.group, value: row.value })),
+          // Hidden slices keep their data slot (zero value) so colors stay
+          // bound to their group instead of shifting onto the survivors
+          data: data.map((row) => ({
+            name: row.group,
+            value: context.hiddenGroups.has(row.group) ? 0 : row.value,
+          })),
         },
       ],
     }),
