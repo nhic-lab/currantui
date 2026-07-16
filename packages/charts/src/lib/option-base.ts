@@ -42,7 +42,8 @@ export function baseGrid(axisNames?: {
     top: 12,
     right: axisNames?.right ? 30 : 24,
     bottom: axisNames?.bottom ? 34 : 4,
-    left: axisNames?.left ? 30 : 4,
+    // Covers the rotated name even when tick labels are narrow (single digits)
+    left: axisNames?.left ? 40 : 4,
     containLabel: true,
   }
 }
