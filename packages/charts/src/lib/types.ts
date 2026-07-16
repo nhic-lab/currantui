@@ -16,6 +16,23 @@ export interface GaugeDataRow {
   value: number
 }
 
+export interface ScatterDataRow {
+  group: string
+  x: number
+  y: number
+}
+
+export interface BubbleDataRow extends ScatterDataRow {
+  /** Encoded as mark area via a square-root size scale */
+  size: number
+}
+
+export interface BoxplotDataRow {
+  group: string
+  /** Raw sample; quartiles and outliers are computed per group */
+  value: number
+}
+
 export interface BaseChartOptions {
   title: string
   description?: string

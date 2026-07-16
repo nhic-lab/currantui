@@ -124,5 +124,9 @@ export function buildChartTheme(): Record<string, unknown> {
         fontSize: 12,
       },
     },
+    // Boxes default to a hardcoded white fill; use the card surface instead
+    boxplot: {
+      itemStyle: { color: token("--card"), borderWidth: 1.5 },
+    },
   }
 }
