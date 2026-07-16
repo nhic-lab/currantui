@@ -40,7 +40,7 @@ import {
 import { formatCell } from "@nhic/currantui-charts/lib/format"
 import { useEChart } from "@nhic/currantui-charts/lib/use-echart"
 
-import type { EChartsCoreOption } from "echarts/core"
+import type { EChartsCoreOption, EChartsType } from "echarts/core"
 import type { ChartLegendItem } from "@nhic/currantui-charts/components/chart-legend"
 import type { ChartTableColumn } from "@nhic/currantui-charts/lib/table-columns"
 import type { BaseChartOptions } from "@nhic/currantui-charts/lib/types"
@@ -63,6 +63,12 @@ export interface ChartShellProps<TRow> {
   buildOption: (context: ChartBuildContext) => EChartsCoreOption
   /** HTML centered over the canvas (donut/gauge value labels); ignores pointer events */
   overlay?: React.ReactNode
+  /**
+   * Fires with each created canvas instance (inline and fullscreen, including
+   * theme re-inits) and null on unmount — for charts that drive frames
+   * imperatively (bar race). Prune disposed instances via `isDisposed()`.
+   */
+  onCanvasInstance?: (chart: EChartsType | null) => void
   className?: string
 }
 
@@ -73,13 +79,15 @@ interface ChartCanvasHandle {
 function ChartCanvas({
   build,
   label,
+  onInstance,
   ref,
 }: {
   build: () => EChartsCoreOption
   label: string
+  onInstance?: (chart: EChartsType | null) => void
   ref?: React.Ref<ChartCanvasHandle>
 }) {
-  const { containerRef, getDataURL } = useEChart(build)
+  const { containerRef, getDataURL } = useEChart(build, onInstance)
   React.useImperativeHandle(ref, () => ({ getDataURL }), [getDataURL])
   return (
     // The canvas is opaque to assistive tech; expose it as a labelled image
@@ -135,6 +143,7 @@ function ChartFrame<TRow>({
   legendContent,
   buildOption,
   overlay,
+  onCanvasInstance,
   className,
   view,
   onViewChange,
@@ -294,6 +303,7 @@ function ChartFrame<TRow>({
               ref={canvasRef}
               build={build}
               label={description ? `${title}. ${description}` : title}
+              onInstance={onCanvasInstance}
             />
             {overlay && (
               <div

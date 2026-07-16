@@ -40,7 +40,7 @@ Charts take tabular `data` rows (default shape `{ group, key, value }`) plus a t
 
 ## Chart types
 
-Bar (grouped/stacked × vertical/horizontal), Line, Area (+stacked), Combo (mixed bar/line, optional secondary axis), Pie, Donut (HTML center label), Gauge (status threshold zones), Meter (proportional bar), Scatter, Bubble (area-true size scale), Histogram (internal binning), Boxplot (computed quartiles and outliers), Heatmap (sequential ramp), and Treemap (drill-down hierarchy).
+Bar (grouped/stacked × vertical/horizontal), Race bar (animated ranking over time with playback controls), Line, Area (+stacked), Combo (mixed bar/line, optional secondary axis), Pie, Donut (HTML center label), Gauge (status threshold zones), Meter (proportional bar), Scatter, Bubble (area-true size scale), Histogram (internal binning), Boxplot (computed quartiles and outliers), Heatmap (sequential ramp), and Treemap (drill-down hierarchy).
 
 Import each from its own subpath, e.g. `@nhic/currantui-charts/components/line-chart`. Legends are HTML and clickable — hiding a series keeps its color bound to its group.
 
