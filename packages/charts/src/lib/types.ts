@@ -33,6 +33,19 @@ export interface BoxplotDataRow {
   value: number
 }
 
+export interface HeatmapDataRow {
+  x: string
+  y: string
+  value: number
+}
+
+export interface TreemapNode {
+  name: string
+  /** Leaf value; branch nodes may omit it and sum their children */
+  value?: number
+  children?: Array<TreemapNode>
+}
+
 export interface BaseChartOptions {
   title: string
   description?: string

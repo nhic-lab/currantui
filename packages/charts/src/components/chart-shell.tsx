@@ -57,6 +57,8 @@ export interface ChartShellProps<TRow> {
   rows: ReadonlyArray<TRow>
   tableColumns: Array<ChartTableColumn<TRow>>
   legendItems?: Array<ChartLegendItem>
+  /** Replaces the swatch legend (e.g. a continuous ramp for heatmaps) */
+  legendContent?: React.ReactNode
   /** Must be referentially stable (memoized) — it keys the canvas update */
   buildOption: (context: ChartBuildContext) => EChartsCoreOption
   /** HTML centered over the canvas (donut/gauge value labels); ignores pointer events */
@@ -130,6 +132,7 @@ function ChartFrame<TRow>({
   rows,
   tableColumns,
   legendItems,
+  legendContent,
   buildOption,
   overlay,
   className,
@@ -302,8 +305,10 @@ function ChartFrame<TRow>({
       {legend?.enabled !== false &&
         !loading &&
         !empty &&
-        legendItems &&
-        legendItems.length > 1 && <ChartLegend items={legendItems} />}
+        (legendContent ??
+          (legendItems && legendItems.length > 1 && (
+            <ChartLegend items={legendItems} />
+          )))}
       <div
         data-slot="chart-footer"
         className="flex items-center justify-between gap-2 text-[0.625rem] text-muted-foreground tabular-nums"
