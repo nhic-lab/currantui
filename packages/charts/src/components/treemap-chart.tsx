@@ -8,6 +8,7 @@ import { formatNumber } from "@nhic/currantui-charts/lib/format"
 import { paletteVar, resolveTokenColor } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type { ChartTableColumn } from "@nhic/currantui-charts/lib/table-columns"
 import type {
   BaseChartOptions,
@@ -59,7 +60,7 @@ function TreemapChart({ data, options, className }: TreemapChartProps) {
   const flat = React.useMemo(() => flattenNodes(data), [data])
 
   const buildOption = React.useCallback(
-    (): EChartsCoreOption => ({
+    (context: ChartBuildContext): EChartsCoreOption => ({
       tooltip: {
         trigger: "item",
         confine: true,
@@ -80,7 +81,11 @@ function TreemapChart({ data, options, className }: TreemapChartProps) {
             borderWidth: 1,
             gapWidth: 2,
           },
-          data: [...data],
+          // Hidden branches keep their node slot (zero value) so top-level
+          // colors stay bound to their branch
+          data: data.map((node) =>
+            context.hiddenGroups.has(node.name) ? { name: node.name, value: 0 } : node
+          ),
         },
       ],
     }),

@@ -17,6 +17,7 @@ import { groupedRowColumns } from "@nhic/currantui-charts/lib/table-columns"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type {
   AxisChartOptions,
   ChartDataRow,
@@ -38,7 +39,7 @@ export interface LineChartProps {
 }
 
 function LineChart({ data, options, className }: LineChartProps) {
-  const buildOption = React.useCallback((): EChartsCoreOption => {
+  const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const groups = groupsOf(data)
     const keys = keysOf(data)
     const values = valuesByGroup(data, groups, keys)
@@ -56,7 +57,7 @@ function LineChart({ data, options, className }: LineChartProps) {
         smooth: options.curve === "smooth",
         showSymbol: options.points !== false,
         symbolSize: 6,
-        data: values.get(group) ?? [],
+        data: context.hiddenGroups.has(group) ? [] : (values.get(group) ?? []),
       })),
     }
   }, [data, options])

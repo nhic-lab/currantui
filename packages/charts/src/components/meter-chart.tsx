@@ -9,6 +9,7 @@ import { partRowColumns } from "@nhic/currantui-charts/lib/table-columns"
 import { paletteVar, resolveTokenColor } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type {
   BaseChartOptions,
   PartDataRow,
@@ -34,8 +35,12 @@ export interface MeterChartProps {
  * part-to-whole breakdown; defaults to a short 120px body.
  */
 function MeterChart({ data, options, className }: MeterChartProps) {
-  const buildOption = React.useCallback((): EChartsCoreOption => {
-    const total = data.reduce((sum, row) => sum + row.value, 0)
+  const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
+    const visible = (row: PartDataRow) => !context.hiddenGroups.has(row.group)
+    const total = data.reduce(
+      (sum, row) => sum + (visible(row) ? row.value : 0),
+      0
+    )
     const format = options.valueFormatter ?? formatNumber
     return {
       grid: { top: 4, right: 4, bottom: 4, left: 4 },
@@ -57,7 +62,7 @@ function MeterChart({ data, options, className }: MeterChartProps) {
         barWidth: 20,
         // Hairline card-colored borders keep adjacent segments separable
         itemStyle: { borderColor: resolveTokenColor("--card"), borderWidth: 1 },
-        data: [row.value],
+        data: [visible(row) ? row.value : 0],
       })),
     }
   }, [data, options])

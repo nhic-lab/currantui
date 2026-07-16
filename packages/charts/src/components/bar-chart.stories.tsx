@@ -128,6 +128,18 @@ export const Empty: Story = {
   },
 }
 
+export const LegendToggle: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const item = canvas.getByRole("button", { name: "Malaria" })
+    await expect(item).toHaveAttribute("aria-pressed", "true")
+    await userEvent.click(item)
+    await expect(item).toHaveAttribute("aria-pressed", "false")
+    await userEvent.click(item)
+    await expect(item).toHaveAttribute("aria-pressed", "true")
+  },
+}
+
 export const TableView: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

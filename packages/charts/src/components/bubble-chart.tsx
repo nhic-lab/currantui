@@ -10,6 +10,7 @@ import { scaleSqrt } from "@nhic/currantui-charts/lib/stats"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type { ChartTableColumn } from "@nhic/currantui-charts/lib/table-columns"
 import type {
   AxisChartOptions,
@@ -38,7 +39,7 @@ function bubbleGroups(rows: ReadonlyArray<BubbleDataRow>): Array<string> {
 }
 
 function BubbleChart({ data, options, className }: BubbleChartProps) {
-  const buildOption = React.useCallback((): EChartsCoreOption => {
+  const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const groups = bubbleGroups(data)
     const format = options.valueFormatter ?? formatNumber
     const sizes = data.map((row) => row.size)
@@ -73,9 +74,11 @@ function BubbleChart({ data, options, className }: BubbleChartProps) {
         symbolSize: (value: Array<number>) => scale(value[2]),
         // Translucent fills keep overlapping bubbles readable
         itemStyle: { opacity: 0.75 },
-        data: data
-          .filter((row) => row.group === group)
-          .map((row) => [row.x, row.y, row.size]),
+        data: context.hiddenGroups.has(group)
+          ? []
+          : data
+              .filter((row) => row.group === group)
+              .map((row) => [row.x, row.y, row.size]),
       })),
     }
   }, [data, options])

@@ -32,11 +32,17 @@ export interface UseEChartResult {
  * (via resolveTokenColor), so the option must be rebuilt on every theme
  * re-init or it would carry colors baked under the previous theme.
  */
-export function useEChart(build: () => EChartsCoreOption): UseEChartResult {
+export function useEChart(
+  build: () => EChartsCoreOption,
+  /** Fires with each (re)created instance, and null on unmount */
+  onInstance?: (chart: EChartsType | null) => void
+): UseEChartResult {
   const containerRef = React.useRef<HTMLDivElement | null>(null)
   const chartRef = React.useRef<EChartsType | null>(null)
   const buildRef = React.useRef(build)
   buildRef.current = build
+  const onInstanceRef = React.useRef(onInstance)
+  onInstanceRef.current = onInstance
 
   React.useLayoutEffect(() => {
     const host = containerRef.current
@@ -47,6 +53,7 @@ export function useEChart(build: () => EChartsCoreOption): UseEChartResult {
       const chart = echarts.init(host, buildChartTheme(), { renderer: "canvas" })
       chart.setOption(buildRef.current(), { notMerge: true })
       chartRef.current = chart
+      onInstanceRef.current?.(chart)
     }
     create()
 
@@ -75,6 +82,7 @@ export function useEChart(build: () => EChartsCoreOption): UseEChartResult {
       cancelAnimationFrame(frame)
       chartRef.current?.dispose()
       chartRef.current = null
+      onInstanceRef.current?.(null)
     }
   }, [])
 

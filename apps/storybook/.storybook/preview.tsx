@@ -125,6 +125,8 @@ const preview: Preview = {
           "Foundation",
           ["Getting Started", "Colors", "Typography", "Design Standards", "Shell", "Component Index"],
           "Components",
+          "Charts",
+          ["Overview"],
         ],
       },
     },
