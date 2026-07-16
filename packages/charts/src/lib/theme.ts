@@ -21,12 +21,23 @@ function resolveColor(value: string): string {
   return `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`
 }
 
-/** Resolve a CurrantUI token (e.g. "--card") to a concrete rgba() color */
-export function resolveTokenColor(token: string): string {
+/**
+ * Resolve a CurrantUI token (e.g. "--card") to a concrete rgba() color.
+ * Safe during server rendering (returns "") — option builders call this from
+ * render, and the value is only consumed by the client-side canvas.
+ */
+export function resolveTokenColor(token: string, alpha?: number): string {
+  if (typeof document === "undefined") return ""
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue(token)
     .trim()
-  return resolveColor(value)
+  const color = resolveColor(value)
+  if (alpha === undefined) return color
+  return color.replace(
+    /rgba\((\d+), (\d+), (\d+), ([\d.]+)\)/,
+    (_, r: string, g: string, b: string, a: string) =>
+      `rgba(${r}, ${g}, ${b}, ${(Number(a) * alpha).toFixed(3)})`
+  )
 }
 
 let paletteCache: { dark: boolean; colors: Array<string> } | null = null
