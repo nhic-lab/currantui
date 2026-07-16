@@ -1,6 +1,6 @@
 {
   "name": "@nhic/currantui-charts",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "CurrantUI Charts — data visualization components for the National Health Intelligence Center (NHIC) design system, built on Apache ECharts.",
   "type": "module",
   "license": "Apache-2.0",
