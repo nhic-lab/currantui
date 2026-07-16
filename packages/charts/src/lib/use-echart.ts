@@ -27,12 +27,16 @@ export interface UseEChartResult {
  * token-driven theme (canvas renderer, required for image export), resize via
  * ResizeObserver, and re-init when the `.dark` class toggles — ECharts themes
  * are fixed at init, so a fresh init is the reliable re-theme path.
+ *
+ * Takes the option BUILDER, not the option: builders resolve design tokens
+ * (via resolveTokenColor), so the option must be rebuilt on every theme
+ * re-init or it would carry colors baked under the previous theme.
  */
-export function useEChart(option: EChartsCoreOption): UseEChartResult {
+export function useEChart(build: () => EChartsCoreOption): UseEChartResult {
   const containerRef = React.useRef<HTMLDivElement | null>(null)
   const chartRef = React.useRef<EChartsType | null>(null)
-  const optionRef = React.useRef(option)
-  optionRef.current = option
+  const buildRef = React.useRef(build)
+  buildRef.current = build
 
   React.useLayoutEffect(() => {
     const host = containerRef.current
@@ -41,7 +45,7 @@ export function useEChart(option: EChartsCoreOption): UseEChartResult {
     const create = () => {
       chartRef.current?.dispose()
       const chart = echarts.init(host, buildChartTheme(), { renderer: "canvas" })
-      chart.setOption(optionRef.current, { notMerge: true })
+      chart.setOption(buildRef.current(), { notMerge: true })
       chartRef.current = chart
     }
     create()
@@ -75,8 +79,8 @@ export function useEChart(option: EChartsCoreOption): UseEChartResult {
   }, [])
 
   React.useEffect(() => {
-    chartRef.current?.setOption(option, { notMerge: true, lazyUpdate: true })
-  }, [option])
+    chartRef.current?.setOption(build(), { notMerge: true, lazyUpdate: true })
+  }, [build])
 
   const getDataURL = React.useCallback(
     (options: ImageExportOptions) => chartRef.current?.getDataURL(options),
