@@ -59,6 +59,8 @@ export interface ChartShellProps<TRow> {
   legendItems?: Array<ChartLegendItem>
   /** Must be referentially stable (memoized) — it keys the canvas update */
   buildOption: (context: ChartBuildContext) => EChartsCoreOption
+  /** HTML centered over the canvas (donut/gauge value labels); ignores pointer events */
+  overlay?: React.ReactNode
   className?: string
 }
 
@@ -67,15 +69,15 @@ interface ChartCanvasHandle {
 }
 
 function ChartCanvas({
-  option,
+  build,
   label,
   ref,
 }: {
-  option: EChartsCoreOption
+  build: () => EChartsCoreOption
   label: string
   ref?: React.Ref<ChartCanvasHandle>
 }) {
-  const { containerRef, getDataURL } = useEChart(option)
+  const { containerRef, getDataURL } = useEChart(build)
   React.useImperativeHandle(ref, () => ({ getDataURL }), [getDataURL])
   return (
     // The canvas is opaque to assistive tech; expose it as a labelled image
@@ -129,6 +131,7 @@ function ChartFrame<TRow>({
   tableColumns,
   legendItems,
   buildOption,
+  overlay,
   className,
   view,
   onViewChange,
@@ -156,8 +159,8 @@ function ChartFrame<TRow>({
   } = options
 
   const canvasRef = React.useRef<ChartCanvasHandle>(null)
-  const option = React.useMemo(
-    () => buildOption({ hiddenGroups: new Set<string>() }),
+  const build = React.useMemo(
+    () => () => buildOption({ hiddenGroups: new Set<string>() }),
     [buildOption]
   )
   const empty = rows.length === 0
@@ -279,11 +282,21 @@ function ChartFrame<TRow>({
         ) : tableView ? (
           <ChartDataTable title={title} rows={rows} columns={tableColumns} />
         ) : (
-          <ChartCanvas
-            ref={canvasRef}
-            option={option}
-            label={description ? `${title}. ${description}` : title}
-          />
+          <div className="relative h-full w-full">
+            <ChartCanvas
+              ref={canvasRef}
+              build={build}
+              label={description ? `${title}. ${description}` : title}
+            />
+            {overlay && (
+              <div
+                data-slot="chart-overlay"
+                className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center"
+              >
+                {overlay}
+              </div>
+            )}
+          </div>
         )}
       </div>
       {legend?.enabled !== false &&

@@ -6,6 +6,16 @@ export interface ChartDataRow {
   value: number
 }
 
+/** One part of a whole (pie/donut slice, meter segment) */
+export interface PartDataRow {
+  group: string
+  value: number
+}
+
+export interface GaugeDataRow {
+  value: number
+}
+
 export interface BaseChartOptions {
   title: string
   description?: string
