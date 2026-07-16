@@ -17,6 +17,7 @@ import { groupedRowColumns } from "@nhic/currantui-charts/lib/table-columns"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type { ChartDataRow } from "@nhic/currantui-charts/lib/types"
 
 echarts.use([BarSeries, GridComponent, TooltipComponent])
@@ -37,7 +38,7 @@ const legendItems = groupsOf(rows).map((group, index) => ({
   color: paletteVar(index),
 }))
 
-const buildOption = () => {
+const buildOption = ({ hiddenGroups }: ChartBuildContext) => {
   const groups = groupsOf(rows)
   const keys = keysOf(rows)
   const values = valuesByGroup(rows, groups, keys)
@@ -49,7 +50,7 @@ const buildOption = () => {
     series: groups.map((group) => ({
       name: group,
       type: "bar" as const,
-      data: values.get(group) ?? [],
+      data: hiddenGroups.has(group) ? [] : (values.get(group) ?? []),
       barMaxWidth: 48,
     })),
   }

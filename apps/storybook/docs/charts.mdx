@@ -1,0 +1,97 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Charts/Overview" />
+
+# Charts
+
+`@nhic/currantui-charts` is the CurrantUI data visualization package: React
+chart components built on Apache ECharts and themed entirely by CurrantUI
+tokens. Every chart ships in the same card shell — title, toolbar, legend, and
+a source/attribution footer — so dashboards read as one system.
+
+## Install
+
+```bash
+pnpm add @nhic/currantui-charts @nhic/currantui
+```
+
+The design tokens (including the 14-step dataviz palette) come from CurrantUI's
+stylesheet, so consumers keep the single CSS import:
+
+```css
+@import "@nhic/currantui/globals.css";
+```
+
+## Usage
+
+```tsx
+import { BarChart } from "@nhic/currantui-charts/components/bar-chart"
+
+const data = [
+  { group: "Malaria", key: "Q1", value: 12400 },
+  { group: "Respiratory infections", key: "Q1", value: 8700 },
+]
+
+<BarChart
+  data={data}
+  options={{
+    title: "Confirmed cases by quarter",
+    source: "HMIS 2025",
+    xAxis: { label: "Quarter" },
+    yAxis: { label: "Cases" },
+  }}
+/>
+```
+
+Charts take tabular `data` rows plus a typed `options` object. The show-table
+view and CSV export derive from the same rows, so what you see is exactly what
+exports.
+
+## Chart types
+
+| Component | Data shape | Use for |
+|---|---|---|
+| `BarChart` | `{ group, key, value }` | Comparing values across categories; grouped or stacked, vertical or horizontal |
+| `LineChart` | `{ group, key, value }` | Change over an ordered domain |
+| `AreaChart` | `{ group, key, value }` | Volume under a trend; optional stacked total |
+| `ComboChart` | `{ group, key, value }` | Mixed bar/line marks; optional secondary value axis |
+| `PieChart` / `DonutChart` | `{ group, value }` | Part-to-whole with few slices; donut carries a headline value |
+| `GaugeChart` | `{ value }` | One value against a bounded range with status zones |
+| `MeterChart` | `{ group, value }` | Compact proportional bar; a pie alternative |
+| `ScatterChart` | `{ group, x, y }` | Relating two measures |
+| `BubbleChart` | `{ group, x, y, size }` | Two measures plus a third as mark area |
+| `HistogramChart` | `Array<number>` | Distribution of a raw sample; bins computed internally |
+| `BoxplotChart` | `{ group, value }` | Distribution summaries per group; quartiles and outliers computed |
+| `HeatmapChart` | `{ x, y, value }` | A measure over two category axes as a sequential ramp |
+| `TreemapChart` | `{ name, value?, children? }` | Hierarchical part-to-whole with drill-down |
+
+## The chart shell
+
+Every chart provides:
+
+- **Show table** — swaps the canvas for an accessible data table of the same
+  rows (computed distributions for histogram/boxplot, flattened paths for
+  treemap).
+- **Fullscreen** — the toolbar icon toggles an expanded dialog view in place.
+- **Export** — CSV of the table rows, or PNG/JPG snapshots of the canvas.
+- **Legend** — HTML, not canvas. Click an item to hide or show its series;
+  hidden series keep their color so identity never shifts. Heatmaps show a
+  continuous ramp legend instead.
+- **Footer** — `Source: {source}` on the left and the attribution (defaults to
+  "Health Intelligence Center") on the right.
+
+## Theming
+
+Series colors come from the `--chart-1` … `--chart-14` tokens, assigned to
+groups in fixed order of first appearance. The palette is tuned separately for
+light and dark surfaces and validated for color-vision-deficiency separation
+and contrast. Charts read the tokens at render time, so a palette adjustment in
+CurrantUI re-themes every chart without a charts release.
+
+## Accessibility
+
+The canvas itself is opaque to assistive technology, so charts expose it as a
+labelled image and keep the HTML around it as the accessible surface: labelled
+toolbar controls, a real list legend with toggle buttons, and the table view as
+the primary non-visual reading of the data. Every story in this workbench runs
+an automated accessibility audit as a test gate.

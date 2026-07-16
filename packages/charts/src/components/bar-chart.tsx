@@ -17,6 +17,7 @@ import { groupedRowColumns } from "@nhic/currantui-charts/lib/table-columns"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type {
   AxisChartOptions,
   ChartDataRow,
@@ -40,7 +41,7 @@ export interface BarChartProps {
 function BarChart({ data, options, className }: BarChartProps) {
   const vertical = options.orientation !== "horizontal"
 
-  const buildOption = React.useCallback((): EChartsCoreOption => {
+  const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const groups = groupsOf(data)
     const keys = keysOf(data)
     const values = valuesByGroup(data, groups, keys)
@@ -65,11 +66,13 @@ function BarChart({ data, options, className }: BarChartProps) {
       },
       xAxis: vertical ? domainAxis : measureAxis,
       yAxis: vertical ? measureAxis : domainAxis,
+      // Hidden groups keep their series slot (empty data) so colors stay
+      // bound to their group instead of shifting onto the survivors
       series: groups.map((group) => ({
         name: group,
         type: "bar" as const,
         stack: stacked ? "total" : undefined,
-        data: values.get(group) ?? [],
+        data: context.hiddenGroups.has(group) ? [] : (values.get(group) ?? []),
         barMaxWidth: 48,
       })),
     }

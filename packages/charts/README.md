@@ -38,6 +38,12 @@ const data = [
 
 Charts take tabular `data` rows (default shape `{ group, key, value }`) plus a typed `options` object per chart. The table view and CSV export derive from the same rows.
 
+## Chart types
+
+Bar (grouped/stacked × vertical/horizontal), Line, Area (+stacked), Combo (mixed bar/line, optional secondary axis), Pie, Donut (HTML center label), Gauge (status threshold zones), Meter (proportional bar), Scatter, Bubble (area-true size scale), Histogram (internal binning), Boxplot (computed quartiles and outliers), Heatmap (sequential ramp), and Treemap (drill-down hierarchy).
+
+Import each from its own subpath, e.g. `@nhic/currantui-charts/components/line-chart`. Legends are HTML and clickable — hiding a series keeps its color bound to its group.
+
 ## Accessibility
 
 The chart canvas is exposed as a labelled image; the interactive, screen-reader-friendly surface is the HTML shell around it — labelled toolbar controls, a real list legend, and the built-in table view of the underlying data.
