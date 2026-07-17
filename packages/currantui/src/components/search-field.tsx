@@ -27,7 +27,7 @@ export function SearchField({
         className,
       )}
     >
-      <MagnifyingGlassIcon size={12} className="shrink-0 text-muted-foreground" />
+      <MagnifyingGlassIcon size={14} className="shrink-0 text-muted-foreground" />
       <input
         type="search"
         aria-label={ariaLabel}
@@ -35,7 +35,7 @@ export function SearchField({
         value={value}
         onChange={(e) => onValueChange(e.target.value)}
         className={cn(
-          "w-44 bg-transparent text-[11px] text-foreground placeholder:text-muted-foreground/60 focus:outline-none",
+          "w-44 bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none",
           inputClassName,
         )}
       />

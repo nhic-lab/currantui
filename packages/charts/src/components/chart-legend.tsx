@@ -47,7 +47,7 @@ function ChartLegend({
                 aria-pressed={!hidden}
                 onClick={() => onToggleItem(item.label)}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-sm text-xs/relaxed text-muted-foreground outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30",
+                  "flex items-center gap-1.5 rounded-sm text-sm/relaxed text-muted-foreground outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30",
                   hidden && "text-muted-foreground/60 line-through"
                 )}
               >
@@ -55,7 +55,7 @@ function ChartLegend({
                 {item.label}
               </button>
             ) : (
-              <span className="flex items-center gap-1.5 text-xs/relaxed text-muted-foreground">
+              <span className="flex items-center gap-1.5 text-sm/relaxed text-muted-foreground">
                 {swatch}
                 {item.label}
               </span>

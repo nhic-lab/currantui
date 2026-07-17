@@ -26,7 +26,7 @@ export function TableFooterCount({
   return (
     <div
       className={cn(
-        "border-t border-border/50 px-4 py-1.5 text-[10px] text-muted-foreground",
+        "border-t border-border/50 px-4 py-1.5 text-xs text-muted-foreground",
         className,
       )}
     >

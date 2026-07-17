@@ -1,23 +1,19 @@
 import { userEvent, waitFor, within } from "storybook/test"
 
 import { Button } from "@nhic/currantui/components/button"
-import { Toaster, toast } from "@nhic/currantui/components/sonner"
+import { Toaster, toast } from "@nhic/currantui/components/toast"
 
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 const meta = {
-  title: "Components/Sonner",
+  title: "Components/Toast",
   component: Toaster,
   parameters: {
     docs: {
       description: {
         component:
-          "Toast queue on sonner. `toast.info/success/warning/error(title, { description, action })` renders the status toast anatomy — solid status fill, filled icon, outlined action button, divider, close button — on the status tokens with `--background` as the ink (the AA-checked inverted pairing in both palettes). Neutral `toast()` keeps the glass treatment.",
+          "Transient notifications on a react-aria toast queue: solid status fills for info/success/warning/error, a neutral glass toast, and a pinned loading fill that resolves in place. Timers pause on hover or focus, at most three toasts show at once, and actionable toasts never auto-dismiss.",
       },
-      // Roomy docs canvases; keep stories inline — iframe rendering
-      // (inline: false) feedback-loops with the theme-synced docs container
-      // (iframe boot emits globals → docs re-render remounts iframes → boot…)
-      story: { height: "360px" },
     },
   },
 } satisfies Meta<typeof Toaster>
@@ -53,16 +49,14 @@ export const Default: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: "Success" }))
     // Toasts render in a portal outside the canvas root
-    await waitFor(() =>
-      within(document.body).getByText("Report submitted")
-    )
+    await waitFor(() => within(document.body).getByText("Report submitted"))
   },
 }
 
 export const WithDescriptionAndAction: Story = {
   render: () => (
     <div className="flex flex-wrap gap-2">
-      <Toaster closeButton />
+      <Toaster />
       <Button
         variant="outline"
         onClick={() =>
@@ -104,6 +98,39 @@ export const WithDescriptionAndAction: Story = {
   },
 }
 
+export const LargeDescription: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-2">
+      <Toaster />
+      <Button
+        variant="outline"
+        onClick={() =>
+          toast.info("Quarterly data submission opens Monday", {
+            size: "lg",
+            description:
+              "All district facilities must submit Q3 service statistics between 21 and 25 July. Records failing range or completeness checks are returned to the facility focal person for correction, and resubmissions close on 28 July at 17:00.",
+            action: {
+              label: "View schedule",
+              onClick: () => {},
+            },
+          })
+        }
+      >
+        Large description
+      </Button>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Large description" })
+    )
+    await waitFor(() =>
+      within(document.body).getByRole("button", { name: "View schedule" })
+    )
+  },
+}
+
 export const Neutral: Story = {
   render: () => (
     <div className="flex flex-wrap gap-2">
@@ -131,4 +158,9 @@ export const Neutral: Story = {
       </Button>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole("button", { name: "Neutral" }))
+    await waitFor(() => within(document.body).getByText("Export queued"))
+  },
 }

@@ -6,7 +6,7 @@ import { useShell } from "@nhic/currantui/components/shell"
 import { cn } from "@nhic/currantui/lib/utils"
 
 const sideNavRowClasses =
-  "flex h-7 w-full items-center gap-2 rounded-md px-2 text-start text-xs/relaxed text-sidebar-foreground/70 transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/30 data-active:bg-sidebar-accent data-active:font-medium data-active:text-sidebar-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+  "flex h-7 w-full items-center gap-2 rounded-md px-2 text-start text-sm/relaxed text-sidebar-foreground/70 transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/30 data-active:bg-sidebar-accent data-active:font-medium data-active:text-sidebar-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
 
 function ShellSideNav({
   variant = "expandable",
@@ -173,7 +173,7 @@ function ShellSideNavMenu({
             </span>
           )}
           <span className="flex-1 truncate">{label}</span>
-          <CaretDownIcon className="size-3.5! text-sidebar-foreground/50 group-data-open/side-nav-menu:rotate-180" />
+          <CaretDownIcon className="size-4! text-sidebar-foreground/50 group-data-open/side-nav-menu:rotate-180" />
         </Collapsible.Trigger>
         <Collapsible.Content data-slot="shell-side-nav-menu-content" asChild>
           <ul className="flex flex-col gap-0.5">{children}</ul>

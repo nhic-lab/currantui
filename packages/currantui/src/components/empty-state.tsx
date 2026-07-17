@@ -43,14 +43,14 @@ function EmptyState({
       )}
       <div
         data-slot="empty-state-title"
-        className="font-heading text-sm font-semibold text-foreground"
+        className="font-heading text-base font-semibold text-foreground"
       >
         {title}
       </div>
       {description && (
         <div
           data-slot="empty-state-description"
-          className="max-w-72 text-xs/relaxed text-muted-foreground"
+          className="max-w-72 text-base/relaxed text-muted-foreground"
         >
           {description}
         </div>

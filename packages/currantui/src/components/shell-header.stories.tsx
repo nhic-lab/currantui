@@ -1,4 +1,4 @@
-import { BellIcon, MagnifyingGlassIcon } from "@phosphor-icons/react"
+import { BellIcon, Gear, MagnifyingGlassIcon, SignOut } from "@phosphor-icons/react"
 import { userEvent, within } from "storybook/test"
 
 import { HicLogo } from "@nhic/currantui/components/hic-logo"
@@ -13,7 +13,14 @@ import {
   ShellHeaderNavMenu,
   ShellHeaderNavMenuItem,
 } from "@nhic/currantui/components/shell-header"
-import { AvatarButton } from "@nhic/currantui/components/avatar-button"
+import {
+  AvatarButton,
+  AvatarButtonItem,
+  AvatarButtonLabel,
+  AvatarButtonMenu,
+  AvatarButtonSeparator,
+  AvatarButtonTrigger,
+} from "@nhic/currantui/components/avatar-button"
 import { ThemeToggle } from "@nhic/currantui/components/theme-toggle"
 
 import type { Meta, StoryObj } from "@storybook/react-vite"
@@ -48,11 +55,18 @@ export const Default: Story = {
             <BellIcon />
           </ShellGlobalAction>
           <ThemeToggle />
-          <AvatarButton
-            name="Bellamy Dan"
-            email="analyst@example.test"
-            onSignOut={() => {}}
-          />
+          <AvatarButton>
+            <AvatarButtonTrigger name="Bellamy Dan" />
+            <AvatarButtonMenu>
+              <AvatarButtonLabel name="Bellamy Dan" email="analyst@example.test" />
+              <AvatarButtonSeparator />
+              <AvatarButtonItem icon={Gear}>Settings</AvatarButtonItem>
+              <AvatarButtonSeparator />
+              <AvatarButtonItem icon={SignOut} destructive onSelect={() => {}}>
+                Sign out
+              </AvatarButtonItem>
+            </AvatarButtonMenu>
+          </AvatarButton>
         </ShellGlobalBar>
       </ShellHeader>
     </ShellProvider>

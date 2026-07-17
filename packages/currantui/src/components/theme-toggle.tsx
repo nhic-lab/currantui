@@ -45,9 +45,9 @@ export function ThemeToggle({ className }: { className?: string }) {
             )}
           >
             {theme === "light" ? (
-              <Moon size={16} aria-hidden />
+              <Moon size={18} aria-hidden />
             ) : (
-              <Sun size={16} aria-hidden />
+              <Sun size={18} aria-hidden />
             )}
           </button>
         </Tooltip.Trigger>
@@ -55,7 +55,7 @@ export function ThemeToggle({ className }: { className?: string }) {
           <Tooltip.Content
             side="bottom"
             sideOffset={8}
-            className="z-50 rounded-md bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95"
+            className="z-50 rounded-md bg-popover px-2 py-1 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95"
           >
             {theme === "light" ? "Dark mode" : "Light mode"}
             <Tooltip.Arrow className="fill-popover" />

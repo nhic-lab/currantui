@@ -57,7 +57,7 @@ function ListView<T extends object>({
     <AriaGridList
       data-slot="list-view"
       className={cn(
-        "flex w-full flex-col gap-0.5 rounded-lg border border-border p-1 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[empty]:justify-center data-[empty]:py-6 data-[empty]:text-center data-[empty]:text-xs/relaxed data-[empty]:text-muted-foreground",
+        "flex w-full flex-col gap-0.5 rounded-lg border border-border p-1 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[empty]:justify-center data-[empty]:py-6 data-[empty]:text-center data-[empty]:text-sm/relaxed data-[empty]:text-muted-foreground",
         className
       )}
       {...props}
@@ -79,7 +79,7 @@ function ListViewItem({
       data-slot="list-view-item"
       textValue={textValue ?? (typeof children === "string" ? children : undefined)}
       className={cn(
-        "group/list-view-item flex h-8 items-center gap-2 rounded-md px-2 text-xs/relaxed transition-colors outline-none data-[hovered]:bg-accent data-[hovered]:text-accent-foreground data-[selected]:bg-accent data-[selected]:text-accent-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "group/list-view-item flex h-8 items-center gap-2 rounded-md px-2 text-sm/relaxed transition-colors outline-none data-[hovered]:bg-accent data-[hovered]:text-accent-foreground data-[selected]:bg-accent data-[selected]:text-accent-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

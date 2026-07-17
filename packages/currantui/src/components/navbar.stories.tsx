@@ -1,4 +1,13 @@
-import { AvatarButton } from "@nhic/currantui/components/avatar-button"
+import { Gear, SignOut } from "@phosphor-icons/react"
+
+import {
+  AvatarButton,
+  AvatarButtonItem,
+  AvatarButtonLabel,
+  AvatarButtonMenu,
+  AvatarButtonSeparator,
+  AvatarButtonTrigger,
+} from "@nhic/currantui/components/avatar-button"
 import { HicLogo } from "@nhic/currantui/components/hic-logo"
 import { Navbar } from "@nhic/currantui/components/navbar"
 import { NotificationsButton } from "@nhic/currantui/components/notifications-button"
@@ -26,7 +35,18 @@ export const Default: Story = {
       <>
         <NotificationsButton />
         <ThemeToggle />
-        <AvatarButton name="A. Uwase" email="analyst@example.org" />
+        <AvatarButton>
+          <AvatarButtonTrigger name="A. Uwase" />
+          <AvatarButtonMenu>
+            <AvatarButtonLabel name="A. Uwase" email="analyst@example.org" />
+            <AvatarButtonSeparator />
+            <AvatarButtonItem icon={Gear}>Settings</AvatarButtonItem>
+            <AvatarButtonSeparator />
+            <AvatarButtonItem icon={SignOut} destructive>
+              Sign out
+            </AvatarButtonItem>
+          </AvatarButtonMenu>
+        </AvatarButton>
       </>
     ),
   },

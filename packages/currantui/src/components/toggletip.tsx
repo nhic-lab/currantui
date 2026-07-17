@@ -59,7 +59,7 @@ function ToggletipTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="toggletip-title"
-      className={cn("font-heading text-xs font-semibold", className)}
+      className={cn("font-heading text-base font-semibold", className)}
       {...props}
     />
   )

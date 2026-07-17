@@ -19,13 +19,13 @@ import type {
 } from "react-aria-components"
 
 const calendarCellBaseClasses =
-  "flex size-7 items-center justify-center rounded-md text-xs/relaxed tabular-nums outline-none data-[hovered]:bg-accent data-[hovered]:text-accent-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[unavailable]:line-through data-[unavailable]:opacity-50 data-[outside-month]:hidden"
+  "flex size-7 items-center justify-center rounded-md text-sm/relaxed tabular-nums outline-none data-[hovered]:bg-accent data-[hovered]:text-accent-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[unavailable]:line-through data-[unavailable]:opacity-50 data-[outside-month]:hidden"
 
 const calendarNavButtonClasses =
-  "flex size-7 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors data-[hovered]:bg-muted data-[hovered]:text-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-30 [&_svg]:size-3.5 [&_svg]:shrink-0"
+  "flex size-7 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors data-[hovered]:bg-muted data-[hovered]:text-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-30 [&_svg]:size-4 [&_svg]:shrink-0"
 
 const calendarHeaderCellClasses =
-  "size-7 text-[0.625rem] font-medium text-muted-foreground"
+  "size-7 text-xs font-medium text-muted-foreground"
 
 function CalendarHeader() {
   return (
@@ -38,7 +38,7 @@ function CalendarHeader() {
       </AriaButton>
       <Heading
         data-slot="calendar-heading"
-        className="text-xs/relaxed font-medium"
+        className="text-sm/relaxed font-medium"
       />
       <AriaButton slot="next" className={calendarNavButtonClasses}>
         <CaretRightIcon className="rtl:rotate-180" />

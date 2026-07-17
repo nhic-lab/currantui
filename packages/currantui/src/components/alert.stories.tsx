@@ -22,7 +22,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Inline status messaging that stays on the page — callouts, inline notifications, form-level errors. For transient toasts use the sonner Toaster instead.",
+          "Inline status messaging that stays on the page — callouts, inline notifications, form-level errors. For transient toasts use the Toaster instead.",
       },
     },
   },

@@ -30,7 +30,7 @@ const pickerPopoverClasses =
   "relative z-50 rounded-lg bg-popover/70 p-3 text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-hidden before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:backdrop-blur-2xl before:backdrop-saturate-150 data-[entering]:animate-in data-[entering]:fade-in-0 data-[entering]:zoom-in-95 data-[exiting]:animate-out data-[exiting]:fade-out-0 data-[exiting]:zoom-out-95 data-[placement=bottom]:slide-in-from-top-2 data-[placement=top]:slide-in-from-bottom-2"
 
 const pickerButtonClasses =
-  "flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors data-[hovered]:bg-muted data-[hovered]:text-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none [&_svg]:size-3.5 [&_svg]:shrink-0"
+  "flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors data-[hovered]:bg-muted data-[hovered]:text-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
 
 function DatePicker<T extends DateValue>({
   label,

@@ -27,7 +27,7 @@ function TreeView<T extends object>({
     <AriaTree
       data-slot="tree-view"
       className={cn(
-        "flex w-full flex-col gap-0.5 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[empty]:py-6 data-[empty]:text-center data-[empty]:text-xs/relaxed data-[empty]:text-muted-foreground",
+        "flex w-full flex-col gap-0.5 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[empty]:py-6 data-[empty]:text-center data-[empty]:text-sm/relaxed data-[empty]:text-muted-foreground",
         className
       )}
       {...props}
@@ -56,7 +56,7 @@ function TreeViewItem({
       data-slot="tree-view-item"
       textValue={textValue ?? (typeof title === "string" ? title : "item")}
       className={cn(
-        "group/tree-view-item rounded-md text-xs/relaxed transition-colors outline-none data-[hovered]:bg-accent data-[hovered]:text-accent-foreground data-[selected]:bg-accent data-[selected]:text-accent-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "group/tree-view-item rounded-md text-sm/relaxed transition-colors outline-none data-[hovered]:bg-accent data-[hovered]:text-accent-foreground data-[selected]:bg-accent data-[selected]:text-accent-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       )}
       {...props}
@@ -76,7 +76,7 @@ function TreeViewItem({
               >
                 <CaretRightIcon
                   aria-hidden="true"
-                  className="size-3.5 transition-transform rtl:-scale-x-100 group-data-[expanded]/tree-view-item:rotate-90"
+                  className="size-4 transition-transform rtl:-scale-x-100 group-data-[expanded]/tree-view-item:rotate-90"
                 />
               </AriaButton>
             ) : (

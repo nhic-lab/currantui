@@ -59,11 +59,11 @@ function FileUploaderRow({
       />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex items-baseline gap-2">
-          <span className="truncate text-xs/relaxed font-medium">
+          <span className="truncate text-sm/relaxed font-medium">
             {item.name}
           </span>
           {item.size != null && (
-            <span className="shrink-0 text-[0.625rem] text-muted-foreground tabular-nums">
+            <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
               {formatBytes(item.size)}
             </span>
           )}
@@ -76,7 +76,7 @@ function FileUploaderRow({
           />
         )}
         {item.status === "error" && item.errorMessage != null && (
-          <span className="text-[0.625rem] text-destructive">
+          <span className="text-xs text-destructive">
             {item.errorMessage}
           </span>
         )}
@@ -183,7 +183,7 @@ function FileUploader({
           {triggerLabel}
         </FileTrigger>
         {hint != null && (
-          <span className="text-[0.625rem] text-muted-foreground">{hint}</span>
+          <span className="text-xs text-muted-foreground">{hint}</span>
         )}
       </DropZone>
       {items.length > 0 && (

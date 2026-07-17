@@ -80,7 +80,7 @@ function Tag({
       data-slot="tag"
       textValue={textValue}
       className={cn(
-        "inline-flex h-5 cursor-default items-center gap-1 rounded-full border border-transparent bg-secondary px-2 text-[0.625rem] font-medium text-secondary-foreground transition-colors outline-none data-[hovered]:bg-secondary/80 data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "inline-flex h-5 cursor-default items-center gap-1 rounded-full border border-transparent bg-secondary px-2 text-xs font-medium text-secondary-foreground transition-colors outline-none data-[hovered]:bg-secondary/80 data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       )}
       {...props}

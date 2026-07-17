@@ -16,7 +16,7 @@ export function SidebarItem({ label, children }: SidebarItemProps) {
           <Tooltip.Content
             side="right"
             sideOffset={8}
-            className="z-50 rounded-md bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95"
+            className="z-50 rounded-md bg-popover px-2 py-1 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95"
           >
             {label}
             <Tooltip.Arrow className="fill-popover" />

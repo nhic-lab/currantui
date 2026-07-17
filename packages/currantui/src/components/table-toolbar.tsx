@@ -36,7 +36,7 @@ export function TableToolbarLabel({
   return (
     <span
       className={cn(
-        "text-[10px] font-medium tracking-wider text-muted-foreground uppercase",
+        "text-xs font-medium tracking-wider text-muted-foreground uppercase",
         className,
       )}
     >

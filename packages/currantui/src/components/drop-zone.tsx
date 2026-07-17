@@ -25,7 +25,7 @@ function DropZone({
     <AriaDropZone
       data-slot="drop-zone"
       className={cn(
-        "flex min-h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-input/10 p-4 text-center text-xs/relaxed text-muted-foreground transition-colors outline-none data-[drop-target]:border-primary data-[drop-target]:bg-primary/5 data-[drop-target]:text-foreground data-[focus-visible]:border-ring data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:border-border/50 data-[disabled]:bg-transparent data-[disabled]:[&_button]:opacity-50",
+        "flex min-h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-input/10 p-4 text-center text-sm/relaxed text-muted-foreground transition-colors outline-none data-[drop-target]:border-primary data-[drop-target]:bg-primary/5 data-[drop-target]:text-foreground data-[focus-visible]:border-ring data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:border-border/50 data-[disabled]:bg-transparent data-[disabled]:[&_button]:opacity-50",
         className
       )}
       {...props}
