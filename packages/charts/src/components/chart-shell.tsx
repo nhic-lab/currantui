@@ -195,14 +195,14 @@ function ChartFrame<TRow>({
       role="group"
       aria-label={title}
       className={cn(
-        "flex flex-col gap-3 rounded-lg bg-card p-4 text-xs/relaxed text-card-foreground ring-1 ring-foreground/10",
+        "flex flex-col gap-3 rounded-lg bg-card p-4 text-sm/relaxed text-card-foreground ring-1 ring-foreground/10",
         fill && "h-full min-h-0 rounded-none p-0 ring-0",
         className
       )}
     >
       <div data-slot="chart-header" className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <div data-slot="chart-title" className="font-heading text-sm font-semibold">
+          <div data-slot="chart-title" className="font-heading text-base font-semibold">
             {title}
           </div>
           {description && (
@@ -329,7 +329,7 @@ function ChartFrame<TRow>({
           )))}
       <div
         data-slot="chart-footer"
-        className="flex items-center justify-between gap-2 text-[0.625rem] text-muted-foreground tabular-nums"
+        className="flex items-center justify-between gap-2 text-xs text-muted-foreground tabular-nums"
       >
         <span data-slot="chart-source">{source ? `Source: ${source}` : null}</span>
         <span data-slot="chart-attribution">{attribution}</span>

@@ -17,8 +17,8 @@ The rules every component in this package follows, extracted from the shipped co
 
 ## Typography
 
-- `--font-sans` = Source Sans 3 Variable: all body/UI text. `--font-heading` = Geist Variable (`font-heading`): headings and titles only.
-- Scale: default control/UI text is `text-xs/relaxed`; floor is `text-[0.625rem]` (badges, xs buttons); page titles are `text-base font-semibold tracking-tight` in `font-heading`. Nothing in chrome exceeds `text-base`.
+- Single family: `--font-sans` and `--font-heading` both resolve to Source Sans 3 Variable. `font-heading` stays the semantic hook for headings and titles.
+- Scale (productive dashboard ramp): default control/UI text is `text-sm/relaxed` (14px); floor is `text-xs` for meta/helper text; `text-2xs` exists only for size-constrained avatar internals (fallback initials, badges) and is never used generally. Arbitrary bracket font sizes are banned in component source (stories exempt), grep-checked, with the `hic-logo.tsx` brand lockup as the sole exception. Card/section titles are `text-base font-semibold tracking-tight` in `font-heading`; page titles are `text-xl font-semibold tracking-tight` in `font-heading`. Nothing in chrome exceeds `text-xl`. A few table surfaces intentionally sit off this scale: the table-toolbar search input and table-selection-bar Clear button are `text-xs`, and the table-empty-state body is `text-sm`, by design.
 - Numeric/meta text (counts, timestamps, IDs) gets `tabular-nums`.
 
 ## Density and sizing
@@ -36,7 +36,7 @@ Horizontal padding `px-2` at default size, `gap-1` between icon and label. A sha
 
 ## Radius
 
-`--radius` is 0.625rem; the derived steps (`rounded-sm` ≈ 0.6×, `rounded-md` ≈ 0.8×, up to `4xl` ≈ 2.6×) come from `@theme inline`. Defaults: `rounded-md` for controls, `rounded-sm` for xs sizes, `rounded-lg` for grouped containers (tabs list), `rounded-full` for badges/pills. Never a literal `rounded-[Npx]`.
+`--radius` is 0.25rem (crisp, dashboard-style 4px on `rounded-lg` containers); the derived steps (`rounded-sm` ≈ 0.6×, `rounded-md` ≈ 0.8×, up to `4xl` ≈ 2.6×) come from `@theme inline`. Defaults: `rounded-md` for controls, `rounded-sm` for xs sizes, `rounded-lg` for grouped containers (tabs list), `rounded-full` for badges/pills. Never a literal `rounded-[Npx]`.
 
 ## Icons
 

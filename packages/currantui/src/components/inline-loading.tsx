@@ -24,7 +24,7 @@ function InlineLoading({
       data-slot="inline-loading"
       data-status={status}
       className={cn(
-        "inline-flex items-center gap-2 text-xs/relaxed text-foreground",
+        "inline-flex items-center gap-2 text-sm/relaxed text-foreground",
         className
       )}
       {...props}

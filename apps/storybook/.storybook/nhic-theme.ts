@@ -10,7 +10,7 @@ const shared = {
   brandTarget: "_blank" as const,
   fontBase: "'Source Sans 3 Variable', 'Source Sans 3', sans-serif",
   fontCode: "ui-monospace, 'SF Mono', Menlo, monospace",
-  appBorderRadius: 10,
+  appBorderRadius: 4,
 }
 
 export const nhicDark = create({

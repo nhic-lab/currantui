@@ -52,7 +52,7 @@ function SegmentedControlItem({
     <ToggleGroupPrimitive.Item
       data-slot="segmented-control-item"
       className={cn(
-        "inline-flex h-full flex-1 items-center justify-center gap-1 rounded-md border border-transparent px-2 text-xs/relaxed font-medium whitespace-nowrap text-foreground/70 transition-all outline-none hover:text-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
+        "inline-flex h-full flex-1 items-center justify-center gap-1 rounded-md border border-transparent px-2 text-sm/relaxed font-medium whitespace-nowrap text-foreground/70 transition-all outline-none hover:text-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

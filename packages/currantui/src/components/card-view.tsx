@@ -27,7 +27,7 @@ function CardView<T extends object>({
       layout="grid"
       data-slot="card-view"
       className={cn(
-        "grid w-full grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] gap-2 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[empty]:block data-[empty]:py-6 data-[empty]:text-center data-[empty]:text-xs/relaxed data-[empty]:text-muted-foreground",
+        "grid w-full grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] gap-2 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[empty]:block data-[empty]:py-6 data-[empty]:text-center data-[empty]:text-sm/relaxed data-[empty]:text-muted-foreground",
         className
       )}
       {...props}
@@ -49,7 +49,7 @@ function CardViewItem({
       data-slot="card-view-item"
       textValue={textValue}
       className={cn(
-        "group/card-view-item relative flex flex-col overflow-hidden rounded-lg bg-card text-xs/relaxed text-card-foreground ring-1 ring-foreground/10 transition-shadow outline-none data-[hovered]:ring-foreground/25 data-[selected]:ring-2 data-[selected]:ring-primary data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "group/card-view-item relative flex flex-col overflow-hidden rounded-lg bg-card text-sm/relaxed text-card-foreground ring-1 ring-foreground/10 transition-shadow outline-none data-[hovered]:ring-foreground/25 data-[selected]:ring-2 data-[selected]:ring-primary data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       )}
       {...props}

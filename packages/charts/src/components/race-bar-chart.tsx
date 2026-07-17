@@ -174,7 +174,7 @@ function RaceBarChart({ data, options, className }: RaceBarChartProps) {
       legendContent={
         <div
           data-slot="chart-race-controls"
-          className="flex items-center gap-2 text-xs/relaxed text-muted-foreground tabular-nums"
+          className="flex items-center gap-2 text-sm/relaxed text-muted-foreground tabular-nums"
         >
           <Button
             variant="ghost"

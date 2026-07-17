@@ -40,15 +40,15 @@ export function TableSelectionBar({
         className,
       )}
     >
-      <span className="text-[11px] font-medium text-primary">{count} selected</span>
+      <span className="text-xs font-medium text-primary">{count} selected</span>
       {children != null && <div className="ml-1 h-3 w-px bg-border/60" />}
       {children}
       <button
         type="button"
         onClick={onClear}
-        className="ml-auto flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] text-foreground/70 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none"
+        className="ml-auto flex items-center gap-1 rounded px-1.5 py-0.5 text-xs text-foreground/70 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none"
       >
-        <XIcon size={11} />
+        <XIcon size={14} />
         {clearLabel}
       </button>
     </div>

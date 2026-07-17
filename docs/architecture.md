@@ -9,8 +9,8 @@
 | Styling | Tailwind CSS v4 (peer) + CSS variable tokens | Consumers compose the tokens into their own Tailwind build; re-branding is a variable override |
 | Variants | class-variance-authority + clsx + tailwind-merge | Standard shadcn variant stack |
 | Icons | @phosphor-icons/react | Icon set already used across NHIC projects |
-| Fonts | Source Sans 3 Variable (body), Geist Variable (headings) via Fontsource | Self-hosted, no external font CDN |
-| Toasts | sonner | Ships as the `sonner.tsx` wrapper component |
+| Fonts | Source Sans 3 Variable via Fontsource — single family for body and headings | Self-hosted, no external font CDN |
+| Toasts | react-aria-components toast queue | Ships as the `toast.tsx` component |
 | Build | tsup (esbuild) → ESM + `.d.ts` | Per-file entries with code splitting keep tree-shaking; fast |
 | Versioning | Changesets | Semver + changelog + automated release PRs |
 | Registry | npmjs.com, `nhic` org, public | GitHub Packages requires the scope to equal the GitHub org (`@nhic-lab`); the `@nhic` scope forces npmjs |

@@ -10,7 +10,7 @@ interface ErrorPageProps {
 
 export function ErrorPage({ code, headline = "That's an error.", detail, logo }: ErrorPageProps) {
   return (
-    <main className="min-h-screen bg-background text-sm">
+    <main className="min-h-screen bg-background text-base">
       <div className="mx-auto flex max-w-[820px] items-center justify-center gap-16 px-8 pt-[210px]">
         {/* Left Content */}
         <div className="max-w-[340px] space-y-5">

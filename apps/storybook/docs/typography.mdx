@@ -4,11 +4,14 @@ import { Meta } from "@storybook/addon-docs/blocks"
 
 # Typography
 
-CurrantUI self-hosts two variable fonts via Fontsource — no CDN requests.
+CurrantUI self-hosts a single variable family — Source Sans 3 — via
+Fontsource, no CDN requests. Both `--font-sans` and `--font-heading` resolve
+to it; `font-heading` remains the semantic hook for titles, and the full
+variable weight range keeps `font-medium` and `font-semibold` distinct.
 
 <div className="flex flex-col gap-4 rounded-lg border border-border p-4">
   <div>
-    <p className="font-heading text-lg font-semibold">Geist — headings</p>
+    <p className="font-heading text-lg font-semibold">Source Sans 3 — headings</p>
     <p className="text-xs text-muted-foreground">
       <code>--font-heading</code>, used via <code>font-heading</code>, headings only
     </p>
@@ -23,14 +26,29 @@ CurrantUI self-hosts two variable fonts via Fontsource — no CDN requests.
 
 ## Scale
 
-The interface is compact by design — radiology chrome stays out of the way.
+The scale is a productive dashboard ramp: default UI text sits at 14px, with
+a 12px floor for meta and helper text — compact, not cramped.
 
 | Role | Class | Notes |
 |---|---|---|
-| Default UI text | `text-xs/relaxed` | Buttons, inputs, table cells |
-| Floor | `text-[0.625rem]` | Badges, stamps — never smaller |
-| Page titles | `text-base` | Nothing in chrome exceeds this |
+| Default UI text | `text-sm/relaxed` | Buttons, inputs, table cells |
+| Meta / helper floor | `text-xs` | Helper text, captions, table headers — never smaller in prose |
+| Avatar internals | `text-2xs` | Size-constrained fallback initials/badges only, never general-purpose |
+| Card / section titles | `text-base` | `font-heading`, sits under page titles |
+| Page titles | `text-xl` | Nothing in chrome exceeds this |
 | Numeric / meta | `tabular-nums` | IDs, counts, timestamps |
+
+Arbitrary bracket font sizes (`text-[0.6875rem]` and the like) are banned in
+component source — every size comes from the named scale above, checked by
+grep over `src/components` (stories are exempt; they may size demo fixtures
+freely). The one exception is the brand lockup in `hic-logo.tsx`, which sizes
+off the logo's own proportions, not prose.
+
+A few table surfaces are called out here since they read as inconsistent at
+a glance but are deliberate: the table toolbar's search input and the table
+selection bar's Clear button sit at `text-xs` (a density exception below the
+default), while the table empty-state body stays at the plain default
+`text-sm`. Don't "fix" any of these to match one another.
 
 ## Density
 
@@ -45,7 +63,7 @@ There is no List component — prose lists are a class recipe on native
 elements:
 
 ```tsx
-<ul className="list-disc ps-4 text-xs/relaxed marker:text-muted-foreground [&_li]:mt-1">
+<ul className="list-disc ps-4 text-sm/relaxed marker:text-muted-foreground [&_li]:mt-1">
   <li>Weekly surveillance</li>
   <li>
     Monthly service report
@@ -56,7 +74,7 @@ elements:
 </ul>
 ```
 
-<ul className="list-disc ps-4 text-xs/relaxed marker:text-muted-foreground [&_li]:mt-1">
+<ul className="list-disc ps-4 text-sm/relaxed marker:text-muted-foreground [&_li]:mt-1">
   <li>Weekly surveillance</li>
   <li>
     Monthly service report
@@ -72,7 +90,7 @@ Ordered lists swap `list-disc` for `list-decimal` (numbers stay
 
 ## Radius
 
-`--radius` is `0.625rem` with derived steps mapped through `@theme inline`.
+`--radius` is `0.25rem` with derived steps mapped through `@theme inline`.
 Use named utilities — `rounded-md` for controls, `rounded-sm` for xs,
 `rounded-lg` for containers, `rounded-full` for pills — never literal pixel
 values.
