@@ -27,13 +27,13 @@ function LabeledValue({
     >
       <span
         data-slot="labeled-value-label"
-        className="text-[0.625rem] font-medium tracking-wide text-muted-foreground uppercase"
+        className="text-xs font-medium tracking-wide text-muted-foreground uppercase"
       >
         {label}
       </span>
       <span
         data-slot="labeled-value-value"
-        className="text-xs/relaxed text-foreground tabular-nums"
+        className="text-sm/relaxed text-foreground tabular-nums"
       >
         {children}
       </span>

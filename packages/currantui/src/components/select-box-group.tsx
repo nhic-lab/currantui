@@ -97,7 +97,7 @@ function SelectBoxGroup({
 }
 
 const selectBoxItemClasses =
-  "group/select-box relative flex flex-col items-start gap-0.5 rounded-lg border p-3 pe-9 text-start text-xs/relaxed transition-colors outline-none hover:bg-muted/50 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:pointer-events-none disabled:opacity-50 data-checked:border-primary data-checked:bg-primary/5 data-checked:hover:bg-primary/5 [&_svg]:pointer-events-none [&_svg]:shrink-0"
+  "group/select-box relative flex flex-col items-start gap-0.5 rounded-lg border p-3 pe-9 text-start text-sm/relaxed transition-colors outline-none hover:bg-muted/50 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:pointer-events-none disabled:opacity-50 data-checked:border-primary data-checked:bg-primary/5 data-checked:hover:bg-primary/5 [&_svg]:pointer-events-none [&_svg]:shrink-0"
 
 function SelectBoxGroupItem({
   value,
@@ -154,7 +154,7 @@ function SelectBoxGroupItemTitle({
     <span
       data-slot="select-box-group-item-title"
       className={cn(
-        "flex items-center gap-1.5 font-medium text-foreground [&_svg:not([class*='size-'])]:size-3.5",
+        "flex items-center gap-1.5 font-medium text-foreground [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -171,7 +171,7 @@ function SelectBoxGroupItemDescription({
       data-slot="select-box-group-item-description"
       className={cn(
         /* muted-foreground misses AA on the checked primary tint in light mode */
-        "block text-muted-foreground group-data-checked/select-box:text-foreground/70",
+        "block text-xs/relaxed text-muted-foreground group-data-checked/select-box:text-foreground/70",
         className
       )}
       {...props}

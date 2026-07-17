@@ -47,7 +47,7 @@ function AvatarFallback({
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
       className={cn(
-        "flex size-full items-center justify-center rounded-full bg-secondary text-[0.625rem] font-medium text-secondary-foreground group-data-[size=lg]/avatar:text-xs",
+        "flex size-full items-center justify-center rounded-full bg-secondary text-2xs font-medium text-secondary-foreground group-data-[size=lg]/avatar:text-xs",
         className
       )}
       {...props}
@@ -93,7 +93,7 @@ function AvatarGroupCount({
     <div
       data-slot="avatar-group-count"
       className={cn(
-        "relative flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary text-[0.625rem] font-medium text-secondary-foreground tabular-nums ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-8 group-has-data-[size=sm]/avatar-group:size-6 group-has-data-[size=xs]/avatar-group:size-5 [&>svg]:size-3.5 group-has-data-[size=lg]/avatar-group:[&>svg]:size-4 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3 group-has-data-[size=xs]/avatar-group:[&>svg]:size-2.5",
+        "relative flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary text-2xs font-medium text-secondary-foreground tabular-nums ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-8 group-has-data-[size=sm]/avatar-group:size-6 group-has-data-[size=xs]/avatar-group:size-5 [&>svg]:size-3.5 group-has-data-[size=lg]/avatar-group:[&>svg]:size-4 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3 group-has-data-[size=xs]/avatar-group:[&>svg]:size-2.5",
         className
       )}
       {...props}

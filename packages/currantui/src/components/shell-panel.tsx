@@ -80,7 +80,7 @@ function ShellSwitcherItem({
         data-active={isActive || undefined}
         aria-current={isActive ? "page" : undefined}
         className={cn(
-          "flex h-7 w-full items-center gap-2 rounded-md px-2 text-xs/relaxed text-sidebar-foreground/70 transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/30 data-active:font-medium data-active:text-sidebar-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+          "flex h-7 w-full items-center gap-2 rounded-md px-2 text-sm/relaxed text-sidebar-foreground/70 transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/30 data-active:font-medium data-active:text-sidebar-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
           className
         )}
         {...props}

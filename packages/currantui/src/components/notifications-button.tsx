@@ -37,11 +37,11 @@ export function NotificationsButton({
         className,
       )}
     >
-      <Bell size={16} aria-hidden />
+      <Bell size={18} aria-hidden />
       {count && count > 0 ? (
         <span
           aria-hidden
-          className="absolute end-1 top-1 flex h-3 min-w-3 items-center justify-center rounded-full bg-primary px-0.5 text-[0.5rem] font-bold tabular-nums text-primary-foreground"
+          className="absolute end-1 top-1 flex h-3 min-w-3 items-center justify-center rounded-full bg-primary px-0.5 text-2xs font-bold tabular-nums text-primary-foreground"
         >
           {count > 99 ? "99+" : count}
         </span>
@@ -81,9 +81,9 @@ export function NotificationsButton({
               className="z-50 w-80 rounded-lg border border-border bg-popover text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95"
             >
               <div className="flex items-center justify-between border-b border-border/50 px-3 py-2">
-                <p className="text-xs font-medium">Notifications</p>
+                <p className="text-sm font-medium">Notifications</p>
                 {count && count > 0 ? (
-                  <span className="text-[0.625rem] text-muted-foreground tabular-nums">
+                  <span className="text-xs text-muted-foreground tabular-nums">
                     {count} unread
                   </span>
                 ) : null}
@@ -105,7 +105,7 @@ function NotificationsTooltip() {
       <Tooltip.Content
         side="bottom"
         sideOffset={8}
-        className="z-50 rounded-md bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95"
+        className="z-50 rounded-md bg-popover px-2 py-1 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95"
       >
         Notifications
         <Tooltip.Arrow className="fill-popover" />
@@ -165,7 +165,7 @@ export function NotificationItem({
         {icon ? (
           <span
             aria-hidden
-            className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground [&_svg:not([class*='size-'])]:size-3.5"
+            className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground [&_svg:not([class*='size-'])]:size-4"
           >
             {icon}
           </span>
@@ -174,20 +174,20 @@ export function NotificationItem({
           <span className="flex items-baseline justify-between gap-2">
             <span
               className={cn(
-                "truncate text-xs/relaxed",
+                "truncate text-sm/relaxed",
                 unread ? "font-semibold" : "font-medium",
               )}
             >
               {title}
             </span>
             {time ? (
-              <span className="shrink-0 text-[0.625rem] text-muted-foreground tabular-nums">
+              <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
                 {time}
               </span>
             ) : null}
           </span>
           {description ? (
-            <span className="line-clamp-2 text-xs/relaxed text-muted-foreground">
+            <span className="line-clamp-2 text-sm/relaxed text-muted-foreground">
               {description}
             </span>
           ) : null}

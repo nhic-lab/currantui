@@ -8,7 +8,7 @@ import type { ReactNode } from "react"
  * "Earlier…" year picker) can borrow the exact same look.
  */
 export const filterChipVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none",
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none",
   {
     variants: {
       active: {

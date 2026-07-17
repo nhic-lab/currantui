@@ -47,7 +47,7 @@ export function TablePagination({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 border-t border-border/50 px-4 py-1 text-[10px] text-muted-foreground",
+        "flex items-center gap-3 border-t border-border/50 px-4 py-1 text-xs text-muted-foreground",
         className,
       )}
     >
@@ -63,7 +63,7 @@ export function TablePagination({
               <SelectTrigger
                 size="sm"
                 aria-label="Rows per page"
-                className="h-6 gap-1 px-2 text-[10px]"
+                className="h-6 gap-1 px-2 text-xs"
               >
                 <SelectValue />
               </SelectTrigger>

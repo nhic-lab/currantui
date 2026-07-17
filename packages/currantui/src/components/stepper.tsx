@@ -87,11 +87,13 @@ function StepperItem({
   const { Icon, weight, className: iconClassName } = STEP_ICONS[state]
   const stateLabel = STEP_STATE_LABELS[state]
 
+  /* text-sm/relaxed first lines are ~23px tall; nudge the 16px marker down so
+     it centers on the title's first line instead of riding high */
   const marker = (
     <Icon
       weight={weight}
       aria-hidden="true"
-      className={cn("size-4 shrink-0", iconClassName)}
+      className={cn("mt-[3px] size-4 shrink-0", iconClassName)}
     />
   )
   const label = (
@@ -99,14 +101,14 @@ function StepperItem({
       {stateLabel && <span className="sr-only">{stateLabel} </span>}
       <div
         data-slot="stepper-item-title"
-        className="text-xs/relaxed font-medium text-foreground"
+        className="text-sm/relaxed font-medium text-foreground"
       >
         {title}
       </div>
       {description && (
         <div
           data-slot="stepper-item-description"
-          className="text-[0.625rem]/relaxed text-muted-foreground"
+          className="text-xs/relaxed text-muted-foreground"
         >
           {description}
         </div>

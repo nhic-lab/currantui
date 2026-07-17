@@ -47,7 +47,7 @@ import {
   ShellSideNavMenu,
   ShellSideNavMenuItem,
 } from "@nhic/currantui/components/shell-side-nav"
-import { Toaster } from "@nhic/currantui/components/sonner"
+import { Toaster } from "@nhic/currantui/components/toast"
 import { ThemeToggle } from "@nhic/currantui/components/theme-toggle"
 
 import type { Meta, StoryObj } from "@storybook/react-vite"

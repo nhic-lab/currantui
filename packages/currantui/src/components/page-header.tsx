@@ -12,14 +12,14 @@ export function PageHeader({ title, subtitle, right, className }: PageHeaderProp
   return (
     <header
       className={cn(
-        "flex shrink-0 items-baseline justify-between border-b border-border/50 px-4 py-3",
+        "flex shrink-0 items-baseline justify-between border-b border-border/50 py-3",
         className,
       )}
     >
       <div className="flex items-baseline gap-2">
-        <h1 className="font-heading text-base font-semibold tracking-tight">{title}</h1>
+        <h1 className="font-heading text-xl font-semibold tracking-tight">{title}</h1>
         {subtitle != null ? (
-          <span className="text-[11px] text-muted-foreground tabular-nums">{subtitle}</span>
+          <span className="text-xs text-muted-foreground tabular-nums">{subtitle}</span>
         ) : null}
       </div>
       {right != null ? right : null}

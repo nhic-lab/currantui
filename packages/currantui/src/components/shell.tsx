@@ -154,7 +154,7 @@ function ShellSkipToContent({
       href={href}
       data-slot="shell-skip-to-content"
       className={cn(
-        "sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:start-2 focus-visible:top-2 focus-visible:z-60 focus-visible:flex focus-visible:h-7 focus-visible:items-center focus-visible:rounded-md focus-visible:bg-primary focus-visible:px-2 focus-visible:text-xs/relaxed focus-visible:font-medium focus-visible:text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none",
+        "sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:start-2 focus-visible:top-2 focus-visible:z-60 focus-visible:flex focus-visible:h-7 focus-visible:items-center focus-visible:rounded-md focus-visible:bg-primary focus-visible:px-2 focus-visible:text-sm/relaxed focus-visible:font-medium focus-visible:text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none",
         className
       )}
       {...props}

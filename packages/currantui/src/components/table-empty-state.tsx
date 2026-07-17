@@ -18,7 +18,7 @@ export function TableEmptyState({ icon, children, className }: TableEmptyStatePr
       )}
     >
       {icon}
-      <p className="text-xs">{children}</p>
+      <p className="text-sm">{children}</p>
     </div>
   )
 }

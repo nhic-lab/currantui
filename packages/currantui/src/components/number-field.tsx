@@ -54,7 +54,7 @@ function NumberField({
       >
         <AriaInput
           data-slot="number-field-input"
-          className="h-full w-full min-w-0 bg-transparent px-2 text-xs/relaxed outline-none placeholder:text-muted-foreground tabular-nums"
+          className="h-full w-full min-w-0 bg-transparent px-2 text-sm/relaxed outline-none placeholder:text-muted-foreground tabular-nums"
         />
         <div
           data-slot="number-field-steppers"

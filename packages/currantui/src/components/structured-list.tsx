@@ -18,7 +18,7 @@ function StructuredList({
       data-slot="structured-list"
       data-variant={variant}
       className={cn(
-        "group/structured-list w-full text-xs/relaxed",
+        "group/structured-list w-full text-sm/relaxed",
         variant === "contained" && "overflow-hidden rounded-lg border",
         className
       )}

@@ -21,7 +21,7 @@ The repo is a pnpm workspace: `packages/currantui` is the published package, `ap
 | Styling | Tailwind CSS v4 (peerDependency) + CSS variable tokens |
 | Variants | class-variance-authority + clsx + tailwind-merge |
 | Icons | @phosphor-icons/react |
-| Fonts | Source Sans 3 Variable + Geist Variable (Fontsource) |
+| Fonts | Source Sans 3 Variable (Fontsource) — single family |
 | Build | tsup → ESM + `.d.ts`, `"use client"` banner |
 | Workbench | Storybook 9 (react-vite) in `apps/storybook`, deployed to GitHub Pages |
 | Testing | Vitest 3 browser mode (Playwright Chromium) — every story renders + passes axe |

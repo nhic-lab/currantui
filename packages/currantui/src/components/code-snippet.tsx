@@ -13,7 +13,7 @@ function CodeSnippetInline({
     <code
       data-slot="code-snippet-inline"
       className={cn(
-        "rounded-sm bg-muted px-1 py-px font-mono text-[0.6875rem] text-foreground",
+        "rounded-sm bg-muted px-1 py-px font-mono text-xs text-foreground",
         className
       )}
       {...props}
@@ -69,15 +69,16 @@ function CodeSnippet({
     <div
       data-slot="code-snippet"
       className={cn(
-        "relative rounded-md border bg-muted/50 font-mono text-[0.6875rem]/relaxed",
+        "relative rounded-md border bg-muted/50 font-mono text-sm/relaxed",
         className
       )}
       {...props}
     >
       <pre
         data-slot="code-snippet-pre"
+        tabIndex={0}
         className={cn(
-          "overflow-x-auto p-3",
+          "overflow-x-auto p-3 outline-none focus-visible:ring-2 focus-visible:ring-ring/30",
           !hideCopy && "pe-10",
           expandable && !expanded && "max-h-40 overflow-y-hidden"
         )}
@@ -106,11 +107,11 @@ function CodeSnippet({
           data-slot="code-snippet-toggle"
           aria-expanded={expanded}
           onClick={() => setExpanded((prev) => !prev)}
-          className="flex h-7 w-full items-center gap-1 border-t px-3 font-sans text-xs/relaxed text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+          className="flex h-7 w-full items-center gap-1 border-t px-3 font-sans text-sm/relaxed text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
         >
           <CaretDownIcon
             aria-hidden="true"
-            className={cn("size-3 transition-transform", expanded && "rotate-180")}
+            className={cn("size-4 transition-transform", expanded && "rotate-180")}
           />
           {expanded ? collapseLabel : expandLabel}
         </button>
