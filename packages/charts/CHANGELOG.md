@@ -1,5 +1,15 @@
 # @nhic/currantui-charts
 
+## 1.1.0
+
+### Minor Changes
+
+- 8876bd3: Step the rendered type scale up to enterprise dashboard sizes: control and body text moves from 12px to 14px (`text-sm`), helper/meta text standardizes on 12px (`text-xs`), page titles move to 20px, and all arbitrary micro font sizes are replaced — nothing renders below 12px except a new `text-2xs` (10px) token reserved for size-constrained avatar internals.
+
+### Patch Changes
+
+- d6ef043: Widen the `@nhic/currantui` peer range to `>=0.5.0`. The previous `workspace:^` range made every 0.x minor of the design system fall out of range, which changesets escalates to a lockstep MAJOR of the charts package — charts now versions only off its own changes.
+
 ## 1.0.1
 
 ### Patch Changes

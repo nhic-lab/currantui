@@ -1,5 +1,14 @@
 # @nhic/currantui
 
+## 0.6.0
+
+### Minor Changes
+
+- 8876bd3: BREAKING: `AvatarButton` is now a compound component — compose `AvatarButtonTrigger`, `AvatarButtonMenu`, `AvatarButtonLabel`, `AvatarButtonItem` (with `icon`/`destructive`), and `AvatarButtonSeparator` instead of the removed `name`/`email`/`onSettings`/`onSignOut` props. The trigger now renders an image (`src`), initials (`name`), or the fallback icon. Migration: `<AvatarButton name="A" onSettings={s} />` becomes `<AvatarButton><AvatarButtonTrigger name="A" /><AvatarButtonMenu><AvatarButtonItem icon={Gear} onSelect={s}>Settings</AvatarButtonItem></AvatarButtonMenu></AvatarButton>`.
+- 8876bd3: Consolidate typography on a single self-hosted family: Source Sans 3 Variable now serves both `--font-sans` and `--font-heading` (Geist Variable removed; `font-heading` remains the semantic hook for titles). Sharpen the geometry to dashboard-style corners — `--radius` drops from 0.625rem to 0.25rem, so `rounded-lg` containers render at 4px — and Card trades its `ring` for a hairline `border-border` with a subtle elevation shadow.
+- 8876bd3: BREAKING: toasts now run on the react-aria toast queue instead of sonner — import `Toaster` and `toast` from `@nhic/currantui/components/toast` (the `components/sonner` entry and the sonner dependency are removed). The `toast()`/`toast.info|success|warning|error|loading` call shape is unchanged, including `description`, `action`, `size`, `duration`, and replace-by-`id`; `toast.dismiss()` clears the queue. New behavior: timers pause while the region is hovered or focused, at most three toasts are visible at once, actionable and loading toasts never auto-dismiss, and `toast.promise`/other sonner-specific APIs are gone.
+- 8876bd3: Step the rendered type scale up to enterprise dashboard sizes: control and body text moves from 12px to 14px (`text-sm`), helper/meta text standardizes on 12px (`text-xs`), page titles move to 20px, and all arbitrary micro font sizes are replaced — nothing renders below 12px except a new `text-2xs` (10px) token reserved for size-constrained avatar internals.
+
 ## 0.5.0
 
 ### Minor Changes
