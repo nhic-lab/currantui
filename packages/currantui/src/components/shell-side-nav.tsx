@@ -5,8 +5,30 @@ import { CaretDownIcon, XIcon } from "@phosphor-icons/react"
 import { useShell } from "@nhic/currantui/components/shell"
 import { cn } from "@nhic/currantui/lib/utils"
 
+declare const process: { env: { NODE_ENV?: string } }
+
 const sideNavRowClasses =
   "flex h-7 w-full items-center gap-2 rounded-md px-2 text-start text-sm/relaxed text-sidebar-foreground/70 transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/30 data-active:bg-sidebar-accent data-active:font-medium data-active:text-sidebar-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+
+const stackedRowClasses =
+  "relative flex w-full flex-col items-center gap-1 rounded-md px-1 py-2 text-center text-2xs/tight text-sidebar-foreground/70 transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/30 data-active:bg-sidebar-accent data-active:font-medium data-active:text-sidebar-accent-foreground data-active:before:absolute data-active:before:inset-y-2 data-active:before:start-0 data-active:before:w-0.5 data-active:before:rounded-full data-active:before:bg-primary [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5"
+
+const SideNavVariantContext = React.createContext<
+  "expandable" | "rail" | "fixed" | "labeled-rail"
+>("expandable")
+
+/**
+ * In the rail's resting state the panel is icon-wide, so label text must not
+ * paint (its first glyphs would bleed out beside the icons). Opacity keeps the
+ * labels in the accessibility tree — names survive — and they fade back in
+ * when the flyout opens on hover or focus-within.
+ */
+function useSideNavLabelClasses() {
+  const variant = React.useContext(SideNavVariantContext)
+  return variant === "rail"
+    ? "opacity-0 transition-opacity duration-150 group-hover/side-nav-inner:opacity-100 group-focus-within/side-nav-inner:opacity-100"
+    : undefined
+}
 
 function ShellSideNav({
   variant = "expandable",
@@ -15,13 +37,13 @@ function ShellSideNav({
   children,
   ...props
 }: React.ComponentProps<"nav"> & {
-  variant?: "expandable" | "rail" | "fixed"
+  variant?: "expandable" | "rail" | "fixed" | "labeled-rail"
   label?: string
 }) {
   const { openMobile, setOpenMobile, isMobile } = useShell()
 
   return (
-    <>
+    <SideNavVariantContext.Provider value={variant}>
       <nav
         id="shell-side-nav"
         aria-label={label}
@@ -34,6 +56,8 @@ function ShellSideNav({
           variant === "fixed" &&
             "w-(--shell-sidenav-w) border-e border-sidebar-border",
           variant === "rail" && "w-(--shell-sidenav-w-rail)",
+          variant === "labeled-rail" &&
+            "w-(--shell-sidenav-w-rail-labeled) border-e border-sidebar-border",
           className
         )}
         {...props}
@@ -41,10 +65,12 @@ function ShellSideNav({
         <div
           data-slot="shell-side-nav-inner"
           className={cn(
-            "flex h-full flex-col overflow-x-hidden overflow-y-auto py-2",
+            "group/side-nav-inner flex h-full flex-col overflow-x-hidden overflow-y-auto py-2",
             variant === "rail"
               ? "absolute inset-y-0 start-0 w-(--shell-sidenav-w-rail) border-e border-sidebar-border bg-sidebar shadow-none transition-[width] duration-150 hover:w-(--shell-sidenav-w) hover:shadow-lg focus-within:w-(--shell-sidenav-w) focus-within:shadow-lg"
-              : "w-(--shell-sidenav-w)"
+              : variant === "labeled-rail"
+                ? "w-full"
+                : "w-(--shell-sidenav-w)"
           )}
         >
           {children}
@@ -81,7 +107,7 @@ function ShellSideNav({
           </DialogPrimitive.Content>
         </DialogPrimitive.Root>
       )}
-    </>
+    </SideNavVariantContext.Provider>
   )
 }
 
@@ -108,6 +134,9 @@ function ShellSideNavLink({
   icon?: React.ReactNode
 }) {
   const Comp = asChild ? Slot.Root : "a"
+  const variant = React.useContext(SideNavVariantContext)
+  const stacked = variant === "labeled-rail"
+  const labelClasses = useSideNavLabelClasses()
 
   return (
     <li data-slot="shell-side-nav-item" className="flex">
@@ -115,18 +144,26 @@ function ShellSideNavLink({
         data-slot="shell-side-nav-link"
         data-active={isActive || undefined}
         aria-current={isActive ? "page" : undefined}
-        className={cn(sideNavRowClasses, className)}
+        className={cn(stacked ? stackedRowClasses : sideNavRowClasses, className)}
         {...props}
       >
         {icon && (
           <span
             aria-hidden="true"
-            className="flex size-4 shrink-0 items-center justify-center"
+            className={cn(
+              "flex shrink-0 items-center justify-center",
+              stacked ? "size-5" : "size-4"
+            )}
           >
             {icon}
           </span>
         )}
-        <span className="truncate">{children}</span>
+        <span
+          data-slot="shell-side-nav-label"
+          className={stacked ? "line-clamp-2 break-words" : cn("truncate", labelClasses)}
+        >
+          {children}
+        </span>
       </Comp>
     </li>
   )
@@ -148,6 +185,25 @@ function ShellSideNavMenu({
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }) {
+  const labelClasses = useSideNavLabelClasses()
+  const variant = React.useContext(SideNavVariantContext)
+  const warned = React.useRef(false)
+
+  React.useEffect(() => {
+    if (
+      variant === "labeled-rail" &&
+      !warned.current &&
+      process.env.NODE_ENV !== "production"
+    ) {
+      warned.current = true
+      console.warn(
+        `ShellSideNavMenu "${label}" is not supported in the labeled-rail variant and renders nothing; lift its items to top-level links.`
+      )
+    }
+  }, [variant, label])
+
+  if (variant === "labeled-rail") return null
+
   return (
     <li data-slot="shell-side-nav-menu" className="flex flex-col" {...props}>
       <Collapsible.Root
@@ -172,8 +228,18 @@ function ShellSideNavMenu({
               {icon}
             </span>
           )}
-          <span className="flex-1 truncate">{label}</span>
-          <CaretDownIcon className="size-4! text-sidebar-foreground/50 group-data-open/side-nav-menu:rotate-180" />
+          <span
+            data-slot="shell-side-nav-label"
+            className={cn("flex-1 truncate", labelClasses)}
+          >
+            {label}
+          </span>
+          <CaretDownIcon
+            className={cn(
+              "size-4! text-sidebar-foreground/50 group-data-open/side-nav-menu:rotate-180",
+              labelClasses
+            )}
+          />
         </Collapsible.Trigger>
         <Collapsible.Content data-slot="shell-side-nav-menu-content" asChild>
           <ul className="flex flex-col gap-0.5">{children}</ul>
@@ -187,9 +253,11 @@ function ShellSideNavMenuItem({
   asChild = false,
   isActive = false,
   className,
+  children,
   ...props
 }: React.ComponentProps<"a"> & { asChild?: boolean; isActive?: boolean }) {
   const Comp = asChild ? Slot.Root : "a"
+  const labelClasses = useSideNavLabelClasses()
 
   return (
     <li data-slot="shell-side-nav-menu-item" className="flex">
@@ -199,7 +267,19 @@ function ShellSideNavMenuItem({
         aria-current={isActive ? "page" : undefined}
         className={cn(sideNavRowClasses, "ps-8", className)}
         {...props}
-      />
+      >
+        {/* asChild consumers own their element; Slot must receive it directly */}
+        {asChild ? (
+          children
+        ) : (
+          <span
+            data-slot="shell-side-nav-label"
+            className={cn("truncate", labelClasses)}
+          >
+            {children}
+          </span>
+        )}
+      </Comp>
     </li>
   )
 }
