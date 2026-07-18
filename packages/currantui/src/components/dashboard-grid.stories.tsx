@@ -1,5 +1,5 @@
 import * as React from "react"
-import { expect, userEvent, waitFor, within } from "storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 
 import {
   DashboardGrid,
@@ -30,7 +30,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   )
 }
 
-function widgets(withToolbar = false) {
+function widgets(withToolbar = false, submissionsToolbar = false) {
   return [
     <DashboardWidget
       key="facilities"
@@ -43,7 +43,12 @@ function widgets(withToolbar = false) {
     <DashboardWidget key="on-time" id="on-time" title="On-time reports">
       <Stat label="On time this week" value="94%" />
     </DashboardWidget>,
-    <DashboardWidget key="submissions" id="submissions" title="Weekly submissions">
+    <DashboardWidget
+      key="submissions"
+      id="submissions"
+      title="Weekly submissions"
+      toolbar={submissionsToolbar ? <WidgetToolbar /> : undefined}
+    >
       <div className="grid h-full place-items-center text-sm text-muted-foreground">
         Chart slot
       </div>
@@ -93,11 +98,32 @@ export const StaticWidget: Story = {
       layout={baseLayout.map((item) =>
         item.id === "submissions" ? { ...item, static: true } : item
       )}
+      mode="edit"
       rowHeight={72}
     >
-      {widgets()}
+      {widgets(false, true)}
     </DashboardGrid>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await canvas.findByRole("button", { name: "Remove Weekly submissions" })
+    await expect(
+      canvas.queryByRole("button", { name: /^move weekly submissions$/i })
+    ).not.toBeInTheDocument()
+  },
+}
+
+export const EmptyLayout: Story = {
+  render: () => (
+    <DashboardGrid layout={[]} mode="edit" rowHeight={72}>
+      {null}
+    </DashboardGrid>
+  ),
+  play: async ({ canvasElement }) => {
+    const grid = canvasElement.querySelector('[data-slot="dashboard-grid"]')!
+    await expect(grid).toBeInTheDocument()
+    await expect(grid.querySelectorAll('[data-slot="dashboard-widget"]')).toHaveLength(0)
+  },
 }
 
 export const Collapsed: Story = {
@@ -127,6 +153,7 @@ export const Collapsed: Story = {
 function EditableDashboard(props: {
   onLayout?: (layout: Array<LayoutItem>) => void
   withToolbar?: boolean
+  onWidgetRemove?: (id: string) => void
 }) {
   const [layout, setLayout] = React.useState(baseLayout)
   return (
@@ -137,6 +164,7 @@ function EditableDashboard(props: {
           setLayout(next)
           props.onLayout?.(next)
         }}
+        onWidgetRemove={props.onWidgetRemove}
         mode="edit"
         rowHeight={72}
       >
@@ -354,9 +382,12 @@ export const UndoRedo: Story = {
   },
 }
 
+const onWidgetRemoveSpy = fn()
+
 export const RemoveWidget: Story = {
-  render: () => <EditableDashboard withToolbar />,
+  render: () => <EditableDashboard withToolbar onWidgetRemove={onWidgetRemoveSpy} />,
   play: async ({ canvasElement }) => {
+    onWidgetRemoveSpy.mockClear()
     const canvas = within(canvasElement)
     await canvas.findByRole("button", { name: /^move facilities$/i })
     await userEvent.click(canvas.getByRole("button", { name: "Remove Facilities" }))
@@ -368,5 +399,6 @@ export const RemoveWidget: Story = {
     await expect(
       canvas.queryByRole("region", { name: "Facilities" })
     ).not.toBeInTheDocument()
+    await expect(onWidgetRemoveSpy).toHaveBeenCalledWith("facilities")
   },
 }

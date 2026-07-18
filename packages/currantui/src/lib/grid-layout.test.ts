@@ -5,6 +5,7 @@ import {
   collides,
   compact,
   findSlot,
+  layoutsEqual,
   moveItem,
   removeItem,
   resizeItem,
@@ -101,6 +102,43 @@ describe("compact", () => {
     const result = compact(layout)
     expect(result.map((i) => i.id)).toEqual(["b", "a"])
     expect(layout).toEqual(snapshot)
+  })
+
+  it("keeps a pinned item mid-column blocked by items above and below", () => {
+    const layout = [
+      item("above", 2, 0, 2, 1),
+      item("pin", 2, 3, 2, 1),
+      item("below", 2, 5, 2, 1),
+    ]
+    const result = compact(layout, "pin")
+    expect(result.find((i) => i.id === "above")).toMatchObject({ y: 0 })
+    expect(result.find((i) => i.id === "pin")).toMatchObject({ y: 3 })
+    expect(result.find((i) => i.id === "below")).toMatchObject({ y: 4 })
+  })
+})
+
+describe("layoutsEqual", () => {
+  it("is true for structurally identical layouts", () => {
+    const layout = [item("a", 0, 0, 2, 2), item("b", 2, 0, 2, 2)]
+    expect(layoutsEqual(layout, [...layout])).toBe(true)
+  })
+
+  it("is false when items are reordered", () => {
+    const a = [item("a", 0, 0), item("b", 1, 0)]
+    const b = [item("b", 1, 0), item("a", 0, 0)]
+    expect(layoutsEqual(a, b)).toBe(false)
+  })
+
+  it("is false when an item moved", () => {
+    const a = [item("a", 0, 0)]
+    const b = [item("a", 1, 0)]
+    expect(layoutsEqual(a, b)).toBe(false)
+  })
+
+  it("is false when an item resized", () => {
+    const a = [item("a", 0, 0, 2, 2)]
+    const b = [item("a", 0, 0, 3, 2)]
+    expect(layoutsEqual(a, b)).toBe(false)
   })
 })
 

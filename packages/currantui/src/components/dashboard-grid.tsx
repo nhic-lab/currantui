@@ -4,6 +4,7 @@ import { DotsSixVerticalIcon } from "@phosphor-icons/react"
 import {
   clamp,
   compact,
+  layoutsEqual,
   moveItem,
   removeItem,
   resizeItem,
@@ -64,7 +65,7 @@ interface GridContextValue {
     title: string,
     e: React.KeyboardEvent<HTMLElement>
   ) => void
-  cancelKeyboard: (id: string) => void
+  cancelKeyboard: (id: string, title: string) => void
   removeWidget: (id: string) => void
 }
 
@@ -109,6 +110,7 @@ function DashboardGrid({
   const lastEmitted = React.useRef<Array<LayoutItem>>(layout)
   const gestureCleanup = React.useRef<(() => void) | null>(null)
   const pendingFocusId = React.useRef<string | null>(null)
+  const warnedKeys = React.useRef(new Set<string>())
   const [history, setHistory] = React.useState<{
     stack: Array<Array<LayoutItem>>
     index: number
@@ -141,6 +143,7 @@ function DashboardGrid({
     if (effectiveMode !== "edit") {
       setKeyboardId(null)
       setPreview(null)
+      pendingFocusId.current = null
     }
   }, [effectiveMode])
 
@@ -152,14 +155,7 @@ function DashboardGrid({
   const itemsById = React.useMemo(() => {
     const map = new Map<string, LayoutItem>()
     for (const item of rendered) {
-      if (map.has(item.id)) {
-        if (isDevelopment) {
-          console.error(
-            `DashboardGrid: duplicate layout id "${item.id}"; first occurrence wins.`
-          )
-        }
-        continue
-      }
+      if (map.has(item.id)) continue
       map.set(item.id, item)
     }
     return map
@@ -180,6 +176,57 @@ function DashboardGrid({
     if (!dragId) return undefined
     return compact(preview ?? layout).find((item) => item.id === dragId)
   }, [dragId, preview, layout])
+
+  React.useEffect(() => {
+    if (!isDevelopment) return
+    const warnOnce = (key: string, log: () => void) => {
+      if (warnedKeys.current.has(key)) return
+      warnedKeys.current.add(key)
+      log()
+    }
+    const layoutIds = new Set<string>()
+    for (const item of layout) {
+      if (layoutIds.has(item.id)) {
+        warnOnce(`duplicate:${item.id}`, () =>
+          console.error(
+            `DashboardGrid: duplicate layout id "${item.id}"; first occurrence wins.`
+          )
+        )
+        continue
+      }
+      layoutIds.add(item.id)
+    }
+    const elements = React.Children.toArray(children).filter(
+      (child): child is React.ReactElement<DashboardWidgetProps> =>
+        React.isValidElement(child) &&
+        typeof (child.props as { id?: unknown }).id === "string"
+    )
+    const childIds = new Set(elements.map((element) => element.props.id))
+    for (const element of elements) {
+      const id = element.props.id
+      if (!layoutIds.has(id)) {
+        warnOnce(`widget:${id}`, () =>
+          console.warn(
+            `DashboardGrid: widget "${id}" has no layout item and will not render.`
+          )
+        )
+      }
+      if (element.type !== DashboardWidget) {
+        warnOnce(`type:${id}`, () =>
+          console.warn(
+            `DashboardGrid: child "${id}" is not a DashboardWidget element; if it does not render a DashboardWidget internally it will not appear on the grid.`
+          )
+        )
+      }
+    }
+    for (const id of layoutIds) {
+      if (!childIds.has(id)) {
+        warnOnce(`layout:${id}`, () =>
+          console.warn(`DashboardGrid: layout item "${id}" has no matching widget.`)
+        )
+      }
+    }
+  }, [layout, children])
 
   const announce = (message: string) => setAnnouncement(message)
 
@@ -215,13 +262,26 @@ function DashboardGrid({
   const canUndo = history.index > 0
   const canRedo = history.index < history.stack.length - 1
 
+  const onHistoryChangeRef = React.useRef(onHistoryChange)
+  onHistoryChangeRef.current = onHistoryChange
+
   React.useEffect(() => {
-    onHistoryChange?.({ canUndo, canRedo })
+    onHistoryChangeRef.current?.({ canUndo, canRedo })
   }, [canUndo, canRedo])
+
+  /** If focus is on a widget's move handle, arm it for re-focus once the restored layout re-renders. */
+  const armFocusRestoreFromActiveElement = () => {
+    const active = document.activeElement
+    if (active instanceof HTMLElement && rootRef.current?.contains(active)) {
+      const widgetId = active.dataset.widgetId
+      if (widgetId) pendingFocusId.current = widgetId
+    }
+  }
 
   const undo = () => {
     const current = historyRef.current
     if (current.index === 0) return
+    armFocusRestoreFromActiveElement()
     const restored = current.stack[current.index - 1]
     setHistory({ stack: current.stack, index: current.index - 1 })
     lastEmitted.current = restored
@@ -232,6 +292,7 @@ function DashboardGrid({
   const redo = () => {
     const current = historyRef.current
     if (current.index >= current.stack.length - 1) return
+    armFocusRestoreFromActiveElement()
     const restored = current.stack[current.index + 1]
     setHistory({ stack: current.stack, index: current.index + 1 })
     lastEmitted.current = restored
@@ -254,82 +315,42 @@ function DashboardGrid({
     canRedo,
   ])
 
-  const startDrag = (id: string, event: React.PointerEvent<HTMLElement>) => {
-    const node = rootRef.current
-    const origin = layout.find((item) => item.id === id)
-    if (
-      effectiveMode !== "edit" ||
-      event.button !== 0 ||
-      !node ||
-      !origin ||
-      origin.static ||
-      gestureCleanup.current !== null ||
-      keyboardId !== null
-    ) {
-      return
-    }
-    event.preventDefault()
-    const cellWidth = (node.clientWidth - gap * (columns - 1)) / columns
-    const stepX = cellWidth + gap
-    const stepY = rowHeight + gap
-    const rect = {
-      left: origin.x * stepX,
-      top: origin.y * stepY,
-      width: origin.w * cellWidth + (origin.w - 1) * gap,
-      height: origin.h * rowHeight + (origin.h - 1) * gap,
-    }
-    const startX = event.clientX
-    const startY = event.clientY
-    const base = layout
-    let current = base
-    setDragId(id)
-    setDragRect(rect)
-    setPreview(base)
-
-    const onPointerMove = (moveEvent: PointerEvent) => {
-      const dx = moveEvent.clientX - startX
-      const dy = moveEvent.clientY - startY
-      setDragRect({ ...rect, left: rect.left + dx, top: rect.top + dy })
-      const targetX = Math.round((rect.left + dx) / stepX)
-      const targetY = Math.round((rect.top + dy) / stepY)
-      current = moveItem(base, id, targetX, targetY, columns)
-      setPreview(current)
-    }
-    const finish = (commit: boolean) => {
-      window.removeEventListener("pointermove", onPointerMove)
-      window.removeEventListener("pointerup", onPointerUp)
-      window.removeEventListener("keydown", onKeyDown, true)
-      window.removeEventListener("pointercancel", onPointerCancel)
-      gestureCleanup.current = null
-      setDragId(null)
-      setDragRect(null)
-      setPreview(null)
-      if (commit && current !== base) {
-        commitLayout(current)
-        const settled = compact(current)
-        const moved = settled.find((item) => item.id === id)!
-        announce(`Moved to column ${moved.x + 1}, row ${moved.y + 1}.`)
-      }
-    }
-    const onPointerUp = () => finish(true)
-    const onPointerCancel = () => finish(false)
-    const onKeyDown = (keyEvent: KeyboardEvent) => {
-      if (keyEvent.key === "Escape") {
-        keyEvent.stopPropagation()
-        finish(false)
-      }
-    }
-    window.addEventListener("pointermove", onPointerMove)
-    window.addEventListener("pointerup", onPointerUp)
-    window.addEventListener("keydown", onKeyDown, true)
-    window.addEventListener("pointercancel", onPointerCancel)
-    gestureCleanup.current = () => finish(false)
+  /**
+   * True when it is safe to steal focus back to `id`'s move handle after a
+   * commit: activeElement is unset (body/null) or already inside that
+   * widget's own section. Never steals focus from an unrelated element.
+   */
+  const shouldArmFocusFor = (id: string): boolean => {
+    const active = document.activeElement
+    if (active === null || active === document.body) return true
+    const section = rootRef.current
+      ?.querySelector(`[data-slot="dashboard-widget-move"][data-widget-id="${id}"]`)
+      ?.closest('[data-slot="dashboard-widget"]')
+    return section != null && section.contains(active)
   }
 
-  const startResize = (
+  /**
+   * Shared pointer-gesture lifecycle for drag and resize: guards re-entrancy,
+   * tracks base/current layout across pointermove, and commits (or cancels)
+   * on pointerup/pointercancel/Escape. `create` supplies the axis-specific
+   * math and any extra visual state (drag uses this for dragId/dragRect).
+   */
+  const beginGesture = (
+    event: React.PointerEvent<HTMLElement>,
     id: string,
-    axis: "both" | "x" | "y",
-    event: React.PointerEvent<HTMLElement>
+    create: (context: {
+      origin: LayoutItem
+      cellWidth: number
+      stepX: number
+      stepY: number
+    }) => {
+      move: (dx: number, dy: number, base: Array<LayoutItem>) => Array<LayoutItem>
+      commitMessage: (settledItem: LayoutItem) => string
+      start?: () => void
+      end?: () => void
+      /** Only the drag gesture reorders relative focus; resize never needs a re-focus. */
+      armFocusOnCommit?: boolean
+    }
   ) => {
     const node = rootRef.current
     const origin = layout.find((item) => item.id === id)
@@ -348,18 +369,18 @@ function DashboardGrid({
     const cellWidth = (node.clientWidth - gap * (columns - 1)) / columns
     const stepX = cellWidth + gap
     const stepY = rowHeight + gap
+    const handlers = create({ origin, cellWidth, stepX, stepY })
     const startX = event.clientX
     const startY = event.clientY
     const base = layout
     let current = base
+    handlers.start?.()
     setPreview(base)
 
     const onPointerMove = (moveEvent: PointerEvent) => {
       const dx = moveEvent.clientX - startX
       const dy = moveEvent.clientY - startY
-      const w = axis === "y" ? origin.w : origin.w + Math.round(dx / stepX)
-      const h = axis === "x" ? origin.h : origin.h + Math.round(dy / stepY)
-      current = resizeItem(base, id, w, h, columns)
+      current = handlers.move(dx, dy, base)
       setPreview(current)
     }
     const finish = (commit: boolean) => {
@@ -368,11 +389,18 @@ function DashboardGrid({
       window.removeEventListener("keydown", onKeyDown, true)
       window.removeEventListener("pointercancel", onPointerCancel)
       gestureCleanup.current = null
+      handlers.end?.()
       setPreview(null)
       if (commit && current !== base) {
-        commitLayout(current)
-        const resized = current.find((item) => item.id === id)!
-        announce(`Resized to ${resized.w} by ${resized.h} cells.`)
+        const settled = compact(current)
+        if (!layoutsEqual(settled, base)) {
+          commitLayout(settled)
+          if (handlers.armFocusOnCommit && shouldArmFocusFor(id)) {
+            pendingFocusId.current = id
+          }
+        }
+        const settledItem = settled.find((item) => item.id === id)!
+        announce(handlers.commitMessage(settledItem))
       }
     }
     const onPointerUp = () => finish(true)
@@ -388,6 +416,50 @@ function DashboardGrid({
     window.addEventListener("keydown", onKeyDown, true)
     window.addEventListener("pointercancel", onPointerCancel)
     gestureCleanup.current = () => finish(false)
+  }
+
+  const startDrag = (id: string, event: React.PointerEvent<HTMLElement>) => {
+    beginGesture(event, id, ({ origin, cellWidth, stepX, stepY }) => {
+      const rect = {
+        left: origin.x * stepX,
+        top: origin.y * stepY,
+        width: origin.w * cellWidth + (origin.w - 1) * gap,
+        height: origin.h * rowHeight + (origin.h - 1) * gap,
+      }
+      return {
+        start: () => {
+          setDragId(id)
+          setDragRect(rect)
+        },
+        end: () => {
+          setDragId(null)
+          setDragRect(null)
+        },
+        move: (dx, dy, base) => {
+          setDragRect({ ...rect, left: rect.left + dx, top: rect.top + dy })
+          const targetX = Math.round((rect.left + dx) / stepX)
+          const targetY = Math.round((rect.top + dy) / stepY)
+          return moveItem(base, id, targetX, targetY, columns)
+        },
+        commitMessage: (settled) => `Moved to column ${settled.x + 1}, row ${settled.y + 1}.`,
+        armFocusOnCommit: true,
+      }
+    })
+  }
+
+  const startResize = (
+    id: string,
+    axis: "both" | "x" | "y",
+    event: React.PointerEvent<HTMLElement>
+  ) => {
+    beginGesture(event, id, ({ origin, stepX, stepY }) => ({
+      move: (dx, dy, base) => {
+        const w = axis === "y" ? origin.w : origin.w + Math.round(dx / stepX)
+        const h = axis === "x" ? origin.h : origin.h + Math.round(dy / stepY)
+        return resizeItem(base, id, w, h, columns)
+      },
+      commitMessage: (settled) => `Resized to ${settled.w} by ${settled.h} cells.`,
+    }))
   }
 
   const arrowDeltas: Record<string, [number, number]> = {
@@ -423,25 +495,36 @@ function DashboardGrid({
       event.preventDefault()
       setKeyboardId(null)
       setPreview(null)
+      let settledLayout = working
       if (working !== keyboardBase.current) {
-        commitLayout(working)
-        pendingFocusId.current = id
+        settledLayout = compact(working)
+        if (!layoutsEqual(settledLayout, keyboardBase.current!)) {
+          commitLayout(settledLayout)
+          pendingFocusId.current = id
+        }
       }
-      const settled = compact(working).find((candidate) => candidate.id === id)!
+      const settled = settledLayout.find((candidate) => candidate.id === id)!
       announce(`${title} placed at column ${settled.x + 1}, row ${settled.y + 1}.`)
     } else if (event.key === "Escape") {
       event.preventDefault()
       setKeyboardId(null)
       setPreview(null)
-      announce(`Move cancelled. ${title} returned to column ${
-        keyboardBase.current!.find((candidate) => candidate.id === id)!.x + 1
-      }, row ${keyboardBase.current!.find((candidate) => candidate.id === id)!.y + 1}.`)
+      const committed = keyboardBase.current!.find((candidate) => candidate.id === id)!
+      announce(
+        `Move cancelled. ${title} returned to column ${committed.x + 1}, row ${committed.y + 1}.`
+      )
     } else if (event.key in arrowDeltas) {
       event.preventDefault()
       const [dx, dy] = arrowDeltas[event.key]
       const next = event.shiftKey
         ? resizeItem(working, id, item.w + dx, item.h + dy, columns)
         : moveItem(working, id, item.x + dx, item.y + dy, columns)
+      if (next === working) {
+        announce(
+          event.shiftKey ? `${title} cannot resize further.` : `${title} cannot move further.`
+        )
+        return
+      }
       setPreview(next)
       const updated = next.find((candidate) => candidate.id === id)!
       announce(
@@ -454,6 +537,15 @@ function DashboardGrid({
 
   const onRootKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (effectiveMode !== "edit") return
+    const target = event.target as HTMLElement
+    if (
+      target.isContentEditable ||
+      target.tagName === "INPUT" ||
+      target.tagName === "TEXTAREA" ||
+      target.tagName === "SELECT"
+    ) {
+      return
+    }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
       event.preventDefault()
       if (event.shiftKey) redo()
@@ -461,10 +553,16 @@ function DashboardGrid({
     }
   }
 
-  const cancelKeyboard = (id: string) => {
+  const cancelKeyboard = (id: string, title: string) => {
     if (keyboardId !== id) return
+    const committed = keyboardBase.current?.find((candidate) => candidate.id === id)
     setKeyboardId(null)
     setPreview(null)
+    if (committed) {
+      announce(
+        `Move cancelled. ${title} returned to column ${committed.x + 1}, row ${committed.y + 1}.`
+      )
+    }
   }
 
   /* children render in y-then-x order so tab order and collapsed order match the visual layout */
@@ -474,21 +572,6 @@ function DashboardGrid({
         React.isValidElement(child) &&
         typeof (child.props as { id?: unknown }).id === "string"
     )
-    if (isDevelopment) {
-      const childIds = new Set(elements.map((element) => element.props.id))
-      for (const element of elements) {
-        if (!itemsById.has(element.props.id)) {
-          console.warn(
-            `DashboardGrid: widget "${element.props.id}" has no layout item and will not render.`
-          )
-        }
-      }
-      for (const id of itemsById.keys()) {
-        if (!childIds.has(id)) {
-          console.warn(`DashboardGrid: layout item "${id}" has no matching widget.`)
-        }
-      }
-    }
     return elements
       .filter((element) => itemsById.has(element.props.id))
       .sort((a, b) => {
@@ -561,7 +644,9 @@ function DashboardWidget({
   const item = context.getItem(id)
   const widgetValue = React.useMemo(() => ({ id, title }), [id, title])
   if (!item) return null
-  const editing = context.mode === "edit" && !context.collapsed && !item.static
+  const editMode = context.mode === "edit" && !context.collapsed
+  /* static widgets never move/resize, but they still get the toolbar (e.g. remove) */
+  const movable = editMode && !item.static
   const dragging = context.dragId === id
   const style: React.CSSProperties = context.collapsed
     ? { gridColumn: "1 / -1", gridRow: `span ${item.h}` }
@@ -594,7 +679,7 @@ function DashboardWidget({
         data-slot="dashboard-widget-header"
         className="flex items-center gap-1 border-b border-border/50 px-3 py-2"
       >
-        {editing && (
+        {movable && (
           <button
             type="button"
             data-slot="dashboard-widget-move"
@@ -603,7 +688,7 @@ function DashboardWidget({
             className="-ms-1 shrink-0 cursor-grab touch-none rounded p-1 text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
             onPointerDown={(event) => context.startDrag(id, event)}
             onKeyDown={(event) => context.handleKeyDown(id, title, event)}
-            onBlur={() => context.cancelKeyboard(id)}
+            onBlur={() => context.cancelKeyboard(id, title)}
           >
             <DotsSixVerticalIcon aria-hidden="true" className="size-4" />
           </button>
@@ -614,7 +699,7 @@ function DashboardWidget({
         >
           {title}
         </span>
-        {editing && toolbar != null && (
+        {editMode && toolbar != null && (
           <WidgetContext.Provider value={widgetValue}>{toolbar}</WidgetContext.Provider>
         )}
       </header>
@@ -624,7 +709,7 @@ function DashboardWidget({
       >
         {children}
       </div>
-      {editing && (
+      {movable && (
         <>
           <div
             data-slot="dashboard-widget-resize"

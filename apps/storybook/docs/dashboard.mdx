@@ -45,7 +45,8 @@ const [layout, setLayout] = React.useState<LayoutItem[]>([
 
 Collisions push items down; gravity then compacts everything upward, so no
 permanent gaps form. `static: true` items never move and never get
-displaced. `minW`/`minH`/`maxW`/`maxH` clamp resizing. Below
+displaced — but they still render their `WidgetToolbar` in edit mode, so
+they can still be removed. `minW`/`minH`/`maxW`/`maxH` clamp resizing. Below
 `collapseBreakpoint` (default 768px, measured on the grid container, not
 the viewport) the grid renders a single column in reading order and edit
 mode is suspended.
@@ -55,7 +56,9 @@ mode is suspended.
 The grid keeps an internal history of committed layouts (cap 50) while in
 edit mode. Cmd/Ctrl+Z and Shift+Cmd/Ctrl+Z work when focus is inside the
 grid; wire your own buttons via the ref handle (`undo()`, `redo()`) and
-`onHistoryChange`. Switching back to view mode ends the undo session.
+`onHistoryChange`. Switching back to view mode ends the undo session. The
+shortcuts ignore keystrokes inside text inputs and other editable elements,
+so native undo in widget content keeps working.
 
 ## Authoring
 

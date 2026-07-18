@@ -49,6 +49,45 @@ interface WidgetPaletteItem {
   icon?: React.ReactNode
 }
 
+function WidgetPaletteButton({
+  item,
+  onWidgetAdd,
+}: {
+  item: WidgetPaletteItem
+  onWidgetAdd: (type: string) => void
+}) {
+  const baseId = React.useId()
+  const labelId = `${baseId}-label`
+  const descriptionId = `${baseId}-description`
+  return (
+    <div role="listitem">
+      <button
+        type="button"
+        className="flex w-full items-start gap-2 rounded-md p-2 text-start outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+        aria-labelledby={labelId}
+        aria-describedby={item.description ? descriptionId : undefined}
+        onClick={() => onWidgetAdd(item.type)}
+      >
+        {item.icon && (
+          <span aria-hidden="true" className="mt-0.5 shrink-0 text-muted-foreground">
+            {item.icon}
+          </span>
+        )}
+        <span className="flex min-w-0 flex-col">
+          <span id={labelId} className="text-sm font-medium">
+            {item.label}
+          </span>
+          {item.description && (
+            <span id={descriptionId} className="text-xs text-muted-foreground">
+              {item.description}
+            </span>
+          )}
+        </span>
+      </button>
+    </div>
+  )
+}
+
 function WidgetPalette({
   items,
   onWidgetAdd,
@@ -70,27 +109,7 @@ function WidgetPalette({
       {...props}
     >
       {items.map((item) => (
-        <div role="listitem" key={item.type}>
-          <button
-            type="button"
-            className="flex w-full items-start gap-2 rounded-md p-2 text-start outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
-            onClick={() => onWidgetAdd(item.type)}
-          >
-            {item.icon && (
-              <span aria-hidden="true" className="mt-0.5 shrink-0 text-muted-foreground">
-                {item.icon}
-              </span>
-            )}
-            <span className="flex min-w-0 flex-col">
-              <span className="text-sm font-medium">{item.label}</span>
-              {item.description && (
-                <span className="text-xs text-muted-foreground">
-                  {item.description}
-                </span>
-              )}
-            </span>
-          </button>
-        </div>
+        <WidgetPaletteButton key={item.type} item={item} onWidgetAdd={onWidgetAdd} />
       ))}
     </div>
   )

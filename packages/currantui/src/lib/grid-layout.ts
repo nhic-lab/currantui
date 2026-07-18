@@ -121,6 +121,29 @@ export function removeItem(layout: Array<LayoutItem>, id: string): Array<LayoutI
   return next.length === layout.length ? layout : compact(next)
 }
 
+/**
+ * Structural equality for gesture-produced layouts: length plus index-wise
+ * id/x/y/w/h comparison. Gestures (move/resize/compact) never change any
+ * other field, so those five are all that matter here.
+ */
+export function layoutsEqual(a: Array<LayoutItem>, b: Array<LayoutItem>): boolean {
+  if (a.length !== b.length) return false
+  for (let i = 0; i < a.length; i++) {
+    const itemA = a[i]
+    const itemB = b[i]
+    if (
+      itemA.id !== itemB.id ||
+      itemA.x !== itemB.x ||
+      itemA.y !== itemB.y ||
+      itemA.w !== itemB.w ||
+      itemA.h !== itemB.h
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
 /** First free w×h position scanning y-then-x; below everything when nothing fits. */
 export function findSlot(
   layout: Array<LayoutItem>,
