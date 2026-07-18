@@ -27,6 +27,18 @@ export default defineConfig({
           setupFiles: ["./.storybook/vitest.setup.ts"],
         },
       },
+      {
+        resolve: {
+          alias: {
+            "@nhic/currantui": join(here, "../../packages/currantui/src"),
+          },
+        },
+        test: {
+          name: "unit",
+          environment: "node",
+          include: [join(here, "../../packages/*/src/**/*.test.ts")],
+        },
+      },
     ],
   },
 })

@@ -1,0 +1,66 @@
+import { Meta } from "@storybook/addon-docs/blocks"
+
+<Meta title="Foundation/Dashboard" />
+
+# Dashboard
+
+`DashboardGrid` arranges widgets — charts, KPI cards, tables, any React
+content — on a 12-column grid. It is fully controlled: the app owns a
+`LayoutItem[]` and persists it wherever it likes; the grid owns interaction
+and undo history only.
+
+## Anatomy
+
+```tsx
+const [layout, setLayout] = React.useState<LayoutItem[]>([
+  { id: "facilities", x: 0, y: 0, w: 3, h: 2 },
+  { id: "submissions", x: 3, y: 0, w: 9, h: 4, minW: 6 },
+])
+
+<DashboardGrid
+  layout={layout}
+  onLayoutChange={setLayout}
+  mode={editing ? "edit" : "view"}
+  onWidgetRemove={(id) => removeFromMyWidgetList(id)}
+>
+  <DashboardWidget id="facilities" title="Facilities" toolbar={<WidgetToolbar />}>
+    <MyKpi />
+  </DashboardWidget>
+  <DashboardWidget id="submissions" title="Weekly submissions">
+    <MyChart />
+  </DashboardWidget>
+</DashboardGrid>
+```
+
+## Modes
+
+- **view** (default) — a static responsive grid. No handles, no extra
+  tabstops, no edit affordances in the DOM.
+- **edit** — drag by the header handle, resize by the corner/edge handles,
+  or use the keyboard: focus the move handle, press Enter to grab, arrows
+  to move, Shift+arrows to resize, Enter to commit, Escape to cancel.
+  Every step is announced to screen readers.
+
+## Layout rules
+
+Collisions push items down; gravity then compacts everything upward, so no
+permanent gaps form. `static: true` items never move and never get
+displaced. `minW`/`minH`/`maxW`/`maxH` clamp resizing. Below
+`collapseBreakpoint` (default 768px, measured on the grid container, not
+the viewport) the grid renders a single column in reading order and edit
+mode is suspended.
+
+## Undo
+
+The grid keeps an internal history of committed layouts (cap 50) while in
+edit mode. Cmd/Ctrl+Z and Shift+Cmd/Ctrl+Z work when focus is inside the
+grid; wire your own buttons via the ref handle (`undo()`, `redo()`) and
+`onHistoryChange`. Switching back to view mode ends the undo session.
+
+## Authoring
+
+`WidgetPalette` lists app-supplied widget types; clicking one fires
+`onWidgetAdd(type)` and the app appends the widget plus a layout item —
+use `findSlot(layout, w, h, columns)` from
+`@nhic/currantui/lib/grid-layout` to place it. `WidgetToolbar` adds a
+remove button (plus your own actions) to a widget header in edit mode.
