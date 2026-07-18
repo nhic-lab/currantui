@@ -116,6 +116,7 @@ function ShellProvider({
             "--shell-header-h": "3rem",
             "--shell-sidenav-w": "16rem",
             "--shell-sidenav-w-rail": "3rem",
+            "--shell-sidenav-w-rail-labeled": "4.5rem",
             ...style,
           } as React.CSSProperties
         }

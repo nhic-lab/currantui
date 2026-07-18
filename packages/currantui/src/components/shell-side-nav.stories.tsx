@@ -80,9 +80,108 @@ export const Fixed: Story = {
 export const Rail: Story = {
   render: () => (
     <ShellProvider className="min-h-96">
-      <ShellSideNav variant="rail">{items}</ShellSideNav>
+      <ShellSideNav variant="rail">
+        <ShellSideNavItems>
+          <ShellSideNavLink href="#" icon={<HouseIcon />} isActive>
+            Overview
+          </ShellSideNavLink>
+          <ShellSideNavLink href="#" icon={<ChartBarIcon />}>
+            Indicators
+          </ShellSideNavLink>
+          <ShellSideNavMenu label="Reports" icon={<TableIcon />} defaultOpen>
+            <ShellSideNavMenuItem href="#">Weekly submissions</ShellSideNavMenuItem>
+            <ShellSideNavMenuItem href="#">Data quality</ShellSideNavMenuItem>
+          </ShellSideNavMenu>
+          <ShellSideNavDivider />
+          <ShellSideNavLink href="#" icon={<GearIcon />}>
+            Administration
+          </ShellSideNavLink>
+        </ShellSideNavItems>
+      </ShellSideNav>
     </ShellProvider>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const labels = canvasElement.querySelectorAll<HTMLElement>(
+      '[data-slot="shell-side-nav-label"]'
+    )
+    // Every library-rendered label (links, menu trigger, open menu items) is
+    // tagged; at rail rest none may paint, or their first glyphs bleed out.
+    expect(labels.length).toBeGreaterThanOrEqual(6)
+    for (const label of labels) {
+      expect(getComputedStyle(label).opacity).toBe("0")
+    }
+    canvas.getByRole("link", { name: "Overview" }).focus()
+    await waitFor(() => {
+      for (const label of labels) {
+        expect(getComputedStyle(label).opacity).toBe("1")
+      }
+    })
+  },
+}
+
+export const LabeledRail: Story = {
+  render: () => (
+    <ShellProvider className="min-h-96">
+      <ShellSideNav variant="labeled-rail" label="Primary">
+        <ShellSideNavItems>
+          <ShellSideNavLink href="#" icon={<HouseIcon />} isActive>
+            Home
+          </ShellSideNavLink>
+          <ShellSideNavLink href="#" icon={<ChartBarIcon />}>
+            Reports
+          </ShellSideNavLink>
+          <ShellSideNavLink href="#" icon={<TableIcon />}>
+            OneLake catalog
+          </ShellSideNavLink>
+          <ShellSideNavMenu label="Legacy menu" icon={<TableIcon />}>
+            <ShellSideNavMenuItem href="#">Hidden</ShellSideNavMenuItem>
+          </ShellSideNavMenu>
+          <ShellSideNavDivider />
+          <ShellSideNavLink href="#" icon={<GearIcon />}>
+            Settings
+          </ShellSideNavLink>
+        </ShellSideNavItems>
+        <ShellSideNavFooter>
+          {/* Footer already pads horizontally — nested lists must not pad again */}
+          <ShellSideNavItems className="flex-none px-0">
+            <ShellSideNavLink href="#" icon={<HouseIcon />}>
+              My workspace
+            </ShellSideNavLink>
+          </ShellSideNavItems>
+        </ShellSideNavFooter>
+      </ShellSideNav>
+    </ShellProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const nav = canvasElement.querySelector('[data-slot="shell-side-nav"]')!
+    await expect(nav).toHaveAttribute("data-variant", "labeled-rail")
+    const home = canvas.getByRole("link", { name: "Home" })
+    await expect(home).toHaveAttribute("aria-current", "page")
+    expect(getComputedStyle(home).flexDirection).toBe("column")
+    const label = home.querySelector('[data-slot="shell-side-nav-label"]')!
+    expect(getComputedStyle(label).opacity).toBe("1")
+    await expect(
+      canvas.queryByRole("button", { name: "Legacy menu" })
+    ).not.toBeInTheDocument()
+    // Long unbreakable labels must stay inside the row (hover bg must cover them)
+    const workspace = canvas.getByRole("link", { name: "My workspace" })
+    const workspaceLabel = workspace.querySelector<HTMLElement>(
+      '[data-slot="shell-side-nav-label"]'
+    )!
+    expect(workspaceLabel.scrollWidth).toBeLessThanOrEqual(
+      workspaceLabel.clientWidth + 1
+    )
+    expect(workspace.getBoundingClientRect().right).toBeLessThanOrEqual(
+      nav.getBoundingClientRect().right + 0.5
+    )
+    // Footer rows must get the same box as main rows (no double padding)
+    expect(workspace.getBoundingClientRect().width).toBeCloseTo(
+      home.getBoundingClientRect().width,
+      0
+    )
+  },
 }
 
 export const MenuOpen: Story = {

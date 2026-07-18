@@ -200,6 +200,62 @@ export const Rail: Story = {
   },
 }
 
+export const LabeledRail: Story = {
+  render: () => (
+    <ShellProvider>
+      <ShellSkipToContent />
+      <ShellHeader>
+        <ShellHeaderName href="#">
+          <HicLogo />
+        </ShellHeaderName>
+        <ShellGlobalBar>
+          <ThemeToggle />
+        </ShellGlobalBar>
+      </ShellHeader>
+      <ShellSideNav variant="labeled-rail">
+        <ShellSideNavItems>
+          <ShellSideNavLink href="#" icon={<HouseIcon />} isActive>
+            Home
+          </ShellSideNavLink>
+          <ShellSideNavLink href="#" icon={<ChartBarIcon />}>
+            Reports
+          </ShellSideNavLink>
+          <ShellSideNavLink href="#" icon={<TableIcon />}>
+            Datasets
+          </ShellSideNavLink>
+          <ShellSideNavDivider />
+          <ShellSideNavLink href="#" icon={<GearIcon />}>
+            Settings
+          </ShellSideNavLink>
+        </ShellSideNavItems>
+        <ShellSideNavFooter>
+          <ShellSideNavItems className="flex-none px-0">
+            <ShellSideNavLink href="#" icon={<SquaresFourIcon />}>
+              My workspace
+            </ShellSideNavLink>
+          </ShellSideNavItems>
+        </ShellSideNavFooter>
+      </ShellSideNav>
+      {demoContent}
+    </ShellProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const nav = canvasElement.querySelector('[data-slot="shell-side-nav"]')!
+    await expect(nav).toHaveAttribute("data-variant", "labeled-rail")
+    const workspace = canvas.getByRole("link", { name: "My workspace" })
+    const home = canvas.getByRole("link", { name: "Home" })
+    // Inside the shell grid the rail keeps its width and rows stay uniform
+    expect(workspace.getBoundingClientRect().width).toBeCloseTo(
+      home.getBoundingClientRect().width,
+      0
+    )
+    expect(workspace.getBoundingClientRect().right).toBeLessThanOrEqual(
+      nav.getBoundingClientRect().right + 0.5
+    )
+  },
+}
+
 export const Fixed: Story = {
   render: () => (
     <ShellProvider>
