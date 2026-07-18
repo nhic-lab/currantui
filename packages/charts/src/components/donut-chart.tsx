@@ -4,7 +4,7 @@ import { TooltipComponent } from "echarts/components"
 import * as echarts from "echarts/core"
 
 import { ChartShell } from "@nhic/currantui-charts/components/chart-shell"
-import { baseTooltip } from "@nhic/currantui-charts/lib/option-base"
+import { baseTooltip, selectionStyle } from "@nhic/currantui-charts/lib/option-base"
 import { partRowColumns } from "@nhic/currantui-charts/lib/table-columns"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
@@ -12,6 +12,7 @@ import type { EChartsCoreOption } from "echarts/core"
 import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type {
   BaseChartOptions,
+  CrossFilterBinding,
   PartDataRow,
 } from "@nhic/currantui-charts/lib/types"
 
@@ -31,10 +32,12 @@ export interface DonutChartOptions extends BaseChartOptions {
 export interface DonutChartProps {
   data: Array<PartDataRow>
   options: DonutChartOptions
+  /** A slice IS a group, so `crossFilter.on` is ignored — clicks and dimming always key on `row.group` */
+  crossFilter?: CrossFilterBinding
   className?: string
 }
 
-function DonutChart({ data, options, className }: DonutChartProps) {
+function DonutChart({ data, options, crossFilter, className }: DonutChartProps) {
   const buildOption = React.useCallback(
     (context: ChartBuildContext): EChartsCoreOption => ({
       tooltip: { trigger: "item", ...baseTooltip(options.valueFormatter) },
@@ -49,6 +52,7 @@ function DonutChart({ data, options, className }: DonutChartProps) {
           data: data.map((row) => ({
             name: row.group,
             value: context.hiddenGroups.has(row.group) ? 0 : row.value,
+            itemStyle: selectionStyle(context.selection, row.group),
           })),
         },
       ],
@@ -104,6 +108,8 @@ function DonutChart({ data, options, className }: DonutChartProps) {
       legendItems={legendItems}
       buildOption={buildOption}
       overlay={overlay}
+      crossFilter={crossFilter}
+      filterValueFrom={(params) => params.name}
       className={className}
     />
   )

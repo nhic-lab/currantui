@@ -10,6 +10,7 @@ import {
   categoryAxis,
   groupsOf,
   keysOf,
+  selectionStyle,
   valueAxis,
   valuesByGroup,
 } from "@nhic/currantui-charts/lib/option-base"
@@ -21,6 +22,7 @@ import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-
 import type {
   AxisChartOptions,
   ChartDataRow,
+  CrossFilterBinding,
 } from "@nhic/currantui-charts/lib/types"
 
 echarts.use([LineSeries, GridComponent, TooltipComponent])
@@ -35,10 +37,18 @@ export interface AreaChartOptions extends AxisChartOptions {
 export interface AreaChartProps {
   data: Array<ChartDataRow>
   options: AreaChartOptions
+  /**
+   * `on: "group"` (recommended) emits and dims via the whole series (fill +
+   * stroke). With the default `on: "key"`, polygon clicks carry no `name` —
+   * only symbol clicks emit, and since `showSymbol` is false there are none,
+   * so this chart shows no dimming of its own; sibling charts and a
+   * CrossFilterBar carry the visual feedback instead.
+   */
+  crossFilter?: CrossFilterBinding
   className?: string
 }
 
-function AreaChart({ data, options, className }: AreaChartProps) {
+function AreaChart({ data, options, crossFilter, className }: AreaChartProps) {
   const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const groups = groupsOf(data)
     const keys = keysOf(data)
@@ -52,20 +62,37 @@ function AreaChart({ data, options, className }: AreaChartProps) {
       tooltip: { trigger: "axis", ...baseTooltip(options.valueFormatter) },
       xAxis: categoryAxis(keys.map(String), options.xAxis),
       yAxis: valueAxis(options.yAxis, options.valueFormatter),
-      series: groups.map((group) => ({
-        name: group,
-        type: "line" as const,
-        smooth: options.curve === "smooth",
-        showSymbol: false,
-        stack: stacked ? "total" : undefined,
-        // Stacked fills tile without overlapping, so they can be denser;
-        // overlapping fills stay light to keep every series readable
-        areaStyle: { opacity: stacked ? 0.5 : 0.2 },
-        emphasis: { focus: "series" as const },
-        data: context.hiddenGroups.has(group) ? [] : (values.get(group) ?? []),
-      })),
+      series: groups.map((group) => {
+        // Per-datum symbol dimming for "key" clicks; the whole series (fill +
+        // stroke) dims for "group" clicks since areaStyle/lineStyle are series-level
+        const groupDim =
+          crossFilter?.on === "group" ? selectionStyle(context.selection, group) : undefined
+        return {
+          name: group,
+          type: "line" as const,
+          smooth: options.curve === "smooth",
+          showSymbol: false,
+          stack: stacked ? "total" : undefined,
+          // Stacked fills tile without overlapping, so they can be denser;
+          // overlapping fills stay light to keep every series readable
+          areaStyle: { opacity: groupDim ? groupDim.opacity : stacked ? 0.5 : 0.2 },
+          lineStyle: groupDim,
+          emphasis: { focus: "series" as const },
+          // Without symbols, ECharts never dispatches click on the
+          // polygon/polyline unless triggerEvent is set — only enabled when
+          // bound, so unbound charts stay byte-identical (standalone safety)
+          ...(crossFilter ? { triggerEvent: true } : {}),
+          data: context.hiddenGroups.has(group)
+            ? []
+            : (values.get(group) ?? []).map((value, index) => ({
+                value,
+                itemStyle:
+                  groupDim ?? selectionStyle(context.selection, keys[index]),
+              })),
+        }
+      }),
     }
-  }, [data, options])
+  }, [data, options, crossFilter?.on, Boolean(crossFilter)])
 
   const legendItems = React.useMemo(
     () =>
@@ -92,6 +119,7 @@ function AreaChart({ data, options, className }: AreaChartProps) {
       tableColumns={tableColumns}
       legendItems={legendItems}
       buildOption={buildOption}
+      crossFilter={crossFilter}
       className={className}
     />
   )

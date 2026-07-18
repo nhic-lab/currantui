@@ -85,3 +85,17 @@ export interface AxisChartOptions extends BaseChartOptions {
   xAxis?: AxisOptions
   yAxis?: AxisOptions
 }
+
+export interface CrossFilterBinding {
+  /** Semantic meaning of this chart's marks, e.g. "district" */
+  dimension: string
+  /** Which datum field carries the value; defaults to "key" */
+  on?: "key" | "group"
+  /** Visual response to selections on this dimension; defaults to "dim" */
+  respond?: "dim" | "none"
+}
+
+export interface ChartSelectionContext {
+  active: boolean
+  matches: (value: string | number) => boolean
+}

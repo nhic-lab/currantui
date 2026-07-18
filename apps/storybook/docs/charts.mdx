@@ -96,3 +96,43 @@ labelled image and keep the HTML around it as the accessible surface: labelled
 toolbar controls, a real list legend with toggle buttons, and the table view as
 the primary non-visual reading of the data. Every story in this workbench runs
 an automated accessibility audit as a test gate.
+
+## Cross-filtering
+
+Wrap a group of linked charts in `CrossFilterProvider` and give each chart a
+`crossFilter={{ dimension }}` binding to turn mark clicks into shared
+selections, Power BI style:
+
+```tsx
+import { CrossFilterProvider } from "@nhic/currantui-charts/components/cross-filter"
+
+<CrossFilterProvider onSelectionsChange={setSelections}>
+  <BarChart
+    data={admissions}
+    options={{ title: "Admissions by district" }}
+    crossFilter={{ dimension: "district" }}
+  />
+  <BarChart
+    data={referrals}
+    options={{ title: "Referrals by district" }}
+    crossFilter={{ dimension: "district" }}
+  />
+</CrossFilterProvider>
+```
+
+Clicking a mark replaces the dimension's selection (clicking the same mark
+again clears it); Ctrl/Cmd-click accumulates additional values within the
+dimension. Selections across different dimensions AND-combine. Charts bound to
+the same dimension dim their non-matching marks automatically; everything else
+— hard filtering the underlying rows, syncing other UI — is the consuming
+app's job, driven off `onSelectionsChange`.
+
+Render `CrossFilterBar` alongside the charts to surface the active selections
+as dismissible chips with a clear-all action once more than one value is
+selected:
+
+```tsx
+import { CrossFilterBar } from "@nhic/currantui-charts/components/cross-filter"
+
+<CrossFilterBar className="mt-3" labels={{ district: "District" }} />
+```
