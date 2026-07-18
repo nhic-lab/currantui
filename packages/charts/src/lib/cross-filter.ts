@@ -5,6 +5,15 @@ export interface CrossFilterSelection {
 }
 
 /**
+ * ECharts click params stringify category names, while apps may seed numeric
+ * keys — values are compared through their string forms everywhere so
+ * 2024 and "2024" are one selection, never duplicates.
+ */
+function sameValue(a: string | number, b: string | number): boolean {
+  return String(a) === String(b)
+}
+
+/**
  * Power BI click semantics. Plain toggle: replace the dimension's selection
  * with the value, or clear the dimension when the value is already its only
  * selection. Additive toggle (Ctrl/Cmd-click): add or remove the value; a
@@ -18,7 +27,11 @@ export function toggleSelection(
 ): Array<CrossFilterSelection> {
   const current = selections.find((selection) => selection.dimension === dimension)
   if (!additive) {
-    if (current && current.values.length === 1 && current.values[0] === value) {
+    if (
+      current &&
+      current.values.length === 1 &&
+      sameValue(current.values[0], value)
+    ) {
       return selections.filter((selection) => selection !== current)
     }
     const next = { dimension, values: [value] }
@@ -27,8 +40,8 @@ export function toggleSelection(
       : [...selections, next]
   }
   if (!current) return [...selections, { dimension, values: [value] }]
-  const values = current.values.includes(value)
-    ? current.values.filter((candidate) => candidate !== value)
+  const values = current.values.some((candidate) => sameValue(candidate, value))
+    ? current.values.filter((candidate) => !sameValue(candidate, value))
     : [...current.values, value]
   if (values.length === 0) {
     return selections.filter((selection) => selection !== current)
@@ -53,6 +66,8 @@ export function isValueSelected(
   value: string | number
 ): boolean {
   return selections.some(
-    (selection) => selection.dimension === dimension && selection.values.includes(value)
+    (selection) =>
+      selection.dimension === dimension &&
+      selection.values.some((candidate) => sameValue(candidate, value))
   )
 }

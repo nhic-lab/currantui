@@ -54,12 +54,16 @@ function CrossFilterProvider({
   const selections = controlled ?? uncontrolled
   const selectionsRef = React.useRef(selections)
   selectionsRef.current = selections
+  const controlledRef = React.useRef(controlled !== undefined)
+  controlledRef.current = controlled !== undefined
   const onChangeRef = React.useRef(onSelectionsChange)
   onChangeRef.current = onSelectionsChange
 
   const update = React.useCallback((next: Array<CrossFilterSelection>) => {
     if (next === selectionsRef.current) return
-    setUncontrolled(next)
+    // Controlled mode owns the state — writing the shadow uncontrolled state
+    // would replay stale history if the consumer ever dropped the prop
+    if (!controlledRef.current) setUncontrolled(next)
     onChangeRef.current?.(next)
   }, [])
 
@@ -109,24 +113,54 @@ function CrossFilterBar({
   className?: string
 }) {
   const { selections, toggle, clear, enabled } = useCrossFilter()
+  const barRef = React.useRef<HTMLDivElement>(null)
+  const pendingFocusIndex = React.useRef<number | null>(null)
+
+  // Dismissing a chip removes the focused element; keep keyboard users in
+  // the bar by moving focus to the nearest surviving chip (or the bar itself)
+  React.useLayoutEffect(() => {
+    const index = pendingFocusIndex.current
+    if (index === null) return
+    pendingFocusIndex.current = null
+    const bar = barRef.current
+    if (!bar) return
+    const chips = bar.querySelectorAll<HTMLButtonElement>(
+      '[data-slot="cross-filter-chip"]'
+    )
+    if (chips.length > 0) chips[Math.min(index, chips.length - 1)].focus()
+    else bar.focus()
+  }, [selections])
+
   if (!enabled) return null
   const total = selections.reduce((count, selection) => count + selection.values.length, 0)
+  let chipIndex = -1
   return (
     <div
+      ref={barRef}
       data-slot="cross-filter-bar"
       aria-live="polite"
-      className={cn("flex min-h-6 flex-wrap items-center gap-1.5", className)}
+      tabIndex={-1}
+      className={cn(
+        "flex min-h-6 flex-wrap items-center gap-1.5 outline-none",
+        className
+      )}
     >
       {selections.flatMap((selection) =>
         selection.values.map((value) => {
           const dimensionLabel = labels?.[selection.dimension] ?? selection.dimension
+          chipIndex += 1
+          const index = chipIndex
           return (
             <button
               key={`${selection.dimension}:${String(value)}`}
               type="button"
+              data-slot="cross-filter-chip"
               aria-label={`Remove filter ${dimensionLabel}: ${String(value)}`}
               className={cn(filterChipVariants({ active: true }), "gap-1")}
-              onClick={() => toggle(selection.dimension, value, true)}
+              onClick={() => {
+                pendingFocusIndex.current = index
+                toggle(selection.dimension, value, true)
+              }}
             >
               <span>
                 {dimensionLabel}: {String(value)}
@@ -137,7 +171,14 @@ function CrossFilterBar({
         })
       )}
       {total >= 2 && (
-        <Button variant="ghost" size="sm" onClick={() => clear()}>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            pendingFocusIndex.current = 0
+            clear()
+          }}
+        >
           Clear all
         </Button>
       )}

@@ -2,6 +2,11 @@ import * as React from "react"
 import * as echarts from "echarts/core"
 import { expect, userEvent, waitFor, within } from "storybook/test"
 
+import {
+  clickAreaFill,
+  clickCategory,
+  settleChart,
+} from "@nhic/currantui-charts/testing/canvas-click"
 import { AreaChart } from "@nhic/currantui-charts/components/area-chart"
 import { CrossFilterBar, CrossFilterProvider } from "@nhic/currantui-charts/components/cross-filter"
 import { BarChart } from "@nhic/currantui-charts/components/bar-chart"
@@ -132,88 +137,6 @@ function LinkedBars() {
   )
 }
 
-/**
- * Click the mark for a category via ECharts' own coordinate conversion.
- * Dispatches real mouse events on the canvas rather than going through
- * userEvent.pointer: synthetic events built by the test runner report
- * offsetX/offsetY as 0, which zrender trusts over clientX/getBoundingClientRect
- * (see zrender/core/event.js clientToLocal), so clicks silently miss every
- * mark. Overriding offsetX/offsetY on the dispatched events keeps the click
- * flowing through the real DOM/zrender/echarts pipeline with correct coordinates.
- */
-function clickPixel(host: HTMLElement, x: number, y: number, ctrl = false) {
-  const canvasEl = host.querySelector("canvas")!
-  const rect = canvasEl.getBoundingClientRect()
-  const clientX = rect.left + x
-  const clientY = rect.top + y
-  for (const type of ["mousedown", "mouseup", "click"]) {
-    const event = new MouseEvent(type, {
-      bubbles: true,
-      cancelable: true,
-      clientX,
-      clientY,
-      button: 0,
-      ctrlKey: ctrl,
-    })
-    Object.defineProperty(event, "offsetX", { value: x })
-    Object.defineProperty(event, "offsetY", { value: y })
-    canvasEl.dispatchEvent(event)
-  }
-}
-
-function clickCategory(
-  chartRoot: Element,
-  categoryIndex: number,
-  value: number,
-  ctrl = false
-) {
-  const host = chartRoot.querySelector<HTMLElement>('div[aria-hidden="true"]')!
-  const chart = echarts.getInstanceByDom(host)!
-  const [x, y] = chart.convertToPixel({ seriesIndex: 0 }, [categoryIndex, value / 2])
-  clickPixel(host, x, y, ctrl)
-}
-
-/**
- * Click inside a filled area/line polygon between two categories (not on a
- * data-point vertex, which sits on the polygon's own edge and can miss the
- * fill hit-test). Callers must await `settleChart` first — the fill is not
- * hit-testable until the reveal animation completes, and dispatching clicks
- * against a mid-animation chart toggles state unpredictably.
- */
-function clickAreaFill(chartRoot: Element, categoryIndex: number, belowValue: number) {
-  const host = chartRoot.querySelector<HTMLElement>('div[aria-hidden="true"]')!
-  const chart = echarts.getInstanceByDom(host)!
-  const [x0] = chart.convertToPixel({ seriesIndex: 0 }, [categoryIndex, 0])
-  const [x1] = chart.convertToPixel({ seriesIndex: 0 }, [categoryIndex + 1, 0])
-  const [, y] = chart.convertToPixel({ seriesIndex: 0 }, [categoryIndex, belowValue])
-  clickPixel(host, (x0 + x1) / 2, y)
-}
-
-/**
- * Resolve once the chart's coordinate system answers convertToPixel and the
- * render/animation pipeline reports finished (bounded fallback in case the
- * "finished" event fired before we could attach).
- */
-async function settleChart(chartRoot: Element) {
-  const host = chartRoot.querySelector<HTMLElement>('div[aria-hidden="true"]')!
-  await waitFor(() => {
-    const chart = echarts.getInstanceByDom(host)
-    expect(chart).toBeTruthy()
-    const pixel = chart!.convertToPixel({ seriesIndex: 0 }, [0, 0])
-    expect(Number.isFinite(pixel[0])).toBe(true)
-  })
-  const chart = echarts.getInstanceByDom(host)!
-  await new Promise<void>((resolve) => {
-    let settled = false
-    const done = () => {
-      if (settled) return
-      settled = true
-      resolve()
-    }
-    chart.on("finished", done)
-    setTimeout(done, 1500)
-  })
-}
 
 export const LinkedBarCharts: Story = {
   render: () => <LinkedBars />,
@@ -259,6 +182,12 @@ export const LinkedBarCharts: Story = {
         '[{"dimension":"district","values":["Kicukiro"]}]'
       )
     })
+    // Focus moves to the nearest surviving chip, not to <body>
+    await waitFor(() => {
+      expect(document.activeElement).toBe(
+        canvas.getByRole("button", { name: "Remove filter District: Kicukiro" })
+      )
+    })
     // With one value left, "Clear all" steps aside for the single chip's own remove
     expect(canvas.queryByRole("button", { name: "Clear all" })).not.toBeInTheDocument()
     // Ctrl-click restores a second selection so "Clear all" can be exercised
@@ -269,6 +198,12 @@ export const LinkedBarCharts: Story = {
       expect(canvas.getByTestId("selections-readout").textContent).toBe("[]")
     })
     expect(canvas.queryByRole("button", { name: /Remove filter/ })).not.toBeInTheDocument()
+    // With no chips left, focus lands on the bar itself
+    await waitFor(() => {
+      expect(document.activeElement).toBe(
+        canvasElement.querySelector('[data-slot="cross-filter-bar"]')
+      )
+    })
   },
 }
 

@@ -88,3 +88,27 @@ describe("isValueSelected", () => {
     expect(isValueSelected(state, "sex", "Gasabo")).toBe(false)
   })
 })
+
+describe("value normalization (numeric keys vs clicked strings)", () => {
+  it("plain toggle clears a seeded numeric value via its string form", () => {
+    const state = [sel("year", 2024)]
+    expect(toggleSelection(state, "year", "2024")).toEqual([])
+  })
+
+  it("additive toggle removes across types instead of duplicating", () => {
+    const state = [sel("year", 2024, "2025")]
+    expect(toggleSelection(state, "year", "2024", true)).toEqual([sel("year", "2025")])
+  })
+
+  it("additive toggle never adds a stringified duplicate", () => {
+    const state = [sel("year", 2024)]
+    const next = toggleSelection(state, "year", "2025", true)
+    expect(toggleSelection(next, "year", 2025, true)).toEqual([sel("year", 2024)])
+  })
+
+  it("isValueSelected matches across types", () => {
+    const state = [sel("year", 2024)]
+    expect(isValueSelected(state, "year", "2024")).toBe(true)
+    expect(isValueSelected(state, "year", 2024)).toBe(true)
+  })
+})
