@@ -1,6 +1,10 @@
 import { formatNumber } from "@nhic/currantui-charts/lib/format"
 
-import type { AxisOptions, ChartDataRow } from "@nhic/currantui-charts/lib/types"
+import type {
+  AxisOptions,
+  ChartDataRow,
+  ChartSelectionContext,
+} from "@nhic/currantui-charts/lib/types"
 
 /** Unique groups in first-appearance order — the fixed series order */
 export function groupsOf(rows: ReadonlyArray<ChartDataRow>): Array<string> {
@@ -84,4 +88,16 @@ export function valueAxis(
     nameGap: 44,
     axisLabel: { formatter: (value: number) => format(value) },
   }
+}
+
+export const SELECTION_DIM_OPACITY = 0.25
+
+/** Per-datum itemStyle under an active cross-filter selection; undefined = fully lit */
+export function selectionStyle(
+  selection: ChartSelectionContext,
+  value: string | number
+): { opacity: number } | undefined {
+  return selection.active && !selection.matches(value)
+    ? { opacity: SELECTION_DIM_OPACITY }
+    : undefined
 }

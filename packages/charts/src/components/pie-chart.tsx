@@ -4,7 +4,7 @@ import { TooltipComponent } from "echarts/components"
 import * as echarts from "echarts/core"
 
 import { ChartShell } from "@nhic/currantui-charts/components/chart-shell"
-import { baseTooltip } from "@nhic/currantui-charts/lib/option-base"
+import { baseTooltip, selectionStyle } from "@nhic/currantui-charts/lib/option-base"
 import { partRowColumns } from "@nhic/currantui-charts/lib/table-columns"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
@@ -12,6 +12,7 @@ import type { EChartsCoreOption } from "echarts/core"
 import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type {
   BaseChartOptions,
+  CrossFilterBinding,
   PartDataRow,
 } from "@nhic/currantui-charts/lib/types"
 
@@ -26,10 +27,12 @@ export interface PieChartOptions extends BaseChartOptions {
 export interface PieChartProps {
   data: Array<PartDataRow>
   options: PieChartOptions
+  /** A slice IS a group, so `crossFilter.on` is ignored — clicks and dimming always key on `row.group` */
+  crossFilter?: CrossFilterBinding
   className?: string
 }
 
-function PieChart({ data, options, className }: PieChartProps) {
+function PieChart({ data, options, crossFilter, className }: PieChartProps) {
   const buildOption = React.useCallback(
     (context: ChartBuildContext): EChartsCoreOption => ({
       tooltip: { trigger: "item", ...baseTooltip(options.valueFormatter) },
@@ -45,6 +48,7 @@ function PieChart({ data, options, className }: PieChartProps) {
           data: data.map((row) => ({
             name: row.group,
             value: context.hiddenGroups.has(row.group) ? 0 : row.value,
+            itemStyle: selectionStyle(context.selection, row.group),
           })),
         },
       ],
@@ -77,6 +81,8 @@ function PieChart({ data, options, className }: PieChartProps) {
       tableColumns={tableColumns}
       legendItems={legendItems}
       buildOption={buildOption}
+      crossFilter={crossFilter}
+      filterValueFrom={(params) => params.name}
       className={className}
     />
   )

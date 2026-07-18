@@ -150,6 +150,91 @@ export const Collapsed: Story = {
   },
 }
 
+/*
+ * Stateful stories render through wrapper components, which Storybook's
+ * "Show code" cannot expand — each carries an explicit, copyable
+ * docs.source snippet (test readouts omitted).
+ */
+const editableSource = `
+function EditableDashboard() {
+  const [layout, setLayout] = React.useState<Array<LayoutItem>>([
+    { id: "facilities", x: 0, y: 0, w: 3, h: 2 },
+    { id: "on-time", x: 3, y: 0, w: 3, h: 2 },
+    { id: "submissions", x: 6, y: 0, w: 6, h: 4 },
+  ])
+  return (
+    <DashboardGrid layout={layout} onLayoutChange={setLayout} mode="edit">
+      <DashboardWidget id="facilities" title="Facilities">
+        <MyKpi />
+      </DashboardWidget>
+      <DashboardWidget id="on-time" title="On-time reports">
+        <MyKpi />
+      </DashboardWidget>
+      <DashboardWidget id="submissions" title="Weekly submissions">
+        <MyChart />
+      </DashboardWidget>
+    </DashboardGrid>
+  )
+}
+`.trim()
+
+const removeSource = `
+function RemovableDashboard() {
+  const [layout, setLayout] = React.useState<Array<LayoutItem>>(initialLayout)
+  return (
+    <DashboardGrid
+      layout={layout}
+      onLayoutChange={setLayout}
+      onWidgetRemove={(id) => removeFromMyWidgetList(id)}
+      mode="edit"
+    >
+      <DashboardWidget id="facilities" title="Facilities" toolbar={<WidgetToolbar />}>
+        <MyKpi />
+      </DashboardWidget>
+    </DashboardGrid>
+  )
+}
+`.trim()
+
+const undoSource = `
+function UndoableDashboard() {
+  const gridRef = React.useRef<DashboardGridHandle>(null)
+  const [layout, setLayout] = React.useState<Array<LayoutItem>>(initialLayout)
+  const [history, setHistory] = React.useState({ canUndo: false, canRedo: false })
+  return (
+    <>
+      <Button
+        variant="outline"
+        disabled={!history.canUndo}
+        onClick={() => gridRef.current?.undo()}
+      >
+        Undo
+      </Button>
+      <Button
+        variant="outline"
+        disabled={!history.canRedo}
+        onClick={() => gridRef.current?.redo()}
+      >
+        Redo
+      </Button>
+      <DashboardGrid
+        ref={gridRef}
+        layout={layout}
+        onLayoutChange={setLayout}
+        onHistoryChange={setHistory}
+        mode="edit"
+      >
+        {widgets}
+      </DashboardGrid>
+    </>
+  )
+}
+`.trim()
+
+const editableDocs = {
+  docs: { source: { code: editableSource, language: "tsx" as const } },
+}
+
 function EditableDashboard(props: {
   onLayout?: (layout: Array<LayoutItem>) => void
   withToolbar?: boolean
@@ -179,10 +264,12 @@ function EditableDashboard(props: {
 
 export const EditMode: Story = {
   render: () => <EditableDashboard />,
+  parameters: editableDocs,
 }
 
 export const PointerDrag: Story = {
   render: () => <EditableDashboard />,
+  parameters: editableDocs,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const handle = await canvas.findByRole("button", { name: /^move facilities$/i })
@@ -204,6 +291,7 @@ export const PointerDrag: Story = {
 
 export const DragCancel: Story = {
   render: () => <EditableDashboard />,
+  parameters: editableDocs,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const handle = await canvas.findByRole("button", { name: /^move facilities$/i })
@@ -226,6 +314,7 @@ export const DragCancel: Story = {
 
 export const PointerResize: Story = {
   render: () => <EditableDashboard />,
+  parameters: editableDocs,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await canvas.findByRole("button", { name: /^move facilities$/i })
@@ -251,6 +340,7 @@ export const PointerResize: Story = {
 
 export const KeyboardMove: Story = {
   render: () => <EditableDashboard />,
+  parameters: editableDocs,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const handle = await canvas.findByRole("button", { name: /^move facilities$/i })
@@ -266,6 +356,7 @@ export const KeyboardMove: Story = {
 
 export const KeyboardMoveDown: Story = {
   render: () => <EditableDashboard />,
+  parameters: editableDocs,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const handle = await canvas.findByRole("button", { name: /^move facilities$/i })
@@ -289,6 +380,7 @@ export const KeyboardMoveDown: Story = {
 
 export const KeyboardResizeAndCancel: Story = {
   render: () => <EditableDashboard />,
+  parameters: editableDocs,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const handle = await canvas.findByRole("button", { name: /^move facilities$/i })
@@ -350,6 +442,7 @@ function UndoableDashboard() {
 
 export const UndoRedo: Story = {
   render: () => <UndoableDashboard />,
+  parameters: { docs: { source: { code: undoSource, language: "tsx" } } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const handle = await canvas.findByRole("button", { name: /^move facilities$/i })
@@ -386,6 +479,7 @@ const onWidgetRemoveSpy = fn()
 
 export const RemoveWidget: Story = {
   render: () => <EditableDashboard withToolbar onWidgetRemove={onWidgetRemoveSpy} />,
+  parameters: { docs: { source: { code: removeSource, language: "tsx" } } },
   play: async ({ canvasElement }) => {
     onWidgetRemoveSpy.mockClear()
     const canvas = within(canvasElement)

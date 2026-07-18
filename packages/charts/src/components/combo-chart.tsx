@@ -10,6 +10,7 @@ import {
   categoryAxis,
   groupsOf,
   keysOf,
+  selectionStyle,
   valueAxis,
   valuesByGroup,
 } from "@nhic/currantui-charts/lib/option-base"
@@ -21,6 +22,7 @@ import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-
 import type {
   AxisChartOptions,
   ChartDataRow,
+  CrossFilterBinding,
 } from "@nhic/currantui-charts/lib/types"
 
 echarts.use([BarSeries, LineSeries, GridComponent, TooltipComponent])
@@ -43,10 +45,11 @@ export interface ComboChartOptions extends AxisChartOptions {
 export interface ComboChartProps {
   data: Array<ChartDataRow>
   options: ComboChartOptions
+  crossFilter?: CrossFilterBinding
   className?: string
 }
 
-function ComboChart({ data, options, className }: ComboChartProps) {
+function ComboChart({ data, options, crossFilter, className }: ComboChartProps) {
   const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const groups = groupsOf(data)
     const keys = keysOf(data)
@@ -80,17 +83,27 @@ function ComboChart({ data, options, className }: ComboChartProps) {
         : primaryAxis,
       series: groups.map((group) => {
         const type = options.seriesTypes?.[group] ?? "bar"
+        // Per-datum dimming for "key" clicks; a line's stroke is series-level
+        // so "group" clicks additionally dim the whole line via lineStyle
+        const groupDim =
+          crossFilter?.on === "group" ? selectionStyle(context.selection, group) : undefined
         const base = {
           name: group,
-          data: context.hiddenGroups.has(group) ? [] : (values.get(group) ?? []),
+          data: context.hiddenGroups.has(group)
+            ? []
+            : (values.get(group) ?? []).map((value, index) => ({
+                value,
+                itemStyle:
+                  groupDim ?? selectionStyle(context.selection, keys[index]),
+              })),
           yAxisIndex: secondary?.groups.includes(group) ? 1 : 0,
         }
         return type === "line"
-          ? { ...base, type: "line" as const, showSymbol: true, symbolSize: 6 }
+          ? { ...base, type: "line" as const, showSymbol: true, symbolSize: 6, lineStyle: groupDim }
           : { ...base, type: "bar" as const, barMaxWidth: 48 }
       }),
     }
-  }, [data, options])
+  }, [data, options, crossFilter?.on])
 
   const legendItems = React.useMemo(
     () =>
@@ -119,6 +132,7 @@ function ComboChart({ data, options, className }: ComboChartProps) {
       tableColumns={tableColumns}
       legendItems={legendItems}
       buildOption={buildOption}
+      crossFilter={crossFilter}
       className={className}
     />
   )

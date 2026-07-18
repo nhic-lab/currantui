@@ -5,6 +5,7 @@ export default defineConfig({
     "src/components/*.tsx",
     "!src/components/*.stories.tsx",
     "src/lib/*.ts",
+    "!src/lib/*.test.ts",
   ],
   format: ["esm"],
   dts: true,
