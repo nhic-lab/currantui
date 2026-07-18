@@ -10,6 +10,7 @@ import {
   categoryAxis,
   groupsOf,
   keysOf,
+  selectionStyle,
   valueAxis,
   valuesByGroup,
 } from "@nhic/currantui-charts/lib/option-base"
@@ -21,6 +22,7 @@ import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-
 import type {
   AxisChartOptions,
   ChartDataRow,
+  CrossFilterBinding,
 } from "@nhic/currantui-charts/lib/types"
 
 echarts.use([LineSeries, GridComponent, TooltipComponent])
@@ -35,10 +37,11 @@ export interface LineChartOptions extends AxisChartOptions {
 export interface LineChartProps {
   data: Array<ChartDataRow>
   options: LineChartOptions
+  crossFilter?: CrossFilterBinding
   className?: string
 }
 
-function LineChart({ data, options, className }: LineChartProps) {
+function LineChart({ data, options, crossFilter, className }: LineChartProps) {
   const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const groups = groupsOf(data)
     const keys = keysOf(data)
@@ -51,16 +54,33 @@ function LineChart({ data, options, className }: LineChartProps) {
       tooltip: { trigger: "axis", ...baseTooltip(options.valueFormatter) },
       xAxis: categoryAxis(keys.map(String), options.xAxis),
       yAxis: valueAxis(options.yAxis, options.valueFormatter),
-      series: groups.map((group) => ({
-        name: group,
-        type: "line" as const,
-        smooth: options.curve === "smooth",
-        showSymbol: options.points !== false,
-        symbolSize: 6,
-        data: context.hiddenGroups.has(group) ? [] : (values.get(group) ?? []),
-      })),
+      series: groups.map((group) => {
+        // Per-datum symbol dimming for "key" clicks; the whole series (line +
+        // symbols) dims for "group" clicks since the stroke isn't per-datum
+        const groupDim =
+          crossFilter?.on === "group" ? selectionStyle(context.selection, group) : undefined
+        return {
+          name: group,
+          type: "line" as const,
+          smooth: options.curve === "smooth",
+          showSymbol: options.points !== false,
+          symbolSize: 6,
+          lineStyle: groupDim,
+          // Without symbols, ECharts never dispatches click on the polyline
+          // unless triggerEvent is set — only enabled when bound, so unbound
+          // charts stay byte-identical (standalone safety)
+          ...(crossFilter ? { triggerEvent: true } : {}),
+          data: context.hiddenGroups.has(group)
+            ? []
+            : (values.get(group) ?? []).map((value, index) => ({
+                value,
+                itemStyle:
+                  groupDim ?? selectionStyle(context.selection, keys[index]),
+              })),
+        }
+      }),
     }
-  }, [data, options])
+  }, [data, options, crossFilter?.on, Boolean(crossFilter)])
 
   const legendItems = React.useMemo(
     () =>
@@ -87,6 +107,7 @@ function LineChart({ data, options, className }: LineChartProps) {
       tableColumns={tableColumns}
       legendItems={legendItems}
       buildOption={buildOption}
+      crossFilter={crossFilter}
       className={className}
     />
   )

@@ -5,7 +5,7 @@ import * as echarts from "echarts/core"
 
 import { ChartShell } from "@nhic/currantui-charts/components/chart-shell"
 import { formatNumber } from "@nhic/currantui-charts/lib/format"
-import { baseGrid, valueAxis } from "@nhic/currantui-charts/lib/option-base"
+import { baseGrid, selectionStyle, valueAxis } from "@nhic/currantui-charts/lib/option-base"
 import { scaleSqrt } from "@nhic/currantui-charts/lib/stats"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
@@ -15,6 +15,7 @@ import type { ChartTableColumn } from "@nhic/currantui-charts/lib/table-columns"
 import type {
   AxisChartOptions,
   BubbleDataRow,
+  CrossFilterBinding,
 } from "@nhic/currantui-charts/lib/types"
 
 echarts.use([ScatterSeries, GridComponent, TooltipComponent])
@@ -31,6 +32,8 @@ export interface BubbleChartOptions extends AxisChartOptions {
 export interface BubbleChartProps {
   data: Array<BubbleDataRow>
   options: BubbleChartOptions
+  /** Group-only — points carry no key, so clicks only ever resolve via `on: "group"` */
+  crossFilter?: CrossFilterBinding
   className?: string
 }
 
@@ -38,7 +41,7 @@ function bubbleGroups(rows: ReadonlyArray<BubbleDataRow>): Array<string> {
   return [...new Set(rows.map((row) => row.group))]
 }
 
-function BubbleChart({ data, options, className }: BubbleChartProps) {
+function BubbleChart({ data, options, crossFilter, className }: BubbleChartProps) {
   const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const groups = bubbleGroups(data)
     const format = options.valueFormatter ?? formatNumber
@@ -72,8 +75,9 @@ function BubbleChart({ data, options, className }: BubbleChartProps) {
         name: group,
         type: "scatter" as const,
         symbolSize: (value: Array<number>) => scale(value[2]),
-        // Translucent fills keep overlapping bubbles readable
-        itemStyle: { opacity: 0.75 },
+        // Translucent fills keep overlapping bubbles readable; dimming
+        // overrides that base opacity when the group is excluded
+        itemStyle: { opacity: selectionStyle(context.selection, group)?.opacity ?? 0.75 },
         data: context.hiddenGroups.has(group)
           ? []
           : data
@@ -109,6 +113,7 @@ function BubbleChart({ data, options, className }: BubbleChartProps) {
       tableColumns={tableColumns}
       legendItems={legendItems}
       buildOption={buildOption}
+      crossFilter={crossFilter}
       className={className}
     />
   )

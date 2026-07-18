@@ -86,12 +86,40 @@ function AuthoringExample() {
   )
 }
 
+/* Stateful wrapper story — "Show code" gets an explicit copyable snippet */
+const authoringSource = `
+function AuthoringDashboard() {
+  const [layout, setLayout] = React.useState<Array<LayoutItem>>(initialLayout)
+  const addWidget = (type: string) => {
+    const id = createWidgetId(type)
+    const slot = findSlot(layout, 4, 2, 12)
+    setLayout((current) => [...current, { id, ...slot, w: 4, h: 2 }])
+  }
+  return (
+    <div className="flex items-start gap-4">
+      <WidgetPalette
+        aria-label="Add a widget"
+        items={[
+          { type: "kpi", label: "KPI card", description: "Single headline number" },
+          { type: "chart", label: "Chart", description: "Time series or categorical" },
+        ]}
+        onWidgetAdd={addWidget}
+      />
+      <DashboardGrid layout={layout} onLayoutChange={setLayout} mode="edit" className="flex-1">
+        {myWidgets}
+      </DashboardGrid>
+    </div>
+  )
+}
+`.trim()
+
 export const Authoring: Story = {
   args: {
     items: paletteItems,
     onWidgetAdd: () => {},
   },
   render: () => <AuthoringExample />,
+  parameters: { docs: { source: { code: authoringSource, language: "tsx" } } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole("button", { name: /kpi card/i }))

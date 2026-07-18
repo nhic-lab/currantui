@@ -30,6 +30,7 @@ export default defineConfig({
       {
         resolve: {
           alias: {
+            "@nhic/currantui-charts": join(here, "../../packages/charts/src"),
             "@nhic/currantui": join(here, "../../packages/currantui/src"),
           },
         },

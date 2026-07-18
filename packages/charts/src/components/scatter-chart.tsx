@@ -5,7 +5,7 @@ import * as echarts from "echarts/core"
 
 import { ChartShell } from "@nhic/currantui-charts/components/chart-shell"
 import { formatNumber } from "@nhic/currantui-charts/lib/format"
-import { baseGrid, valueAxis } from "@nhic/currantui-charts/lib/option-base"
+import { baseGrid, selectionStyle, valueAxis } from "@nhic/currantui-charts/lib/option-base"
 import { paletteVar } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
@@ -13,6 +13,7 @@ import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-
 import type { ChartTableColumn } from "@nhic/currantui-charts/lib/table-columns"
 import type {
   AxisChartOptions,
+  CrossFilterBinding,
   ScatterDataRow,
 } from "@nhic/currantui-charts/lib/types"
 
@@ -28,6 +29,8 @@ export interface ScatterChartOptions extends AxisChartOptions {
 export interface ScatterChartProps {
   data: Array<ScatterDataRow>
   options: ScatterChartOptions
+  /** Group-only — points carry no key, so clicks only ever resolve via `on: "group"` */
+  crossFilter?: CrossFilterBinding
   className?: string
 }
 
@@ -35,7 +38,7 @@ function scatterGroups(rows: ReadonlyArray<ScatterDataRow>): Array<string> {
   return [...new Set(rows.map((row) => row.group))]
 }
 
-function ScatterChart({ data, options, className }: ScatterChartProps) {
+function ScatterChart({ data, options, crossFilter, className }: ScatterChartProps) {
   const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const groups = scatterGroups(data)
     const format = options.valueFormatter ?? formatNumber
@@ -61,6 +64,7 @@ function ScatterChart({ data, options, className }: ScatterChartProps) {
         name: group,
         type: "scatter" as const,
         symbolSize: options.pointSize ?? 9,
+        itemStyle: selectionStyle(context.selection, group),
         data: context.hiddenGroups.has(group)
           ? []
           : data
@@ -95,6 +99,7 @@ function ScatterChart({ data, options, className }: ScatterChartProps) {
       tableColumns={tableColumns}
       legendItems={legendItems}
       buildOption={buildOption}
+      crossFilter={crossFilter}
       className={className}
     />
   )

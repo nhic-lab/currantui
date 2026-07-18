@@ -10,13 +10,15 @@ import * as echarts from "echarts/core"
 import { ChartRampLegend } from "@nhic/currantui-charts/components/chart-ramp-legend"
 import { ChartShell } from "@nhic/currantui-charts/components/chart-shell"
 import { formatNumber } from "@nhic/currantui-charts/lib/format"
-import { baseGrid, categoryAxis } from "@nhic/currantui-charts/lib/option-base"
+import { baseGrid, categoryAxis, selectionStyle } from "@nhic/currantui-charts/lib/option-base"
 import { resolveTokenColor } from "@nhic/currantui-charts/lib/theme"
 
 import type { EChartsCoreOption } from "echarts/core"
+import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-shell"
 import type { ChartTableColumn } from "@nhic/currantui-charts/lib/table-columns"
 import type {
   AxisChartOptions,
+  CrossFilterBinding,
   HeatmapDataRow,
 } from "@nhic/currantui-charts/lib/types"
 
@@ -35,6 +37,8 @@ export interface HeatmapChartOptions extends AxisChartOptions {
 export interface HeatmapChartProps {
   data: Array<HeatmapDataRow>
   options: HeatmapChartOptions
+  /** `on: "key"` maps to a cell's x value, `on: "group"` to its y value */
+  crossFilter?: CrossFilterBinding
   className?: string
 }
 
@@ -42,7 +46,7 @@ function uniqueInOrder(values: ReadonlyArray<string>): Array<string> {
   return [...new Set(values)]
 }
 
-function HeatmapChart({ data, options, className }: HeatmapChartProps) {
+function HeatmapChart({ data, options, crossFilter, className }: HeatmapChartProps) {
   const format = options.valueFormatter ?? formatNumber
   const domain = React.useMemo(() => {
     const values = data.map((row) => row.value)
@@ -52,7 +56,7 @@ function HeatmapChart({ data, options, className }: HeatmapChartProps) {
     }
   }, [data])
 
-  const buildOption = React.useCallback((): EChartsCoreOption => {
+  const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
     const xKeys = uniqueInOrder(data.map((row) => row.x))
     const yKeys = uniqueInOrder(data.map((row) => row.y))
     return {
@@ -99,11 +103,17 @@ function HeatmapChart({ data, options, className }: HeatmapChartProps) {
             borderColor: resolveTokenColor("--card"),
             borderWidth: 1,
           },
-          data: data.map((row) => [row.x, row.y, row.value]),
+          data: data.map((row) => ({
+            value: [row.x, row.y, row.value],
+            itemStyle: selectionStyle(
+              context.selection,
+              crossFilter?.on === "group" ? row.y : row.x
+            ),
+          })),
         },
       ],
     }
-  }, [data, domain, format, options])
+  }, [data, domain, format, options, crossFilter?.on])
 
   const tableColumns = React.useMemo(
     (): Array<ChartTableColumn<HeatmapDataRow>> => [
@@ -127,6 +137,16 @@ function HeatmapChart({ data, options, className }: HeatmapChartProps) {
         />
       }
       buildOption={buildOption}
+      crossFilter={crossFilter}
+      // Data items are {value: [x, y, value], ...} objects (needed for
+      // per-datum itemStyle), so the resolved value lives on params.value,
+      // not params.data
+      filterValueFrom={(params, on) => {
+        const value = params.value
+        return Array.isArray(value)
+          ? String(on === "group" ? value[1] : value[0])
+          : undefined
+      }}
       className={className}
     />
   )

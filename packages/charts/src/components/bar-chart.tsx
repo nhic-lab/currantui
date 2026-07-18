@@ -10,6 +10,7 @@ import {
   categoryAxis,
   groupsOf,
   keysOf,
+  selectionStyle,
   valueAxis,
   valuesByGroup,
 } from "@nhic/currantui-charts/lib/option-base"
@@ -21,6 +22,7 @@ import type { ChartBuildContext } from "@nhic/currantui-charts/components/chart-
 import type {
   AxisChartOptions,
   ChartDataRow,
+  CrossFilterBinding,
 } from "@nhic/currantui-charts/lib/types"
 
 echarts.use([BarSeries, GridComponent, TooltipComponent])
@@ -35,10 +37,11 @@ export interface BarChartOptions extends AxisChartOptions {
 export interface BarChartProps {
   data: Array<ChartDataRow>
   options: BarChartOptions
+  crossFilter?: CrossFilterBinding
   className?: string
 }
 
-function BarChart({ data, options, className }: BarChartProps) {
+function BarChart({ data, options, crossFilter, className }: BarChartProps) {
   const vertical = options.orientation !== "horizontal"
 
   const buildOption = React.useCallback((context: ChartBuildContext): EChartsCoreOption => {
@@ -72,11 +75,19 @@ function BarChart({ data, options, className }: BarChartProps) {
         name: group,
         type: "bar" as const,
         stack: stacked ? "total" : undefined,
-        data: context.hiddenGroups.has(group) ? [] : (values.get(group) ?? []),
+        data: context.hiddenGroups.has(group)
+          ? []
+          : (values.get(group) ?? []).map((value, index) => ({
+              value,
+              itemStyle: selectionStyle(
+                context.selection,
+                crossFilter?.on === "group" ? group : keys[index]
+              ),
+            })),
         barMaxWidth: 48,
       })),
     }
-  }, [data, options, vertical])
+  }, [data, options, vertical, crossFilter?.on])
 
   const legendItems = React.useMemo(
     () =>
@@ -100,6 +111,7 @@ function BarChart({ data, options, className }: BarChartProps) {
       tableColumns={tableColumns}
       legendItems={legendItems}
       buildOption={buildOption}
+      crossFilter={crossFilter}
       className={className}
     />
   )
