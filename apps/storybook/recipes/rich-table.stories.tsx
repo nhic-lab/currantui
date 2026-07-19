@@ -694,6 +694,13 @@ export function RichTable({ data, onOpen, onSetStatus }: RichTableProps) {
 const meta = {
   title: "Recipes/Rich Table",
   component: RichTable,
+  /*
+   * RichTable is exported for the recipe's readability, but CSF would index
+   * it as a legacy function story whose dynamic "Show code" serializes the
+   * entire rendered tree — cyclic TanStack table objects hang the docs page
+   * for minutes. Exclude it from story indexing.
+   */
+  excludeStories: ["RichTable"],
   parameters: {
     layout: "padded",
     docs: {
