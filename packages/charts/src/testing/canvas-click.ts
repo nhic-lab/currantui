@@ -40,16 +40,44 @@ export function chartHost(chartRoot: Element): HTMLElement {
   return chartRoot.querySelector<HTMLElement>('div[aria-hidden="true"]')!
 }
 
+/**
+ * Poll the pure coordinate conversion until the chart's coordinate system
+ * answers with finite pixels. Right after a selection-triggered
+ * setOption(notMerge) rebuild — common on slow CI runners — convertToPixel
+ * briefly returns undefined; retrying the conversion is side-effect-free,
+ * unlike retrying clicks.
+ */
+async function resolvePixel(
+  host: HTMLElement,
+  coords: [number, number]
+): Promise<[number, number]> {
+  const deadline = Date.now() + 3000
+  for (;;) {
+    const chart = echarts.getInstanceByDom(host)
+    const pixel = chart?.convertToPixel({ seriesIndex: 0 }, coords) as
+      | [number, number]
+      | undefined
+    if (pixel && Number.isFinite(pixel[0]) && Number.isFinite(pixel[1])) {
+      return pixel
+    }
+    if (Date.now() > deadline) {
+      throw new Error(
+        "convertToPixel produced no finite pixel within 3s — is the chart's coordinate system mounted?"
+      )
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  }
+}
+
 /** Click the mark for a category via ECharts' own coordinate conversion. */
-export function clickCategory(
+export async function clickCategory(
   chartRoot: Element,
   categoryIndex: number,
   value: number,
   ctrl = false
 ) {
   const host = chartHost(chartRoot)
-  const chart = echarts.getInstanceByDom(host)!
-  const [x, y] = chart.convertToPixel({ seriesIndex: 0 }, [categoryIndex, value / 2])
+  const [x, y] = await resolvePixel(host, [categoryIndex, value / 2])
   clickPixel(host, x, y, ctrl)
 }
 
@@ -60,16 +88,15 @@ export function clickCategory(
  * hit-testable until the reveal animation completes, and dispatching clicks
  * against a mid-animation chart toggles state unpredictably.
  */
-export function clickAreaFill(
+export async function clickAreaFill(
   chartRoot: Element,
   categoryIndex: number,
   belowValue: number
 ) {
   const host = chartHost(chartRoot)
-  const chart = echarts.getInstanceByDom(host)!
-  const [x0] = chart.convertToPixel({ seriesIndex: 0 }, [categoryIndex, 0])
-  const [x1] = chart.convertToPixel({ seriesIndex: 0 }, [categoryIndex + 1, 0])
-  const [, y] = chart.convertToPixel({ seriesIndex: 0 }, [categoryIndex, belowValue])
+  const [x0] = await resolvePixel(host, [categoryIndex, 0])
+  const [x1] = await resolvePixel(host, [categoryIndex + 1, 0])
+  const [, y] = await resolvePixel(host, [categoryIndex, belowValue])
   clickPixel(host, (x0 + x1) / 2, y)
 }
 
@@ -101,16 +128,12 @@ export async function settleChart(chartRoot: Element) {
 }
 
 /** Click a map region by geographic coordinate (a point inside the feature). */
-export function clickGeoCoord(
+export async function clickGeoCoord(
   chartRoot: Element,
   lngLat: [number, number],
   ctrl = false
 ) {
   const host = chartHost(chartRoot)
-  const chart = echarts.getInstanceByDom(host)!
-  const pixel = chart.convertToPixel({ seriesIndex: 0 }, lngLat) as unknown as [
-    number,
-    number,
-  ]
+  const pixel = await resolvePixel(host, lngLat)
   clickPixel(host, pixel[0], pixel[1], ctrl)
 }

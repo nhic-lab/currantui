@@ -186,7 +186,7 @@ export const LinkedWithBarChart: Story = {
     const canvas = within(canvasElement)
     const map = await canvas.findByRole("group", { name: "Coverage by district" })
     await settleChart(map)
-    clickGeoCoord(map, [5, 5]) // centre of the Gasabo rectangle
+    await clickGeoCoord(map, [5, 5]) // centre of the Gasabo rectangle
     await waitFor(() => {
       expect(canvas.getByTestId("selections-readout").textContent).toContain(
         '{"dimension":"district","values":["Gasabo"]}'

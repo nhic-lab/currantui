@@ -149,7 +149,7 @@ export const LinkedBarCharts: Story = {
     // CI runners are slow enough that the initial render animation is still
     // in flight when the click lands — settle first or the hit-test misses
     await settleChart(admissionsChart)
-    clickCategory(admissionsChart, 0, 840)
+    await clickCategory(admissionsChart, 0, 840)
     await waitFor(() => {
       expect(canvas.getByTestId("selections-readout").textContent).toContain(
         '{"dimension":"district","values":["Gasabo"]}'
@@ -169,7 +169,7 @@ export const LinkedBarCharts: Story = {
       expect(kicukiro.itemStyle?.opacity).toBe(0.25)
     })
     // Ctrl-click accumulates a second selection instead of replacing it
-    clickCategory(admissionsChart, 1, 720, true)
+    await clickCategory(admissionsChart, 1, 720, true)
     await waitFor(() => {
       expect(canvas.getByTestId("selections-readout").textContent).toContain(
         '"values":["Gasabo","Kicukiro"]'
@@ -194,7 +194,7 @@ export const LinkedBarCharts: Story = {
     // With one value left, "Clear all" steps aside for the single chip's own remove
     expect(canvas.queryByRole("button", { name: "Clear all" })).not.toBeInTheDocument()
     // Ctrl-click restores a second selection so "Clear all" can be exercised
-    clickCategory(admissionsChart, 0, 840, true)
+    await clickCategory(admissionsChart, 0, 840, true)
     const clearAll = await canvas.findByRole("button", { name: "Clear all" })
     await userEvent.click(clearAll)
     await waitFor(() => {
@@ -244,7 +244,7 @@ export const LinkedMixedCharts: Story = {
     // CI runners are slow enough that the initial render animation is still
     // in flight when the click lands — settle first or the hit-test misses
     await settleChart(admissionsChart)
-    clickCategory(admissionsChart, 0, 840)
+    await clickCategory(admissionsChart, 0, 840)
     await waitFor(() => {
       expect(canvas.getByTestId("selections-readout").textContent).toContain(
         '{"dimension":"district","values":["Gasabo"]}'
@@ -293,7 +293,7 @@ export const LinkedAreaChartOnGroup: Story = {
     // Settle first, then click exactly ONCE — a click inside a waitFor retry
     // loop toggles the selection on every retry and races the chart rebuild.
     await settleChart(areaChart)
-    clickAreaFill(areaChart, 0, 500)
+    await clickAreaFill(areaChart, 0, 500)
     await waitFor(() => {
       expect(canvas.getByTestId("selections-readout").textContent).toContain(
         '{"dimension":"district","values":["Enrollment"]}'

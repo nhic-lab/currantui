@@ -1,4 +1,12 @@
+import { MapChart } from "echarts/charts"
 import * as echarts from "echarts/core"
+
+/*
+ * registerMap is a no-op stub until a module providing the map implementation
+ * is used — apps call registerGeoMap at startup, often before any chart
+ * module has loaded, so this module must supply the implementation itself.
+ */
+echarts.use([MapChart])
 
 /** Minimal structural GeoJSON type — a FeatureCollection with named features */
 export interface GeoMapJson {

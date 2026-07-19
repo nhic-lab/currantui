@@ -138,11 +138,13 @@ export const Fullscreen: Story = {
     const body = within(canvasElement.ownerDocument.body)
     await userEvent.click(canvas.getByRole("button", { name: "Fullscreen" }))
     const dialog = await body.findByRole("dialog")
-    // findByRole retries while the dialog content mounts — slow CI runners
-    // rendered the frame after the assertion under plain getByRole
-    await expect(
-      await within(dialog).findByRole("button", { name: "Show table view" })
-    ).toBeVisible()
+    // The dialog fades in (data-open:fade-in-0): the button exists at once
+    // but jest-dom treats opacity 0 as invisible, so the VISIBILITY check is
+    // what must retry until the animation completes on slow CI runners
+    const fullscreenToggle = await within(dialog).findByRole("button", {
+      name: "Show table view",
+    })
+    await waitFor(() => expect(fullscreenToggle).toBeVisible())
     // The toolbar button toggles: pressed in the dialog, and clicking it
     // closes fullscreen (never Escape — it reloads the vitest iframe)
     const exit = within(dialog).getByRole("button", { name: "Fullscreen" })
