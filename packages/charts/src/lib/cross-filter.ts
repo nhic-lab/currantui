@@ -14,8 +14,8 @@ function sameValue(a: string | number, b: string | number): boolean {
 }
 
 /**
- * Power BI click semantics. Plain toggle: replace the dimension's selection
- * with the value, or clear the dimension when the value is already its only
+ * Click semantics: plain toggle replaces the dimension's selection with the
+ * value, or clears the dimension when the value is already its only
  * selection. Additive toggle (Ctrl/Cmd-click): add or remove the value; a
  * dimension emptied of values drops out entirely.
  */

@@ -67,3 +67,12 @@ so native undo in widget content keeps working.
 use `findSlot(layout, w, h, columns)` from
 `@nhic/currantui/lib/grid-layout` to place it. `WidgetToolbar` adds a
 remove button (plus your own actions) to a widget header in edit mode.
+
+`WidgetPalette` rows are also draggable: dragging one onto a
+`DashboardGrid` in `mode="edit"` with an `onWidgetDrop` handler shows a
+drop overlay and calls `onWidgetDrop(type, cell)` with the grid cell under
+the pointer. The grid never inserts the widget itself — as with
+`onWidgetAdd`, the app appends the layout item, falling back to
+`findSlot(layout, w, h, columns)` when the dropped cell is already
+occupied. See the `Recipes/Authoring Surface` story for palette, grid,
+field wells, and `Inspector` composed end to end.
