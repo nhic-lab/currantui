@@ -155,7 +155,12 @@ const appShell = (
 const meta = {
   title: "Recipes/App Shell",
   component: ShellProvider,
-  parameters: { layout: "fullscreen" },
+  parameters: {
+    layout: "fullscreen",
+    /* Full chassis cannot render inline on the docs page (landmark ids,
+       min-h-svh stacking) — isolate it in an iframe like Components/Shell. */
+    docs: { story: { inline: false, iframeHeight: 560 } },
+  },
 } satisfies Meta<typeof ShellProvider>
 
 export default meta

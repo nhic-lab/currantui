@@ -99,3 +99,18 @@ export async function settleChart(chartRoot: Element) {
     setTimeout(done, 1500)
   })
 }
+
+/** Click a map region by geographic coordinate (a point inside the feature). */
+export function clickGeoCoord(
+  chartRoot: Element,
+  lngLat: [number, number],
+  ctrl = false
+) {
+  const host = chartHost(chartRoot)
+  const chart = echarts.getInstanceByDom(host)!
+  const pixel = chart.convertToPixel({ seriesIndex: 0 }, lngLat) as unknown as [
+    number,
+    number,
+  ]
+  clickPixel(host, pixel[0], pixel[1], ctrl)
+}

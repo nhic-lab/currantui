@@ -22,7 +22,12 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 const meta = {
   title: "Components/Shell/SideNav",
   component: ShellSideNav,
-  parameters: { layout: "fullscreen" },
+  parameters: {
+    layout: "fullscreen",
+    /* Every variant hardcodes id="shell-side-nav" — inline docs rendering
+       would duplicate it across stories; isolate each in an iframe. */
+    docs: { story: { inline: false, iframeHeight: 420 } },
+  },
   argTypes: {
     variant: {
       control: "select",

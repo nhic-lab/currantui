@@ -53,8 +53,14 @@ const meta = {
     docs: {
       description: {
         component:
-          "Application chassis: header, side navigation (expandable / rail / fixed), exclusive right panels, and content area. State lives in ShellProvider (`useShell()`); Mod+B toggles the side nav.",
+          "Application chassis: header, side navigation (expandable / rail / fixed / labeled-rail), exclusive right panels, and content area. State lives in ShellProvider (`useShell()`); Mod+B toggles the side nav.",
       },
+      /*
+       * Full app chassis cannot render inline on the docs page: stacking
+       * them duplicates landmark ids (#shell-side-nav, #main-content) and
+       * piles up min-h-svh sticky layouts. Each story gets its own iframe.
+       */
+      story: { inline: false, iframeHeight: 560 },
     },
   },
   argTypes: {
