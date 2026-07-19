@@ -1,5 +1,12 @@
 # @nhic/currantui-charts
 
+## 1.2.0
+
+### Minor Changes
+
+- 84158a2: Add cross-filtering: CrossFilterProvider + useCrossFilter coordinate mark selections (click replaces or clears, Ctrl/Cmd-click accumulates, dimensions AND-combine); categorical charts accept a crossFilter binding that emits selections and dims non-matching marks on shared dimensions; CrossFilterBar renders active selections as dismissible chips with clear-all.
+- d099d10: Add geo support: registerGeoMap registers app-supplied GeoJSON boundaries behind an idempotent typed wrapper, and ChoroplethChart renders region-shaded maps on the standard chart shell (continuous token-colored scale, ramp legend, no-data fills, table view and exports) with full cross-filtering — clicking a region toggles a selection on the bound dimension.
+
 ## 1.1.0
 
 ### Minor Changes

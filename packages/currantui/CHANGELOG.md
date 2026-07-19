@@ -1,5 +1,14 @@
 # @nhic/currantui
 
+## 0.7.0
+
+### Minor Changes
+
+- 049eb3c: Add the authoring primitives: FieldWellGroup (drag-and-drop field wells on react-aria GridList DnD with a pure applyFieldMove engine and a pivotConfigFromWells adapter), drag-from-palette onto DashboardGrid via a typed drop overlay emitting onWidgetDrop, and the Inspector composition shell (sections, rows, separators) for property panes.
+- 30cb9e1: Add the dashboard layout system: DashboardGrid/DashboardWidget (controlled CSS-grid layout with drag, resize, keyboard move/resize, live-region announcements, and built-in undo/redo), WidgetToolbar and WidgetPalette authoring chrome, and the pure lib/grid-layout engine (moveItem, resizeItem, removeItem, compact, findSlot, clamp, collides, layoutsEqual).
+- d099d10: Add PivotTable (config-driven crosstab with collapsible row groups, true descendant subtotals, grand totals, and per-value formatting, powered by the new pure lib/pivot engine) and VirtualizedTable (semantic table windowed via the new @tanstack/react-virtual dependency, proven at 100,000 rows).
+- 30cb9e1: Add the labeled-rail ShellSideNav variant — a fixed 4.5rem rail with labels stacked under every icon and a left accent bar on the active item — and fix the rail variant leaking label glyphs beside the icons in its resting state (labels now fade in only when the flyout opens).
+
 ## 0.6.0
 
 ### Minor Changes
