@@ -146,6 +146,9 @@ export const LinkedBarCharts: Story = {
     const admissionsChart = await canvas.findByRole("group", {
       name: "Admissions by district",
     })
+    // CI runners are slow enough that the initial render animation is still
+    // in flight when the click lands — settle first or the hit-test misses
+    await settleChart(admissionsChart)
     clickCategory(admissionsChart, 0, 840)
     await waitFor(() => {
       expect(canvas.getByTestId("selections-readout").textContent).toContain(
@@ -238,6 +241,9 @@ export const LinkedMixedCharts: Story = {
     const admissionsChart = await canvas.findByRole("group", {
       name: "Admissions by district",
     })
+    // CI runners are slow enough that the initial render animation is still
+    // in flight when the click lands — settle first or the hit-test misses
+    await settleChart(admissionsChart)
     clickCategory(admissionsChart, 0, 840)
     await waitFor(() => {
       expect(canvas.getByTestId("selections-readout").textContent).toContain(

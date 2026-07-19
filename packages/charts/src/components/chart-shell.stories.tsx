@@ -138,8 +138,10 @@ export const Fullscreen: Story = {
     const body = within(canvasElement.ownerDocument.body)
     await userEvent.click(canvas.getByRole("button", { name: "Fullscreen" }))
     const dialog = await body.findByRole("dialog")
+    // findByRole retries while the dialog content mounts — slow CI runners
+    // rendered the frame after the assertion under plain getByRole
     await expect(
-      within(dialog).getByRole("button", { name: "Show table view" })
+      await within(dialog).findByRole("button", { name: "Show table view" })
     ).toBeVisible()
     // The toolbar button toggles: pressed in the dialog, and clicking it
     // closes fullscreen (never Escape — it reloads the vitest iframe)
