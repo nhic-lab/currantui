@@ -1,11 +1,20 @@
 import * as React from "react"
-import { XIcon } from "@phosphor-icons/react"
+import {
+  GridList as AriaGridList,
+  GridListItem as AriaGridListItem,
+  Button,
+  useDragAndDrop,
+} from "react-aria-components"
+import { DotsSixVerticalIcon, XIcon } from "@phosphor-icons/react"
 
+import { endWidgetDrag, startWidgetDrag } from "@nhic/currantui/lib/widget-drag"
 import {
   useDashboardGrid,
   useDashboardWidget,
 } from "@nhic/currantui/components/dashboard-grid"
 import { cn } from "@nhic/currantui/lib/utils"
+
+const WIDGET_DRAG_TYPE = "application/x-nhic-widget"
 
 /**
  * Header slot for DashboardWidget in edit mode: app-supplied actions plus a
@@ -49,42 +58,37 @@ interface WidgetPaletteItem {
   icon?: React.ReactNode
 }
 
-function WidgetPaletteButton({
-  item,
-  onWidgetAdd,
-}: {
-  item: WidgetPaletteItem
-  onWidgetAdd: (type: string) => void
-}) {
+function WidgetPaletteRow({ item }: { item: WidgetPaletteItem }) {
   const baseId = React.useId()
   const labelId = `${baseId}-label`
   const descriptionId = `${baseId}-description`
   return (
-    <div role="listitem">
-      <button
-        type="button"
-        className="flex w-full items-start gap-2 rounded-md p-2 text-start outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
-        aria-labelledby={labelId}
-        aria-describedby={item.description ? descriptionId : undefined}
-        onClick={() => onWidgetAdd(item.type)}
-      >
-        {item.icon && (
-          <span aria-hidden="true" className="mt-0.5 shrink-0 text-muted-foreground">
-            {item.icon}
+    <AriaGridListItem
+      id={item.type}
+      textValue={item.label}
+      aria-labelledby={labelId}
+      aria-describedby={item.description ? descriptionId : undefined}
+      className="flex w-full cursor-grab items-start gap-2 rounded-md p-2 text-start outline-none hover:bg-muted data-[dragging]:opacity-50 data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring"
+    >
+      <Button slot="drag" className="mt-0.5 shrink-0 outline-none">
+        <DotsSixVerticalIcon size={12} aria-hidden />
+      </Button>
+      {item.icon && (
+        <span aria-hidden="true" className="mt-0.5 shrink-0 text-muted-foreground">
+          {item.icon}
+        </span>
+      )}
+      <span className="flex min-w-0 flex-col">
+        <span id={labelId} className="text-sm font-medium">
+          {item.label}
+        </span>
+        {item.description && (
+          <span id={descriptionId} className="text-xs text-muted-foreground">
+            {item.description}
           </span>
         )}
-        <span className="flex min-w-0 flex-col">
-          <span id={labelId} className="text-sm font-medium">
-            {item.label}
-          </span>
-          {item.description && (
-            <span id={descriptionId} className="text-xs text-muted-foreground">
-              {item.description}
-            </span>
-          )}
-        </span>
-      </button>
-    </div>
+      </span>
+    </AriaGridListItem>
   )
 }
 
@@ -98,20 +102,34 @@ function WidgetPalette({
   onWidgetAdd: (type: string) => void
   className?: string
 } & Omit<React.ComponentProps<"div">, "children">) {
+  const { dragAndDropHooks } = useDragAndDrop({
+    getItems: (keys) =>
+      [...keys].map((key) => ({
+        [WIDGET_DRAG_TYPE]: JSON.stringify({ type: key as string }),
+      })),
+    onDragStart(event) {
+      const [key] = [...event.keys]
+      startWidgetDrag(key as string)
+    },
+    onDragEnd() {
+      endWidgetDrag()
+    },
+  })
+
   return (
-    <div
+    <AriaGridList
       data-slot="widget-palette"
-      role="list"
+      items={items}
+      dragAndDropHooks={dragAndDropHooks}
+      onAction={(key) => onWidgetAdd(key as string)}
       className={cn(
-        "flex w-64 flex-col gap-1 rounded-lg bg-card p-2 ring-1 ring-foreground/10",
+        "flex w-64 flex-col gap-1 rounded-lg bg-card p-2 ring-1 ring-foreground/10 outline-none",
         className
       )}
       {...props}
     >
-      {items.map((item) => (
-        <WidgetPaletteButton key={item.type} item={item} onWidgetAdd={onWidgetAdd} />
-      ))}
-    </div>
+      {(item) => <WidgetPaletteRow item={item} />}
+    </AriaGridList>
   )
 }
 

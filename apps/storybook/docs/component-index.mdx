@@ -63,6 +63,7 @@ file name: `@nhic/currantui/components/<kebab-name>`.
 | `StructuredList` | Lightweight read-only rows (`contained` variant for the boxed look) |
 | `Pagination` / `TablePagination` | Page navigation, generic and table-attached |
 | `PivotTable` | Config-driven crosstab/matrix with collapsible groups, subtotals, grand totals |
+| `FieldWellGroup` | Drag-and-drop field wells; pair with `pivotConfigFromWells` to drive a `PivotTable` |
 | `VirtualizedTable` | Large row sets (100k+) with windowed rendering; state the row count in `caption` |
 
 ## Status & feedback
@@ -102,7 +103,8 @@ file name: `@nhic/currantui/components/<kebab-name>`.
 | `DashboardGrid` | Controlled widget-grid dashboards; `mode="edit"` for drag/resize/undo |
 | `DashboardWidget` | One widget card on the grid: title, toolbar slot, content |
 | `WidgetToolbar` | Edit-mode header actions incl. built-in remove |
-| `WidgetPalette` | Click-to-add list of widget types for authoring UIs |
+| `WidgetPalette` | Click-to-add (or drag-to-`DashboardGrid`) list of widget types for authoring UIs |
+| `Inspector` family | Property-pane chrome — `Inspector` shell, `InspectorSection` (collapsible), `InspectorRow` (label/control grid), `InspectorSeparator`; fill rows with the existing Field/Select/Switch controls |
 
 ## Shell & app chrome
 

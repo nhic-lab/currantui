@@ -1,6 +1,11 @@
 import * as React from "react"
+import { DropZone } from "react-aria-components"
 import { DotsSixVerticalIcon } from "@phosphor-icons/react"
 
+import {
+  getActiveWidgetDrag,
+  subscribeWidgetDrag,
+} from "@nhic/currantui/lib/widget-drag"
 import {
   clamp,
   compact,
@@ -10,11 +15,41 @@ import {
   resizeItem,
 } from "@nhic/currantui/lib/grid-layout"
 import { cn } from "@nhic/currantui/lib/utils"
+import type { DropZoneProps, TextDropItem } from "react-aria-components"
 import type { LayoutItem } from "@nhic/currantui/lib/grid-layout"
+
+type DropEvent = Parameters<NonNullable<DropZoneProps["onDrop"]>>[0]
+type DropMoveEvent = Parameters<NonNullable<DropZoneProps["onDropMove"]>>[0]
 
 declare const process: { env: { NODE_ENV?: string } }
 
 const isDevelopment = process.env.NODE_ENV !== "production"
+
+const WIDGET_DRAG_TYPE = "application/x-nhic-widget"
+
+/** Column/row pixel sizing at the grid's current width, used to convert a pointer offset to a cell. */
+function gridSteps(
+  node: HTMLElement,
+  columns: number,
+  rowHeight: number,
+  gap: number
+): { cellWidth: number; stepX: number; stepY: number } {
+  const cellWidth = (node.clientWidth - gap * (columns - 1)) / columns
+  return { cellWidth, stepX: cellWidth + gap, stepY: rowHeight + gap }
+}
+
+/** Pixel offset (relative to the grid root) to a clamped grid cell. */
+function pointToCell(
+  x: number,
+  y: number,
+  steps: { stepX: number; stepY: number },
+  columns: number
+): { x: number; y: number } {
+  return {
+    x: Math.min(Math.max(Math.round(x / steps.stepX), 0), columns - 1),
+    y: Math.max(Math.round(y / steps.stepY), 0),
+  }
+}
 
 interface DashboardGridHandle {
   undo: () => void
@@ -28,6 +63,7 @@ interface DashboardGridProps {
   onLayoutChange?: (layout: Array<LayoutItem>) => void
   onHistoryChange?: (state: { canUndo: boolean; canRedo: boolean }) => void
   onWidgetRemove?: (id: string) => void
+  onWidgetDrop?: (type: string, cell: { x: number; y: number }) => void
   mode?: "view" | "edit"
   columns?: number
   rowHeight?: number
@@ -90,6 +126,7 @@ function DashboardGrid({
   onLayoutChange,
   onHistoryChange,
   onWidgetRemove,
+  onWidgetDrop,
   mode = "view",
   columns = 12,
   rowHeight = 96,
@@ -102,6 +139,16 @@ function DashboardGrid({
   const rootRef = React.useRef<HTMLDivElement>(null)
   const [collapsed, setCollapsed] = React.useState(false)
   const [preview, setPreview] = React.useState<Array<LayoutItem> | null>(null)
+  const activeWidgetDrag = React.useSyncExternalStore(
+    subscribeWidgetDrag,
+    getActiveWidgetDrag,
+    getActiveWidgetDrag
+  )
+  const [dropHoverCell, setDropHoverCell] = React.useState<{
+    x: number
+    y: number
+  } | null>(null)
+  const dropStepsRef = React.useRef<ReturnType<typeof gridSteps> | null>(null)
   const [dragId, setDragId] = React.useState<string | null>(null)
   const [dragRect, setDragRect] = React.useState<GridContextValue["dragRect"]>(null)
   const [keyboardId, setKeyboardId] = React.useState<string | null>(null)
@@ -146,6 +193,13 @@ function DashboardGrid({
       pendingFocusId.current = null
     }
   }, [effectiveMode])
+
+  React.useEffect(() => {
+    if (activeWidgetDrag === null) {
+      setDropHoverCell(null)
+      dropStepsRef.current = null
+    }
+  }, [activeWidgetDrag])
 
   const rendered = React.useMemo(
     () => (preview ?? layout).map((item) => clamp(item, columns)),
@@ -366,9 +420,7 @@ function DashboardGrid({
       return
     }
     event.preventDefault()
-    const cellWidth = (node.clientWidth - gap * (columns - 1)) / columns
-    const stepX = cellWidth + gap
-    const stepY = rowHeight + gap
+    const { cellWidth, stepX, stepY } = gridSteps(node, columns, rowHeight, gap)
     const handlers = create({ origin, cellWidth, stepX, stepY })
     const startX = event.clientX
     const startY = event.clientY
@@ -596,6 +648,36 @@ function DashboardGrid({
     removeWidget,
   }
 
+  const showDropOverlay =
+    effectiveMode === "edit" && onWidgetDrop != null && activeWidgetDrag !== null
+
+  /** Reads (and caches for the duration of the current drag) the grid's cell sizing, so `clientWidth` is not re-read on every drop-move event. */
+  const getDropSteps = (node: HTMLElement) => {
+    if (!dropStepsRef.current) {
+      dropStepsRef.current = gridSteps(node, columns, rowHeight, gap)
+    }
+    return dropStepsRef.current
+  }
+
+  const handleWidgetDropMove = (event: DropMoveEvent) => {
+    const node = rootRef.current
+    if (!node) return
+    setDropHoverCell(pointToCell(event.x, event.y, getDropSteps(node), columns))
+  }
+
+  const handleWidgetDrop = async (event: DropEvent) => {
+    const node = rootRef.current
+    const item = event.items.find(
+      (candidate): candidate is TextDropItem =>
+        candidate.kind === "text" && candidate.types.has(WIDGET_DRAG_TYPE)
+    )
+    if (!node || !item) return
+    const { type } = JSON.parse(await item.getText(WIDGET_DRAG_TYPE)) as { type: string }
+    onWidgetDrop?.(type, pointToCell(event.x, event.y, getDropSteps(node), columns))
+    setDropHoverCell(null)
+    dropStepsRef.current = null
+  }
+
   return (
     <GridContext.Provider value={context}>
       <div
@@ -623,6 +705,28 @@ function DashboardGrid({
               gridColumn: `${dragPlaceholderItem.x + 1} / span ${dragPlaceholderItem.w}`,
               gridRow: `${dragPlaceholderItem.y + 1} / span ${dragPlaceholderItem.h}`,
             }}
+          />
+        )}
+        {dropHoverCell && (
+          <div
+            data-slot="dashboard-grid-placeholder"
+            aria-hidden="true"
+            className="pointer-events-none rounded-lg border-2 border-dashed border-foreground/25 bg-muted/60"
+            style={{
+              gridColumn: `${dropHoverCell.x + 1} / span 1`,
+              gridRow: `${dropHoverCell.y + 1} / span 1`,
+            }}
+          />
+        )}
+        {showDropOverlay && (
+          <DropZone
+            aria-label="Drop a widget"
+            className={({ isDropTarget }: { isDropTarget: boolean }) =>
+              cn("absolute inset-0 z-40 rounded-lg", isDropTarget && "ring-2 ring-primary")
+            }
+            getDropOperation={(types) => (types.has(WIDGET_DRAG_TYPE) ? "move" : "cancel")}
+            onDropMove={handleWidgetDropMove}
+            onDrop={handleWidgetDrop}
           />
         )}
         <div aria-live="polite" className="sr-only">
