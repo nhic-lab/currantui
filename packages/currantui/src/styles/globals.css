@@ -19,14 +19,20 @@
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    /* WCAG AA: white text on primary 5.2:1, primary as text on white 5.4:1 */
-    --primary: oklch(0.52 0.079 222);
-    --primary-deep: oklch(0.42 0.10 222);
-    --primary-foreground: oklch(0.984 0.019 200.873);
+    /* Brand blue #068ECE fails AA as a text/fill pairing (3.6:1), so the
+       interactive primary is the nearest same-hue shade that clears it
+       everywhere it renders: white text on primary 5.1:1, primary as text
+       on white 5.1:1 and on its own /10 tint 4.7:1. The exact brand hex
+       lives on non-text accents (--ring, --sidebar-*). */
+    --primary: oklch(0.536 0.121 239.2);
+    /* Brand deep blue #054D6F: 9.1:1 against white in both directions */
+    --primary-deep: oklch(0.3986 0.0849 237.2);
+    --primary-foreground: oklch(1 0 0);
     --bg: var(--background);
     --text: var(--foreground);
-    --secondary: oklch(0.967 0.001 286.375);
-    --secondary-foreground: oklch(0.21 0.006 285.885);
+    /* Brand deep blue #054D6F: white text on secondary 9.1:1 */
+    --secondary: oklch(0.3986 0.0849 237.2);
+    --secondary-foreground: oklch(1 0 0);
     --muted: oklch(0.97 0 0);
     --muted-foreground: oklch(0.556 0 0);
     --accent: oklch(0.97 0 0);
@@ -39,7 +45,8 @@
     --info: oklch(0.52 0.13 245);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    /* Exact brand blue #068ECE — non-text focus indicator, 3.6:1 on white */
+    --ring: oklch(0.6156 0.1379 239.2);
     /* CurrantUI dataviz palette — 14-step categorical scale, assigned to series
        in fixed order. Validated for CVD separation and >=3:1 contrast on card. */
     --chart-1: oklch(0.47 0.2 295);
@@ -59,12 +66,13 @@
     --radius: 0.25rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.609 0.126 221.723);
-    --sidebar-primary-foreground: oklch(0.984 0.019 200.873);
+    /* Exact brand blue #068ECE for active indicators; dark ink on it 5.4:1 */
+    --sidebar-primary: oklch(0.6156 0.1379 239.2);
+    --sidebar-primary-foreground: oklch(0.15 0.02 239.2);
     --sidebar-accent: oklch(0.97 0 0);
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --sidebar-ring: oklch(0.6156 0.1379 239.2);
 }
 
 .dark {
@@ -74,15 +82,17 @@
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.67 0.079 222);
-    --primary-deep: oklch(0.42 0.10 222);
-    /* WCAG AA: dark ink on the bright teal fill 6.8:1 (dark mode keeps the
-       lighter brand teal, so the readable text on it is dark, not white) */
-    --primary-foreground: oklch(0.16 0.02 222);
+    /* Exact brand blue #068ECE — bright enough for dark surfaces: 4.7:1 as
+       text on card, 5.4:1 under the dark ink foreground (dark mode keeps
+       the bright brand fill, so the readable text on it is dark, not white) */
+    --primary: oklch(0.6156 0.1379 239.2);
+    --primary-deep: oklch(0.3986 0.0849 237.2);
+    --primary-foreground: oklch(0.15 0.02 239.2);
     --bg: var(--background);
     --text: var(--foreground);
-    --secondary: oklch(0.274 0.006 286.033);
-    --secondary-foreground: oklch(0.985 0 0);
+    /* Brand deep blue #054D6F: white text on secondary 9.1:1 */
+    --secondary: oklch(0.3986 0.0849 237.2);
+    --secondary-foreground: oklch(1 0 0);
     --muted: oklch(0.269 0 0);
     --muted-foreground: oklch(0.708 0 0);
     --accent: oklch(0.269 0 0);
@@ -94,7 +104,8 @@
     --info: oklch(0.71 0.12 245);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
+    /* Exact brand blue #068ECE — 5.3:1 against the dark background */
+    --ring: oklch(0.6156 0.1379 239.2);
     /* Dataviz palette, dark: same hue order, re-tuned per step for the dark
        card surface (not a lightness flip) and re-validated there. */
     --chart-1: oklch(0.56 0.24 297);
@@ -113,12 +124,13 @@
     --chart-14: oklch(0.66 0.16 300);
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.715 0.143 215.221);
-    --sidebar-primary-foreground: oklch(0.302 0.056 229.695);
+    /* Exact brand blue #068ECE for active indicators; dark ink on it 5.4:1 */
+    --sidebar-primary: oklch(0.6156 0.1379 239.2);
+    --sidebar-primary-foreground: oklch(0.15 0.02 239.2);
     --sidebar-accent: oklch(0.269 0 0);
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    --sidebar-ring: oklch(0.6156 0.1379 239.2);
 }
 
 @theme inline {
