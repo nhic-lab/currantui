@@ -6,6 +6,8 @@ import { cn } from "@nhic/currantui/lib/utils"
 const SHELL_COOKIE_NAME = "currantui_shell_sidenav"
 const SHELL_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 
+type ShellSideNavVariant = "expandable" | "rail" | "fixed" | "labeled-rail"
+
 /* z-index ladder: content auto → side nav rail overlay z-30 → header + right
    panels z-40 → dialogs/sheets/popovers/tooltips z-50 → skip link z-60 */
 
@@ -23,6 +25,9 @@ type ShellContextValue = {
   activePanel: string | null
   setActivePanel: React.Dispatch<React.SetStateAction<string | null>>
   togglePanel: (id: string) => void
+  /** Registered by the mounted ShellSideNav; read by ShellHeaderMenuButton to no-op on variants without a toggle */
+  sideNavVariant: ShellSideNavVariant
+  setSideNavVariant: React.Dispatch<React.SetStateAction<ShellSideNavVariant>>
 }
 
 const ShellContext = React.createContext<ShellContextValue | null>(null)
@@ -79,6 +84,9 @@ function ShellProvider({
     setActivePanel((prev) => (prev === id ? null : id))
   }, [])
 
+  const [sideNavVariant, setSideNavVariant] =
+    React.useState<ShellSideNavVariant>("expandable")
+
   React.useEffect(() => {
     if (!keyboardShortcut) return
     const onKeyDown = (event: KeyboardEvent) => {
@@ -102,8 +110,19 @@ function ShellProvider({
       activePanel,
       setActivePanel,
       togglePanel,
+      sideNavVariant,
+      setSideNavVariant,
     }),
-    [open, setOpen, openMobile, isMobile, toggleSideNav, activePanel, togglePanel]
+    [
+      open,
+      setOpen,
+      openMobile,
+      isMobile,
+      toggleSideNav,
+      activePanel,
+      togglePanel,
+      sideNavVariant,
+    ]
   )
 
   return (
@@ -116,7 +135,7 @@ function ShellProvider({
             "--shell-header-h": "3rem",
             "--shell-sidenav-w": "16rem",
             "--shell-sidenav-w-rail": "3rem",
-            "--shell-sidenav-w-rail-labeled": "4.5rem",
+            "--shell-sidenav-w-rail-labeled": "5rem",
             ...style,
           } as React.CSSProperties
         }
@@ -165,4 +184,11 @@ function ShellSkipToContent({
   )
 }
 
-export { ShellProvider, useShell, ShellContent, ShellSkipToContent, SHELL_COOKIE_NAME }
+export {
+  ShellProvider,
+  useShell,
+  ShellContent,
+  ShellSkipToContent,
+  SHELL_COOKIE_NAME,
+}
+export type { ShellSideNavVariant }

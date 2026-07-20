@@ -19,12 +19,18 @@ const withDirection: Decorator = (Story, context) => {
 
 /* Components like ThemeToggle flip the dark class on <html> directly;
    mirror that back into the theme global so the toolbar, the manager, and
-   every other story follow the in-story toggle. Story view only — docs
-   pages render many stories at staggered times, and a late render with
-   stale globals would bounce the class back through this observer */
+   every other story follow the in-story toggle. Top-frame story view only:
+   `viewMode === "story"` alone isn't enough — addon-docs renders each
+   `inline: false` story as its own standalone preview iframe, which also
+   has viewMode "story". Running there closes a loop: the theme decorator
+   applies the class, this observer sees that mutation and calls
+   updateGlobals, which forces that nested iframe to re-render and reapply
+   the class, re-triggering the observer forever. `window.top === window.self`
+   excludes any frame embedded inside another (docs-embedded previews,
+   composed/nested stories) — only the frame the user is directly viewing. */
 const withThemeSync: Decorator = (Story, context) => {
   const [globals, updateGlobals] = useGlobals()
-  const enabled = context.viewMode === "story"
+  const enabled = context.viewMode === "story" && window.top === window.self
   useEffect(() => {
     if (!enabled) return
     const el = document.documentElement

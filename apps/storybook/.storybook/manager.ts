@@ -10,7 +10,7 @@ const tagBadges: TagBadgeParameters = [
     tags: "new",
     badge: {
       text: "New",
-      style: { backgroundColor: "#2a7389", color: "#fafafa" },
+      style: { backgroundColor: "#0175AC", color: "#fafafa" },
       tooltip: "Recently added — API may still move",
     },
     display: {

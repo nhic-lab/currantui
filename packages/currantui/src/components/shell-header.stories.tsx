@@ -34,12 +34,48 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const defaultSource = `<ShellProvider>
+  <ShellHeader>
+    <ShellHeaderName href="#">
+      <HicLogo />
+    </ShellHeaderName>
+    <ShellHeaderNav>
+      <ShellHeaderNavLink href="#" isActive>
+        Surveillance
+      </ShellHeaderNavLink>
+      <ShellHeaderNavLink href="#">Registry</ShellHeaderNavLink>
+    </ShellHeaderNav>
+    <ShellGlobalBar>
+      <ShellGlobalAction label="Search">
+        <MagnifyingGlassIcon />
+      </ShellGlobalAction>
+      <ShellGlobalAction label="Notifications">
+        <BellIcon />
+      </ShellGlobalAction>
+      <ThemeToggle />
+      <AvatarButton>
+        <AvatarButtonTrigger name="Bellamy Dan" />
+        <AvatarButtonMenu>
+          <AvatarButtonLabel name="Bellamy Dan" email="analyst@example.test" />
+          <AvatarButtonSeparator />
+          <AvatarButtonItem icon={Gear}>Settings</AvatarButtonItem>
+          <AvatarButtonSeparator />
+          <AvatarButtonItem icon={SignOut} destructive onSelect={() => {}}>
+            Sign out
+          </AvatarButtonItem>
+        </AvatarButtonMenu>
+      </AvatarButton>
+    </ShellGlobalBar>
+  </ShellHeader>
+</ShellProvider>`
+
 export const Default: Story = {
   render: () => (
     <ShellProvider className="min-h-24">
       <ShellHeader>
         <ShellHeaderName href="#">
-          <HicLogo />
+          {/* Page-relative: the deployed Storybook lives under a subpath */}
+          <HicLogo src="./logo.svg" />
         </ShellHeaderName>
         <ShellHeaderNav>
           <ShellHeaderNavLink href="#" isActive>
@@ -71,14 +107,36 @@ export const Default: Story = {
       </ShellHeader>
     </ShellProvider>
   ),
+  parameters: {
+    docs: { source: { code: defaultSource, language: "tsx" } },
+  },
 }
+
+const withSubmenuSource = `<ShellProvider>
+  <ShellHeader>
+    <ShellHeaderName href="#">
+      <HicLogo />
+    </ShellHeaderName>
+    <ShellHeaderNav>
+      <ShellHeaderNavLink href="#">Surveillance</ShellHeaderNavLink>
+      <ShellHeaderNavMenu label="Analytics">
+        <ShellHeaderNavMenuItem asChild>
+          <a href="#">Dashboards</a>
+        </ShellHeaderNavMenuItem>
+        <ShellHeaderNavMenuItem asChild isActive>
+          <a href="#">Exports</a>
+        </ShellHeaderNavMenuItem>
+      </ShellHeaderNavMenu>
+    </ShellHeaderNav>
+  </ShellHeader>
+</ShellProvider>`
 
 export const WithSubmenu: Story = {
   render: () => (
     <ShellProvider className="min-h-48">
       <ShellHeader>
         <ShellHeaderName href="#">
-          <HicLogo />
+          <HicLogo src="./logo.svg" />
         </ShellHeaderName>
         <ShellHeaderNav>
           <ShellHeaderNavLink href="#">Surveillance</ShellHeaderNavLink>
@@ -95,6 +153,7 @@ export const WithSubmenu: Story = {
     </ShellProvider>
   ),
   parameters: {
+    docs: { source: { code: withSubmenuSource, language: "tsx" } },
     a11y: {
       config: {
         // Radix DropdownMenu marks the page background aria-hidden while

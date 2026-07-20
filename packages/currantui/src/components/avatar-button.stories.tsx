@@ -26,6 +26,19 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+/*
+ * `icon` takes a component reference (React.ElementType), not an element —
+ * Storybook's dynamic source serializer (used for any `render:` story) can't
+ * print a forwardRef object and emits raw `$$typeof` internals instead, so
+ * every story below carries an explicit copyable docs.source.code snippet.
+ */
+const onlySettingsSource = `<AvatarButton>
+  <AvatarButtonTrigger name="Aline Umutoni" />
+  <AvatarButtonMenu>
+    <AvatarButtonItem icon={Gear}>Settings</AvatarButtonItem>
+  </AvatarButtonMenu>
+</AvatarButton>`
+
 export const OnlySettings: Story = {
   render: () => (
     <AvatarButton>
@@ -35,7 +48,24 @@ export const OnlySettings: Story = {
       </AvatarButtonMenu>
     </AvatarButton>
   ),
+  parameters: {
+    docs: { source: { code: onlySettingsSource, language: "tsx" } },
+  },
 }
+
+const fullMenuSource = `<AvatarButton>
+  <AvatarButtonTrigger name="Aline Umutoni" />
+  <AvatarButtonMenu>
+    <AvatarButtonLabel name="Aline Umutoni" email="aline@nhic.gov.rw" />
+    <AvatarButtonSeparator />
+    <AvatarButtonItem icon={Gear}>Settings</AvatarButtonItem>
+    <AvatarButtonItem icon={Question}>Help</AvatarButtonItem>
+    <AvatarButtonSeparator />
+    <AvatarButtonItem icon={SignOut} destructive>
+      Sign out
+    </AvatarButtonItem>
+  </AvatarButtonMenu>
+</AvatarButton>`
 
 export const FullMenu: Story = {
   render: () => (
@@ -53,11 +83,15 @@ export const FullMenu: Story = {
       </AvatarButtonMenu>
     </AvatarButton>
   ),
+  parameters: {
+    docs: { source: { code: fullMenuSource, language: "tsx" } },
+  },
 }
 
 export const Open: Story = {
   render: FullMenu.render,
   parameters: {
+    docs: { source: { code: fullMenuSource, language: "tsx" } },
     a11y: {
       config: {
         // Radix DropdownMenu marks the page background aria-hidden while
@@ -75,6 +109,13 @@ export const Open: Story = {
   },
 }
 
+const imageTriggerSource = `<AvatarButton>
+  <AvatarButtonTrigger name="Aline Umutoni" src={AVATAR_DATA_URI} />
+  <AvatarButtonMenu>
+    <AvatarButtonItem icon={Gear}>Settings</AvatarButtonItem>
+  </AvatarButtonMenu>
+</AvatarButton>`
+
 export const ImageTrigger: Story = {
   render: () => (
     <AvatarButton>
@@ -84,7 +125,17 @@ export const ImageTrigger: Story = {
       </AvatarButtonMenu>
     </AvatarButton>
   ),
+  parameters: {
+    docs: { source: { code: imageTriggerSource, language: "tsx" } },
+  },
 }
+
+const iconOnlyTriggerSource = `<AvatarButton>
+  <AvatarButtonTrigger />
+  <AvatarButtonMenu>
+    <AvatarButtonItem icon={Gear}>Settings</AvatarButtonItem>
+  </AvatarButtonMenu>
+</AvatarButton>`
 
 export const IconOnlyTrigger: Story = {
   render: () => (
@@ -95,4 +146,7 @@ export const IconOnlyTrigger: Story = {
       </AvatarButtonMenu>
     </AvatarButton>
   ),
+  parameters: {
+    docs: { source: { code: iconOnlyTriggerSource, language: "tsx" } },
+  },
 }
