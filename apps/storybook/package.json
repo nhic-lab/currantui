@@ -23,7 +23,7 @@
     "@storybook/addon-docs": "^9.1.20",
     "@storybook/addon-themes": "^9.1.20",
     "@storybook/addon-vitest": "^9.1.20",
-    "@storybook/react-vite": "^9.1.20",
+    "@storybook/react-vite": "^10.5.3",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-table": "^8.21.3",
     "@types/react": "^19.2.10",
