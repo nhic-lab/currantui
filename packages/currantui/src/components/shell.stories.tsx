@@ -104,13 +104,89 @@ const demoContent = (
   </ShellContent>
 )
 
+const fullChassisSource = `<ShellProvider>
+  <ShellSkipToContent />
+  <ShellHeader>
+    <ShellHeaderMenuButton />
+    <ShellHeaderName href="#">
+      <HicLogo />
+    </ShellHeaderName>
+    <ShellHeaderNav>
+      <ShellHeaderNavLink href="#" isActive>
+        Surveillance
+      </ShellHeaderNavLink>
+      <ShellHeaderNavLink href="#">Registry</ShellHeaderNavLink>
+      <ShellHeaderNavMenu label="Analytics">
+        <ShellHeaderNavMenuItem asChild>
+          <a href="#">Dashboards</a>
+        </ShellHeaderNavMenuItem>
+        <ShellHeaderNavMenuItem asChild>
+          <a href="#">Exports</a>
+        </ShellHeaderNavMenuItem>
+      </ShellHeaderNavMenu>
+    </ShellHeaderNav>
+    <ShellGlobalBar>
+      <ShellGlobalAction label="Notifications">
+        <BellIcon />
+      </ShellGlobalAction>
+      <ThemeToggle />
+      <ShellGlobalAction label="Switch product" panelId="switcher">
+        <SquaresFourIcon />
+      </ShellGlobalAction>
+    </ShellGlobalBar>
+    <ShellPanel id="switcher" label="Switch product">
+      <ShellSwitcher>
+        <ShellSwitcherItem href="#" isActive>
+          Surveillance
+        </ShellSwitcherItem>
+        <ShellSwitcherItem href="#">Facility registry</ShellSwitcherItem>
+        <ShellSwitcherDivider />
+        <ShellSwitcherItem href="#">Admin console</ShellSwitcherItem>
+      </ShellSwitcher>
+    </ShellPanel>
+  </ShellHeader>
+  <ShellSideNav>
+    <ShellSideNavItems>
+      <ShellSideNavLink href="#" icon={<HouseIcon />} isActive>
+        Overview
+      </ShellSideNavLink>
+      <ShellSideNavLink href="#" icon={<ChartBarIcon />}>
+        Indicators
+      </ShellSideNavLink>
+      <ShellSideNavMenu label="Reports" icon={<TableIcon />} defaultOpen>
+        <ShellSideNavMenuItem href="#">Weekly submissions</ShellSideNavMenuItem>
+        <ShellSideNavMenuItem href="#">Data quality</ShellSideNavMenuItem>
+      </ShellSideNavMenu>
+      <ShellSideNavDivider />
+      <ShellSideNavLink href="#" icon={<GearIcon />}>
+        Administration
+      </ShellSideNavLink>
+    </ShellSideNavItems>
+    <ShellSideNavFooter>
+      <p className="px-2 pb-1 text-[0.625rem] text-sidebar-foreground/70 tabular-nums">
+        CurrantUI v0.3.0
+      </p>
+    </ShellSideNavFooter>
+  </ShellSideNav>
+  <ShellContent>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 p-4">
+      <PageHeader
+        title="Facility coverage"
+        subtitle="Weekly reporting across all districts"
+      />
+      <div className="h-64 rounded-lg border border-dashed border-border" />
+    </div>
+  </ShellContent>
+</ShellProvider>`
+
+/* Page-relative: the deployed Storybook lives under a subpath */
 const fullChassis = (
   <ShellProvider>
     <ShellSkipToContent />
     <ShellHeader>
       <ShellHeaderMenuButton />
       <ShellHeaderName href="#">
-        <HicLogo />
+        <HicLogo src="./logo.svg" />
       </ShellHeaderName>
       <ShellHeaderNav>
         <ShellHeaderNavLink href="#" isActive>
@@ -160,6 +236,9 @@ const fullChassis = (
 
 export const Default: Story = {
   render: () => fullChassis,
+  parameters: {
+    docs: { source: { code: fullChassisSource, language: "tsx" } },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const shell = canvasElement.querySelector('[data-slot="shell"]')
@@ -176,13 +255,53 @@ export const Default: Story = {
   },
 }
 
+const railSource = `<ShellProvider>
+  <ShellSkipToContent />
+  <ShellHeader>
+    <ShellHeaderName href="#">
+      <HicLogo />
+    </ShellHeaderName>
+    <ShellGlobalBar>
+      <ThemeToggle />
+    </ShellGlobalBar>
+  </ShellHeader>
+  <ShellSideNav variant="rail">
+    <ShellSideNavItems>
+      <ShellSideNavLink href="#" icon={<HouseIcon />} isActive>
+        Overview
+      </ShellSideNavLink>
+      <ShellSideNavLink href="#" icon={<ChartBarIcon />}>
+        Indicators
+      </ShellSideNavLink>
+      <ShellSideNavMenu label="Reports" icon={<TableIcon />} defaultOpen>
+        <ShellSideNavMenuItem href="#">Weekly submissions</ShellSideNavMenuItem>
+        <ShellSideNavMenuItem href="#">Data quality</ShellSideNavMenuItem>
+      </ShellSideNavMenu>
+      <ShellSideNavDivider />
+      <ShellSideNavLink href="#" icon={<GearIcon />}>
+        Administration
+      </ShellSideNavLink>
+    </ShellSideNavItems>
+  </ShellSideNav>
+  <ShellContent>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 p-4">
+      <PageHeader
+        title="Facility coverage"
+        subtitle="Weekly reporting across all districts"
+      />
+      <div className="h-64 rounded-lg border border-dashed border-border" />
+    </div>
+  </ShellContent>
+</ShellProvider>`
+
 export const Rail: Story = {
   render: () => (
     <ShellProvider>
       <ShellSkipToContent />
       <ShellHeader>
         <ShellHeaderName href="#">
-          <HicLogo />
+          {/* Page-relative: the deployed Storybook lives under a subpath */}
+          <HicLogo src="./logo.svg" />
         </ShellHeaderName>
         <ShellGlobalBar>
           <ThemeToggle />
@@ -194,6 +313,9 @@ export const Rail: Story = {
       {demoContent}
     </ShellProvider>
   ),
+  parameters: {
+    docs: { source: { code: railSource, language: "tsx" } },
+  },
   play: async ({ canvasElement }) => {
     // Tabbing into the rail expands it via focus-within — labels become visible
     await userEvent.tab() // skip link
@@ -206,13 +328,60 @@ export const Rail: Story = {
   },
 }
 
+const labeledRailSource = `<ShellProvider>
+  <ShellSkipToContent />
+  <ShellHeader>
+    <ShellHeaderMenuButton />
+    <ShellHeaderName href="#">
+      <HicLogo />
+    </ShellHeaderName>
+    <ShellGlobalBar>
+      <ThemeToggle />
+    </ShellGlobalBar>
+  </ShellHeader>
+  <ShellSideNav variant="labeled-rail">
+    <ShellSideNavItems>
+      <ShellSideNavLink href="#" icon={<HouseIcon />} isActive>
+        Home
+      </ShellSideNavLink>
+      <ShellSideNavLink href="#" icon={<ChartBarIcon />}>
+        Reports
+      </ShellSideNavLink>
+      <ShellSideNavLink href="#" icon={<TableIcon />}>
+        Datasets
+      </ShellSideNavLink>
+      <ShellSideNavDivider />
+      <ShellSideNavLink href="#" icon={<GearIcon />}>
+        Settings
+      </ShellSideNavLink>
+    </ShellSideNavItems>
+    <ShellSideNavFooter>
+      <ShellSideNavItems className="flex-none px-0">
+        <ShellSideNavLink href="#" icon={<SquaresFourIcon />}>
+          My workspace
+        </ShellSideNavLink>
+      </ShellSideNavItems>
+    </ShellSideNavFooter>
+  </ShellSideNav>
+  <ShellContent>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 p-4">
+      <PageHeader
+        title="Facility coverage"
+        subtitle="Weekly reporting across all districts"
+      />
+      <div className="h-64 rounded-lg border border-dashed border-border" />
+    </div>
+  </ShellContent>
+</ShellProvider>`
+
 export const LabeledRail: Story = {
   render: () => (
     <ShellProvider>
       <ShellSkipToContent />
       <ShellHeader>
+        <ShellHeaderMenuButton />
         <ShellHeaderName href="#">
-          <HicLogo />
+          <HicLogo src="./logo.svg" />
         </ShellHeaderName>
         <ShellGlobalBar>
           <ThemeToggle />
@@ -245,6 +414,9 @@ export const LabeledRail: Story = {
       {demoContent}
     </ShellProvider>
   ),
+  parameters: {
+    docs: { source: { code: labeledRailSource, language: "tsx" } },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const nav = canvasElement.querySelector('[data-slot="shell-side-nav"]')!
@@ -259,8 +431,47 @@ export const LabeledRail: Story = {
     expect(workspace.getBoundingClientRect().right).toBeLessThanOrEqual(
       nav.getBoundingClientRect().right + 0.5
     )
+    expect(
+      canvas.queryByRole("button", { name: /open navigation|close navigation/i })
+    ).not.toBeInTheDocument()
   },
 }
+
+const fixedSource = `<ShellProvider>
+  <ShellSkipToContent />
+  <ShellHeader>
+    <ShellHeaderName href="#">
+      <HicLogo />
+    </ShellHeaderName>
+  </ShellHeader>
+  <ShellSideNav variant="fixed">
+    <ShellSideNavItems>
+      <ShellSideNavLink href="#" icon={<HouseIcon />} isActive>
+        Overview
+      </ShellSideNavLink>
+      <ShellSideNavLink href="#" icon={<ChartBarIcon />}>
+        Indicators
+      </ShellSideNavLink>
+      <ShellSideNavMenu label="Reports" icon={<TableIcon />} defaultOpen>
+        <ShellSideNavMenuItem href="#">Weekly submissions</ShellSideNavMenuItem>
+        <ShellSideNavMenuItem href="#">Data quality</ShellSideNavMenuItem>
+      </ShellSideNavMenu>
+      <ShellSideNavDivider />
+      <ShellSideNavLink href="#" icon={<GearIcon />}>
+        Administration
+      </ShellSideNavLink>
+    </ShellSideNavItems>
+  </ShellSideNav>
+  <ShellContent>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 p-4">
+      <PageHeader
+        title="Facility coverage"
+        subtitle="Weekly reporting across all districts"
+      />
+      <div className="h-64 rounded-lg border border-dashed border-border" />
+    </div>
+  </ShellContent>
+</ShellProvider>`
 
 export const Fixed: Story = {
   render: () => (
@@ -268,7 +479,7 @@ export const Fixed: Story = {
       <ShellSkipToContent />
       <ShellHeader>
         <ShellHeaderName href="#">
-          <HicLogo />
+          <HicLogo src="./logo.svg" />
         </ShellHeaderName>
       </ShellHeader>
       <ShellSideNav variant="fixed">
@@ -277,10 +488,16 @@ export const Fixed: Story = {
       {demoContent}
     </ShellProvider>
   ),
+  parameters: {
+    docs: { source: { code: fixedSource, language: "tsx" } },
+  },
 }
 
 export const MobileOverlay: Story = {
   render: () => fullChassis,
+  parameters: {
+    docs: { source: { code: fullChassisSource, language: "tsx" } },
+  },
   // Viewport switching mid-run crashes the vitest browser page — view this
   // story in the Storybook UI (mobile viewport) instead; the mobile sheet
   // behavior itself is exercised by Radix Dialog primitives
@@ -290,13 +507,50 @@ export const MobileOverlay: Story = {
   },
 }
 
+const panelExclusivitySource = `<ShellProvider>
+  <ShellSkipToContent />
+  <ShellHeader>
+    <ShellHeaderName href="#">
+      <HicLogo />
+    </ShellHeaderName>
+    <ShellGlobalBar>
+      <ShellGlobalAction label="Notifications" panelId="notifications">
+        <BellIcon />
+      </ShellGlobalAction>
+      <ShellGlobalAction label="Switch product" panelId="switcher">
+        <SquaresFourIcon />
+      </ShellGlobalAction>
+    </ShellGlobalBar>
+    <ShellPanel id="notifications" label="Notifications">
+      <p className="p-4 text-xs/relaxed text-sidebar-foreground/70">
+        No unread notifications.
+      </p>
+    </ShellPanel>
+    <ShellPanel id="switcher" label="Switch product">
+      <ShellSwitcher>
+        <ShellSwitcherItem href="#">Surveillance</ShellSwitcherItem>
+        <ShellSwitcherItem href="#">Facility registry</ShellSwitcherItem>
+      </ShellSwitcher>
+    </ShellPanel>
+  </ShellHeader>
+  <ShellContent>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 p-4">
+      <PageHeader
+        title="Facility coverage"
+        subtitle="Weekly reporting across all districts"
+      />
+      <div className="h-64 rounded-lg border border-dashed border-border" />
+    </div>
+  </ShellContent>
+</ShellProvider>`
+
 export const PanelExclusivity: Story = {
   render: () => (
     <ShellProvider>
       <ShellSkipToContent />
       <ShellHeader>
         <ShellHeaderName href="#">
-          <HicLogo />
+          <HicLogo src="./logo.svg" />
         </ShellHeaderName>
         <ShellGlobalBar>
           <ShellGlobalAction label="Notifications" panelId="notifications">
@@ -321,6 +575,9 @@ export const PanelExclusivity: Story = {
       {demoContent}
     </ShellProvider>
   ),
+  parameters: {
+    docs: { source: { code: panelExclusivitySource, language: "tsx" } },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const notifications = canvas.getByRole("button", { name: "Notifications" })
@@ -347,6 +604,9 @@ export const PanelExclusivity: Story = {
 
 export const SkipToContent: Story = {
   render: () => fullChassis,
+  parameters: {
+    docs: { source: { code: fullChassisSource, language: "tsx" } },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.tab()

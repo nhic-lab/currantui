@@ -34,12 +34,36 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const switcherSource = `<ShellProvider>
+  <ShellHeader>
+    <ShellHeaderName href="#">
+      <HicLogo />
+    </ShellHeaderName>
+    <ShellGlobalBar>
+      <ShellGlobalAction label="Switch product" panelId="switcher">
+        <SquaresFourIcon />
+      </ShellGlobalAction>
+    </ShellGlobalBar>
+    <ShellPanel id="switcher" label="Switch product">
+      <ShellSwitcher>
+        <ShellSwitcherItem href="#" isActive>
+          Surveillance
+        </ShellSwitcherItem>
+        <ShellSwitcherItem href="#">Facility registry</ShellSwitcherItem>
+        <ShellSwitcherDivider />
+        <ShellSwitcherItem href="#">Admin console</ShellSwitcherItem>
+      </ShellSwitcher>
+    </ShellPanel>
+  </ShellHeader>
+</ShellProvider>`
+
 export const Switcher: Story = {
   render: () => (
     <ShellProvider className="min-h-96">
       <ShellHeader>
         <ShellHeaderName href="#">
-          <HicLogo />
+          {/* Page-relative: the deployed Storybook lives under a subpath */}
+          <HicLogo src="./logo.svg" />
         </ShellHeaderName>
         <ShellGlobalBar>
           <ShellGlobalAction label="Switch product" panelId="switcher">
@@ -59,6 +83,9 @@ export const Switcher: Story = {
       </ShellHeader>
     </ShellProvider>
   ),
+  parameters: {
+    docs: { source: { code: switcherSource, language: "tsx" } },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const trigger = canvas.getByRole("button", { name: "Switch product" })

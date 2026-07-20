@@ -4,6 +4,7 @@ import { Collapsible, Dialog as DialogPrimitive, Slot } from "radix-ui"
 import { CaretDownIcon, XIcon } from "@phosphor-icons/react"
 import { useShell } from "@nhic/currantui/components/shell"
 import { cn } from "@nhic/currantui/lib/utils"
+import type { ShellSideNavVariant } from "@nhic/currantui/components/shell"
 
 declare const process: { env: { NODE_ENV?: string } }
 
@@ -13,9 +14,8 @@ const sideNavRowClasses =
 const stackedRowClasses =
   "relative flex w-full flex-col items-center gap-1 rounded-md px-1 py-2 text-center text-2xs/tight text-sidebar-foreground/70 transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/30 data-active:bg-sidebar-accent data-active:font-medium data-active:text-sidebar-accent-foreground data-active:before:absolute data-active:before:inset-y-2 data-active:before:start-0 data-active:before:w-0.5 data-active:before:rounded-full data-active:before:bg-primary [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5"
 
-const SideNavVariantContext = React.createContext<
-  "expandable" | "rail" | "fixed" | "labeled-rail"
->("expandable")
+const SideNavVariantContext =
+  React.createContext<ShellSideNavVariant>("expandable")
 
 /**
  * In the rail's resting state the panel is icon-wide, so label text must not
@@ -37,10 +37,15 @@ function ShellSideNav({
   children,
   ...props
 }: React.ComponentProps<"nav"> & {
-  variant?: "expandable" | "rail" | "fixed" | "labeled-rail"
+  variant?: ShellSideNavVariant
   label?: string
 }) {
-  const { openMobile, setOpenMobile, isMobile } = useShell()
+  const { openMobile, setOpenMobile, isMobile, setSideNavVariant } = useShell()
+
+  React.useLayoutEffect(() => {
+    setSideNavVariant(variant)
+    return () => setSideNavVariant("expandable")
+  }, [variant, setSideNavVariant])
 
   return (
     <SideNavVariantContext.Provider value={variant}>

@@ -58,12 +58,19 @@ function ShellHeader({ className, ...props }: React.ComponentProps<"header">) {
   )
 }
 
+/**
+ * Toggles the side nav; renders nothing when the mounted ShellSideNav is
+ * "labeled-rail" — that variant has no collapsed/mobile state to toggle.
+ */
 function ShellHeaderMenuButton({
   className,
   ...props
 }: React.ComponentProps<"button">) {
-  const { open, openMobile, isMobile, toggleSideNav } = useShell()
+  const { open, openMobile, isMobile, toggleSideNav, sideNavVariant } =
+    useShell()
   const expanded = isMobile ? openMobile : open
+
+  if (sideNavVariant === "labeled-rail") return null
 
   return (
     <button

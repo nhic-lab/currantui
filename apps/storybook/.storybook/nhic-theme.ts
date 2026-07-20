@@ -2,7 +2,9 @@ import { create } from "storybook/theming/create"
 
 /* Hex mirrors of the palette tokens in
    packages/currantui/src/styles/globals.css — Storybook's theming engine
-   (polished) cannot parse oklch, so the values are pre-converted */
+   (polished) cannot parse oklch, so the values are pre-converted:
+   #068ECE = brand blue (accents; dark-mode primary), #0175AC = the AA
+   interactive primary oklch(0.536 0.121 239.2), #054D6F = secondary */
 
 const shared = {
   brandTitle: "CurrantUI — NHIC Design System",
@@ -18,8 +20,8 @@ export const nhicDark = create({
   ...shared,
   brandImage: "./nhic-brand.svg",
 
-  colorPrimary: "#5aa0b8",
-  colorSecondary: "#2a7389",
+  colorPrimary: "#068ECE",
+  colorSecondary: "#068ECE",
 
   appBg: "#0a0a0a",
   appContentBg: "#0a0a0a",
@@ -32,8 +34,8 @@ export const nhicDark = create({
 
   barBg: "#0a0a0a",
   barTextColor: "#a1a1a1",
-  barHoverColor: "#5aa0b8",
-  barSelectedColor: "#5aa0b8",
+  barHoverColor: "#068ECE",
+  barSelectedColor: "#068ECE",
 
   inputBg: "#171717",
   inputBorder: "#333333",
@@ -43,7 +45,7 @@ export const nhicDark = create({
   buttonBg: "#171717",
   buttonBorder: "#333333",
   booleanBg: "#171717",
-  booleanSelectedBg: "#2a7389",
+  booleanSelectedBg: "#0175AC",
 })
 
 export const nhicLight = create({
@@ -51,8 +53,8 @@ export const nhicLight = create({
   ...shared,
   brandImage: "./nhic-brand-light.svg",
 
-  colorPrimary: "#2a7389",
-  colorSecondary: "#2a7389",
+  colorPrimary: "#068ECE",
+  colorSecondary: "#0175AC",
 
   appBg: "#ffffff",
   appContentBg: "#ffffff",
@@ -65,8 +67,8 @@ export const nhicLight = create({
 
   barBg: "#ffffff",
   barTextColor: "#737373",
-  barHoverColor: "#2a7389",
-  barSelectedColor: "#2a7389",
+  barHoverColor: "#0175AC",
+  barSelectedColor: "#0175AC",
 
   inputBg: "#ffffff",
   inputBorder: "#e5e5e5",
@@ -76,5 +78,5 @@ export const nhicLight = create({
   buttonBg: "#f5f5f5",
   buttonBorder: "#e5e5e5",
   booleanBg: "#f5f5f5",
-  booleanSelectedBg: "#2a7389",
+  booleanSelectedBg: "#0175AC",
 })
