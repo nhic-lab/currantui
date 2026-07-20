@@ -30,7 +30,8 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
-    leftSlot: <HicLogo stamp="DOCS" />,
+    /* Page-relative: the deployed Storybook lives under a subpath */
+    leftSlot: <HicLogo stamp="DOCS" src="./logo.svg" />,
     rightSlot: (
       <>
         <NotificationsButton />
@@ -50,10 +51,46 @@ export const Default: Story = {
       </>
     ),
   },
+  parameters: {
+    docs: {
+      source: {
+        code: `<Navbar
+  leftSlot={<HicLogo stamp="DOCS" />}
+  rightSlot={
+    <>
+      <NotificationsButton />
+      <ThemeToggle />
+      <AvatarButton>
+        <AvatarButtonTrigger name="A. Uwase" />
+        <AvatarButtonMenu>
+          <AvatarButtonLabel name="A. Uwase" email="analyst@example.org" />
+          <AvatarButtonSeparator />
+          <AvatarButtonItem icon={Gear}>Settings</AvatarButtonItem>
+          <AvatarButtonSeparator />
+          <AvatarButtonItem icon={SignOut} destructive>
+            Sign out
+          </AvatarButtonItem>
+        </AvatarButtonMenu>
+      </AvatarButton>
+    </>
+  }
+/>`,
+        language: "tsx",
+      },
+    },
+  },
 }
 
 export const Minimal: Story = {
   args: {
-    leftSlot: <HicLogo compact />,
+    leftSlot: <HicLogo compact src="./logo.svg" />,
+  },
+  parameters: {
+    docs: {
+      source: {
+        code: `<Navbar leftSlot={<HicLogo compact />} />`,
+        language: "tsx",
+      },
+    },
   },
 }

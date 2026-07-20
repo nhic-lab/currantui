@@ -90,8 +90,10 @@
     --primary-foreground: oklch(0.15 0.02 239.2);
     --bg: var(--background);
     --text: var(--foreground);
-    /* Brand deep blue #054D6F: white text on secondary 9.1:1 */
-    --secondary: oklch(0.3986 0.0849 237.2);
+    /* Brand deep blue #054D6F sinks into dark surfaces (1.9:1), so dark mode
+       steps the secondary up to the mid brand shade #0175AC — same hue as
+       the bright primary, white text 5.1:1 */
+    --secondary: oklch(0.536 0.121 239.2);
     --secondary-foreground: oklch(1 0 0);
     --muted: oklch(0.269 0 0);
     --muted-foreground: oklch(0.708 0 0);
