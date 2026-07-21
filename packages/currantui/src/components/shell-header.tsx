@@ -25,6 +25,7 @@ const globalActionClasses =
 
 function ShellHeader({ className, ...props }: React.ComponentProps<"header">) {
   const ref = React.useRef<HTMLElement>(null)
+  const { sideNavVariant } = useShell()
 
   /* The header grows with its content (tall brand lockups, wrapped nav) —
      write the measured height back to --shell-header-h so the side nav and
@@ -50,7 +51,10 @@ function ShellHeader({ className, ...props }: React.ComponentProps<"header">) {
       ref={ref}
       data-slot="shell-header"
       className={cn(
-        "sticky top-0 z-40 col-span-full row-start-1 flex min-h-(--shell-header-h) items-center gap-1 border-b border-sidebar-border bg-sidebar px-2 py-1.5 text-sidebar-foreground",
+        "sticky top-0 z-40 row-start-1 flex min-h-(--shell-header-h) items-center gap-1 border-b border-sidebar-border bg-sidebar px-2 py-1.5 text-sidebar-foreground",
+        /* labeled-rail spans the full shell height, so the header yields the
+           first column and covers only the content width */
+        sideNavVariant === "labeled-rail" ? "col-start-2" : "col-span-full",
         className
       )}
       {...props}
