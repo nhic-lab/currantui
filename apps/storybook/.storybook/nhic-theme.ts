@@ -4,7 +4,7 @@ import { create } from "storybook/theming/create"
    packages/currantui/src/styles/globals.css — Storybook's theming engine
    (polished) cannot parse oklch, so the values are pre-converted:
    #068ECE = brand blue (accents; dark-mode primary), #0175AC = the AA
-   interactive primary oklch(0.536 0.121 239.2), #054D6F = secondary */
+   interactive primary oklch(0.536 0.121 239.2) */
 
 const shared = {
   brandTitle: "CurrantUI — NHIC Design System",

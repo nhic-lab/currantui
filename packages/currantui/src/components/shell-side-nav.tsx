@@ -62,7 +62,12 @@ function ShellSideNav({
             "w-(--shell-sidenav-w) border-e border-sidebar-border",
           variant === "rail" && "w-(--shell-sidenav-w-rail)",
           variant === "labeled-rail" &&
-            "w-(--shell-sidenav-w-rail-labeled) border-e border-sidebar-border",
+            /* Spans the full shell height (both grid rows); the header sits
+               beside it in the content column, and the top padding keeps the
+               corner beside the header empty */
+            /* -1px: --shell-header-h includes the header's bottom border, so
+               the inner border-t must overlap that same pixel row to align */
+            "top-0 row-start-1 row-span-2 h-svh w-(--shell-sidenav-w-rail-labeled) border-e border-sidebar-border pt-[calc(var(--shell-header-h)-1px)]",
           className
         )}
         {...props}
@@ -74,7 +79,9 @@ function ShellSideNav({
             variant === "rail"
               ? "absolute inset-y-0 start-0 w-(--shell-sidenav-w-rail) border-e border-sidebar-border bg-sidebar shadow-none transition-[width] duration-150 hover:w-(--shell-sidenav-w) hover:shadow-lg focus-within:w-(--shell-sidenav-w) focus-within:shadow-lg"
               : variant === "labeled-rail"
-                ? "w-full"
+                ? /* Border continues the navbar's bottom line across the rail;
+                     items start (and scroll) below it */
+                  "w-full border-t border-sidebar-border"
                 : "w-(--shell-sidenav-w)"
           )}
         >

@@ -30,8 +30,10 @@
     --primary-foreground: oklch(1 0 0);
     --bg: var(--background);
     --text: var(--foreground);
-    /* Brand deep blue #054D6F: white text on secondary 9.1:1 */
-    --secondary: oklch(0.3986 0.0849 237.2);
+    /* Violet — hue-separated from the blue primary so secondary fills
+       (tags, badges, avatar fallbacks) read as a different category, and
+       clear of the success/warning semantic hues. White text 7.6:1. */
+    --secondary: oklch(0.46 0.14 305);
     --secondary-foreground: oklch(1 0 0);
     --muted: oklch(0.97 0 0);
     --muted-foreground: oklch(0.556 0 0);
@@ -90,10 +92,10 @@
     --primary-foreground: oklch(0.15 0.02 239.2);
     --bg: var(--background);
     --text: var(--foreground);
-    /* Brand deep blue #054D6F sinks into dark surfaces (1.9:1), so dark mode
-       steps the secondary up to the mid brand shade #0175AC — same hue as
-       the bright primary, white text 5.1:1 */
-    --secondary: oklch(0.536 0.121 239.2);
+    /* Violet, brightened for dark surfaces (3.4:1 vs card) — hue-separated
+       from the blue primary so secondary fills stay distinguishable.
+       White text 5.0:1. */
+    --secondary: oklch(0.56 0.14 305);
     --secondary-foreground: oklch(1 0 0);
     --muted: oklch(0.269 0 0);
     --muted-foreground: oklch(0.708 0 0);

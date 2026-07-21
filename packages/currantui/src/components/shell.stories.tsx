@@ -434,6 +434,32 @@ export const LabeledRail: Story = {
     expect(
       canvas.queryByRole("button", { name: /open navigation|close navigation/i })
     ).not.toBeInTheDocument()
+    // The rail spans the full shell height; the header yields the first
+    // column and starts where the rail ends
+    const shell = canvasElement.querySelector('[data-slot="shell"]')!
+    const header = canvasElement.querySelector('[data-slot="shell-header"]')!
+    const navRect = nav.getBoundingClientRect()
+    const shellRect = shell.getBoundingClientRect()
+    expect(Math.abs(navRect.top - shellRect.top)).toBeLessThanOrEqual(1)
+    // Sticky h-svh: fills the viewport even when shell content runs longer
+    expect(navRect.height).toBeGreaterThanOrEqual(window.innerHeight - 1)
+    expect(header.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+      navRect.right - 1
+    )
+    // Items start below the navbar line — the rail's top corner stays empty
+    // and a border continues the header's bottom line across the rail
+    expect(home.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      header.getBoundingClientRect().bottom
+    )
+    const inner = nav.querySelector('[data-slot="shell-side-nav-inner"]')!
+    expect(getComputedStyle(inner).borderTopWidth).toBe("1px")
+    // The rail's line overlaps the exact pixel row of the header's border
+    expect(
+      Math.abs(
+        inner.getBoundingClientRect().top -
+          (header.getBoundingClientRect().bottom - 1)
+      )
+    ).toBeLessThanOrEqual(0.5)
   },
 }
 

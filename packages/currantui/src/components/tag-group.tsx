@@ -80,7 +80,9 @@ function Tag({
       data-slot="tag"
       textValue={textValue}
       className={cn(
-        "inline-flex h-5 cursor-default items-center gap-1 rounded-full border border-transparent bg-secondary px-2 text-xs font-medium text-secondary-foreground transition-colors outline-none data-[hovered]:bg-secondary/80 data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        /* Inactive tags are a soft secondary tint with foreground ink so they
+           read as unselected; only selection fills solid */
+        "inline-flex h-5 cursor-default items-center gap-1 rounded-full border border-secondary/30 bg-secondary/15 px-2 text-xs font-medium text-foreground transition-colors outline-none data-[hovered]:bg-secondary/25 data-[selected]:border-transparent data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[focus-visible]:ring-2 data-[focus-visible]:ring-ring/30 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       )}
       {...props}
