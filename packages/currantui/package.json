@@ -1,6 +1,6 @@
 {
   "name": "@nhic/currantui",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "CurrantUI — the National Health Intelligence Center (NHIC) React design system: shadcn/ui + Radix primitives with Tailwind v4 tokens.",
   "type": "module",
   "license": "Apache-2.0",

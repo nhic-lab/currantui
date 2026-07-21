@@ -1,5 +1,16 @@
 # @nhic/currantui
 
+## 0.8.0
+
+### Minor Changes
+
+- 130d0a0: Adopt the brand color pair across the design tokens: the interactive primary is the nearest WCAG AA shade of brand blue #068ECE (oklch 0.536 0.121 239.2 — 5.1:1 with white and 4.7:1 on its own tints), the exact brand hex drives non-text accents (focus ring, sidebar active indicators) and the dark-mode primary fill, and deep blue #054D6F becomes the light-mode secondary and the primary-deep token (9.1:1 with white); dark mode's secondary steps up to the mid brand shade so it stays legible on dark surfaces. The Storybook manager theme mirrors the palette.
+
+### Patch Changes
+
+- 4f72ea4: The labeled-rail side nav now spans the full shell height with the header sitting beside it over the content column, and its items start below the navbar line so the rail's top corner stays empty. The secondary token moves off blue to a violet (white text 7.6:1 light / 5.0:1 dark) so secondary fills — badges, avatar fallbacks — are clearly distinguishable from the blue primary in both modes. Unselected tags restyle as a soft secondary tint with foreground ink; only selected tags fill solid.
+- 130d0a0: Shell refinements: the labeled-rail side nav widens to 5rem, and ShellHeaderMenuButton no longer renders for the labeled-rail variant (the toggle is a no-op there — only the expandable variant reads it); dark mode's secondary token steps up to the mid brand shade so secondary fills stay legible on dark surfaces.
+
 ## 0.7.0
 
 ### Minor Changes
