@@ -1,7 +1,8 @@
-import { userEvent, within } from "storybook/test"
+import { expect, userEvent, within } from "storybook/test"
 
 import {
   Sheet,
+  SheetBody,
   SheetClose,
   SheetContent,
   SheetDescription,
@@ -88,4 +89,63 @@ export const FromLeft: Story = {
 
 export const FromBottom: Story = {
   render: () => template("bottom"),
+}
+
+export const ScrollableBody: Story = {
+  render: () => (
+    <Sheet defaultOpen>
+      <SheetContent side="right">
+        <SheetHeader>
+          <SheetTitle>Facility details</SheetTitle>
+        </SheetHeader>
+        <SheetBody>
+          {Array.from({ length: 60 }, (_, index) => (
+            <p key={index}>Attribute {index + 1} of the selected facility.</p>
+          ))}
+        </SheetBody>
+        <SheetFooter>
+          <Button>Save changes</Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  ),
+  play: async ({ canvasElement }) => {
+    const body = canvasElement.ownerDocument.body
+    const screen = within(body)
+    const sheetBody = body.querySelector<HTMLElement>(
+      '[data-slot="sheet-body"]'
+    )!
+    expect(sheetBody.scrollHeight).toBeGreaterThan(sheetBody.clientHeight)
+    const save = screen.getByRole("button", { name: "Save changes" })
+    expect(save.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      window.innerHeight
+    )
+    await userEvent.click(save)
+  },
+}
+
+export const BottomCapped: Story = {
+  render: () => (
+    <Sheet defaultOpen>
+      <SheetContent side="bottom">
+        <SheetHeader>
+          <SheetTitle>Filters</SheetTitle>
+        </SheetHeader>
+        <SheetBody>
+          {Array.from({ length: 60 }, (_, index) => (
+            <p key={index}>Filter option {index + 1}.</p>
+          ))}
+        </SheetBody>
+      </SheetContent>
+    </Sheet>
+  ),
+  play: ({ canvasElement }) => {
+    const body = canvasElement.ownerDocument.body
+    const content = body.querySelector<HTMLElement>(
+      '[data-slot="sheet-content"]'
+    )!
+    expect(content.getBoundingClientRect().height).toBeLessThanOrEqual(
+      window.innerHeight - 64 + 1
+    )
+  },
 }

@@ -23,7 +23,7 @@ file name: `@nhic/currantui/components/<kebab-name>`.
 | Component | Use it for |
 |---|---|
 | `Field` family | Field chrome: label, description, error, sets and groups |
-| `Input` / `Textarea` / `Label` | Text entry |
+| `Input` / `Textarea` (`size` presets cap auto-growth) / `Label` | Text entry |
 | `SearchField` | Text search with clear affordance |
 | `NumberField` | Numeric entry with steppers and locale formatting |
 | `Checkbox` / `RadioGroup` / `Switch` | Binary and single-choice controls |
@@ -44,8 +44,8 @@ file name: `@nhic/currantui/components/<kebab-name>`.
 
 | Component | Use it for |
 |---|---|
-| `Dialog` | Modal confirmation or focused task |
-| `Sheet` | Side-anchored panel/tray/drawer |
+| `Dialog` | Modal confirmation or focused task; `size` prop (sm–xl, full) and `DialogBody` for scrollable content |
+| `Sheet` | Side-anchored panel/tray/drawer; `SheetBody` scrolls between pinned header and footer |
 | `Popover` | Anchored floating surface for arbitrary content |
 | `Tooltip` | Hover-only text hint |
 | `Toggletip` | Click-triggered bubble that can hold links and rich content |
