@@ -4,7 +4,7 @@ import {
   PencilSimpleIcon,
   TrashIcon,
 } from "@phosphor-icons/react"
-import { userEvent, within } from "storybook/test"
+import { expect, userEvent, waitFor, within } from "storybook/test"
 
 import {
   DropdownMenu,
@@ -139,4 +139,56 @@ export const Selection: Story = {
       </DropdownMenuContent>
     </DropdownMenu>
   ),
+}
+
+export const OverflowingSubmenu: Story = {
+  render: () => (
+    <DropdownMenu defaultOpen>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Export</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>Download</DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Districts</DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            {Array.from({ length: 40 }, (_, index) => (
+              <DropdownMenuItem key={index}>
+                District {index + 1}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+  parameters: {
+    a11y: {
+      config: {
+        // Radix DropdownMenu marks the page background aria-hidden while
+        // open, which axe flags because the focusable trigger sits inside it
+        // (library-level interplay, not story authoring)
+        rules: [{ id: "aria-hidden-focus", enabled: false }],
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const body = canvasElement.ownerDocument.body
+    const screen = within(body)
+    const subTrigger = await screen.findByRole("menuitem", {
+      name: "Districts",
+    })
+    subTrigger.focus()
+    await userEvent.keyboard("{ArrowRight}")
+    const subContent = await waitFor(() => {
+      const el = body.querySelector<HTMLElement>(
+        '[data-slot="dropdown-menu-sub-content"]'
+      )
+      expect(el).not.toBeNull()
+      return el!
+    })
+    const rect = subContent.getBoundingClientRect()
+    expect(rect.bottom).toBeLessThanOrEqual(window.innerHeight + 1)
+    expect(subContent.scrollHeight).toBeGreaterThan(subContent.clientHeight)
+  },
 }
