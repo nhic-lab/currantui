@@ -1,5 +1,11 @@
 # @nhic/currantui-charts
 
+## 1.2.1
+
+### Patch Changes
+
+- 0e67591: Remove a dead grid-rows utility from the fullscreen chart dialog — DialogContent's internal layout is flex-column, so the class no longer applied; fullscreen sizing is unchanged.
+
 ## 1.2.0
 
 ### Minor Changes
