@@ -467,7 +467,7 @@ function ChartShell<TRow>(props: ChartShellProps<TRow>) {
       />
       <Dialog open={fullscreen} onOpenChange={setFullscreen}>
         <DialogContent
-          className="h-[90vh] w-[95vw] max-w-none grid-rows-[1fr] sm:max-w-none"
+          className="h-[90vh] w-[95vw] max-w-none sm:max-w-none"
           aria-describedby={undefined}
           showCloseButton={false}
         >

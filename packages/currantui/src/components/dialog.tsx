@@ -1,9 +1,12 @@
 import * as React from "react"
+import { cva } from "class-variance-authority"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { XIcon } from "@phosphor-icons/react"
 import { cn } from "@nhic/currantui/lib/utils"
 import { Button } from "@nhic/currantui/components/button"
+
+import type { VariantProps } from "class-variance-authority"
 
 function Dialog({
   ...props
@@ -45,23 +48,38 @@ function DialogOverlay({
   )
 }
 
+const dialogContentVariants = cva(
+  "fixed top-1/2 inset-s-1/2 z-50 flex max-h-[calc(100svh-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-hidden rounded-xl bg-popover p-4 text-sm/relaxed text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+  {
+    variants: {
+      size: {
+        sm: "sm:max-w-sm",
+        md: "sm:max-w-md",
+        lg: "sm:max-w-lg",
+        xl: "sm:max-w-xl",
+        full: "h-[calc(100svh-2rem)] sm:max-w-[calc(100%-2rem)]",
+      },
+    },
+    defaultVariants: { size: "sm" },
+  }
+)
+
 function DialogContent({
   className,
   children,
+  size,
   showCloseButton = true,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean
-}) {
+}: React.ComponentProps<typeof DialogPrimitive.Content> &
+  VariantProps<typeof dialogContentVariants> & {
+    showCloseButton?: boolean
+  }) {
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
-        className={cn(
-          "fixed top-1/2 inset-s-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm/relaxed text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
-          className
-        )}
+        className={cn(dialogContentVariants({ size }), className)}
         {...props}
       >
         {children}
@@ -75,6 +93,21 @@ function DialogContent({
         )}
       </DialogPrimitive.Content>
     </DialogPortal>
+  )
+}
+
+/** Scroll region between DialogHeader and DialogFooter; both stay pinned */
+function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-body"
+      tabIndex={0}
+      className={cn(
+        "min-h-0 flex-1 overflow-y-auto outline-none focus-visible:ring-2 focus-visible:ring-ring/30",
+        className
+      )}
+      {...props}
+    />
   )
 }
 
@@ -146,6 +179,7 @@ function DialogDescription({
 
 export {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
