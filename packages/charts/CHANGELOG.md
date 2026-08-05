@@ -1,5 +1,11 @@
 # @nhic/currantui-charts
 
+## 1.2.2
+
+### Patch Changes
+
+- 4347220: Fill the container in ChoroplethChart. The map series set no `layoutCenter`/`layoutSize`, so echarts rendered the map at a small default scale centered in the chart body, leaving large empty margins. Adding `layoutCenter: ["50%", "50%"]` and `layoutSize: "100%"` scales the geometry to the smaller container dimension so the map fills the available area.
+
 ## 1.2.1
 
 ### Patch Changes
