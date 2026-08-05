@@ -187,8 +187,18 @@ export const OverflowingSubmenu: Story = {
       expect(el).not.toBeNull()
       return el!
     })
-    const rect = subContent.getBoundingClientRect()
-    expect(rect.bottom).toBeLessThanOrEqual(window.innerHeight + 1)
+    /*
+     * Radix settles the submenu over a few frames after mount: it slides to
+     * its collision-aware position and grows the
+     * --radix-dropdown-menu-content-available-height clamp toward the
+     * viewport edge. Measure inside waitFor so the assertion reads the
+     * rested, clamped box; under CI load the box is briefly taller than the
+     * viewport mid-settle before it clamps.
+     */
+    await waitFor(() => {
+      const rect = subContent.getBoundingClientRect()
+      expect(rect.bottom).toBeLessThanOrEqual(window.innerHeight + 1)
+    })
     expect(subContent.scrollHeight).toBeGreaterThan(subContent.clientHeight)
   },
 }
