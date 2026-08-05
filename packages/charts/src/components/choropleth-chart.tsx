@@ -92,6 +92,12 @@ function ChoroplethChart({ data, options, crossFilter, className }: ChoroplethCh
           type: "map" as const,
           map: options.map,
           roam: false,
+          /* Fill the chart body: without these echarts renders the map at a
+             conservative default scale, centered, leaving large empty margins.
+             layoutSize "100%" scales the geometry to the smaller container
+             dimension; layoutCenter keeps it centered. */
+          layoutCenter: ["50%", "50%"],
+          layoutSize: "100%",
           label: { show: false },
           itemStyle: {
             borderColor: resolveTokenColor("--card"),
