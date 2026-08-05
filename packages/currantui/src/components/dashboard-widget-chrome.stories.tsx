@@ -292,13 +292,16 @@ export const AuthoringDrop: Story = {
     /*
      * Keyboard drag: focus the palette row's drag handle, Enter to start.
      * The grid's drop-zone overlay mounts only for this drag and is the
-     * sole registered drop target, so react-aria auto-focuses it
-     * immediately (same auto-focus behavior verified in
-     * field-well.stories.tsx); a second Enter drops.
+     * sole registered drop target, so react-aria auto-focuses it (same
+     * behavior verified in field-well.stories.tsx). Wait for that overlay
+     * before the second Enter: under CI load the keypress can otherwise
+     * arrive before the overlay mounts, re-firing drag-begin on the handle
+     * and leaving the drop incomplete. A second Enter then drops.
      */
     const dragHandle = canvas.getByRole("button", { name: "Drag Chart" })
     dragHandle.focus()
     await userEvent.keyboard("{Enter}")
+    await canvas.findByRole("button", { name: "Drop a widget" })
     await userEvent.keyboard("{Enter}")
     await waitFor(() => {
       expect(canvas.getByTestId("drop-readout").textContent).toContain("chart-1")
