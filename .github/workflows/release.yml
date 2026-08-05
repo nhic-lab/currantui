@@ -62,8 +62,17 @@ jobs:
         # --no-git-checks flag pnpm forwards during changeset publish
         run: npm install -g npm@11
       - name: Publish to npm (trusted publishing)
+        id: changesets
         uses: changesets/action@v1
         with:
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Trigger MCP catalog re-sync
+        # Ping currantui-mcp only when a package actually shipped, so its
+        # sync workflow re-extracts the catalog instantly instead of waiting
+        # for the daily cron. Cross-repo dispatch needs a PAT, not GITHUB_TOKEN.
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.MCP_DISPATCH_TOKEN }}
+        run: gh api repos/nhic-lab/currantui-mcp/dispatches -f event_type=currantui-release
