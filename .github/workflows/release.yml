@@ -27,7 +27,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Open or update the version PR
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check whether this push bumped the package version
@@ -63,7 +63,7 @@ jobs:
         run: npm install -g npm@11
       - name: Publish to npm (trusted publishing)
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
           publish: pnpm release
         env:
