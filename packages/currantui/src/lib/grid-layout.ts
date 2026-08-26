@@ -11,6 +11,20 @@ export interface LayoutItem {
   static?: boolean
 }
 
+/**
+ * How a layout settles after a gesture.
+ *
+ * - `vertical` — gravity: tiles float up into free rows, so no permanent gaps
+ *   form. The historical (and default) behaviour.
+ * - `none` — free placement: a tile stays on the row it was dropped on, and a
+ *   deliberate gap survives. Collisions are still resolved, so tiles never
+ *   overlap; only the upward float is skipped.
+ */
+export type Compaction = "vertical" | "none"
+
+/** The eight edges and corners a resize gesture can be anchored to. */
+export type ResizeHandle = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw"
+
 /** Axis-aligned overlap test; an item never collides with itself (by id). */
 export function collides(a: LayoutItem, b: LayoutItem): boolean {
   if (a.id === b.id) return false
@@ -21,8 +35,15 @@ export function collides(a: LayoutItem, b: LayoutItem): boolean {
 
 /** Enforce grid bounds and min/max constraints. Returns `item` untouched when already valid. */
 export function clamp(item: LayoutItem, columns: number): LayoutItem {
-  const w = Math.min(Math.max(item.w, item.minW ?? 1), item.maxW ?? columns, columns)
-  const h = Math.max(Math.min(item.h, item.maxH ?? Number.MAX_SAFE_INTEGER), item.minH ?? 1)
+  const w = Math.min(
+    Math.max(item.w, item.minW ?? 1),
+    item.maxW ?? columns,
+    columns
+  )
+  const h = Math.max(
+    Math.min(item.h, item.maxH ?? Number.MAX_SAFE_INTEGER),
+    item.minH ?? 1
+  )
   const x = Math.min(Math.max(item.x, 0), columns - w)
   const y = Math.max(item.y, 0)
   if (x === item.x && y === item.y && w === item.w && h === item.h) return item
@@ -35,7 +56,10 @@ export function clamp(item: LayoutItem, columns: number): LayoutItem {
  * is treated like a static item for its own position but still blocks others.
  * Returns the input array reference when nothing moved.
  */
-export function compact(layout: Array<LayoutItem>, pinnedId?: string): Array<LayoutItem> {
+export function compact(
+  layout: Array<LayoutItem>,
+  pinnedId?: string
+): Array<LayoutItem> {
   const sorted = [...layout].sort((a, b) => a.y - b.y || a.x - b.x)
   const placed: Array<LayoutItem> = []
   const byId = new Map<string, LayoutItem>()
@@ -56,11 +80,27 @@ export function compact(layout: Array<LayoutItem>, pinnedId?: string): Array<Lay
 }
 
 /**
+ * Apply the gesture's compaction mode. `none` skips the upward float only —
+ * collisions have already been resolved by the caller, so tiles still cannot
+ * overlap.
+ */
+function settle(
+  layout: Array<LayoutItem>,
+  pinnedId: string,
+  compaction: Compaction
+): Array<LayoutItem> {
+  return compaction === "none" ? layout : compact(layout, pinnedId)
+}
+
+/**
  * Push every non-static item colliding with the seed down below it,
  * cascading. A non-static seed colliding with a static item is itself
  * shifted below the static. Terminates because y only ever grows.
  */
-function resolveCollisions(layout: Array<LayoutItem>, seedId: string): Array<LayoutItem> {
+function resolveCollisions(
+  layout: Array<LayoutItem>,
+  seedId: string
+): Array<LayoutItem> {
   const items = layout.map((item) => ({ ...item }))
   const queue = [seedId]
   while (queue.length > 0) {
@@ -91,34 +131,114 @@ export function moveItem(
   id: string,
   x: number,
   y: number,
-  columns: number
+  columns: number,
+  compaction: Compaction = "vertical"
 ): Array<LayoutItem> {
   const target = layout.find((item) => item.id === id)
   if (!target || target.static) return layout
   const placed = clamp({ ...target, x, y }, columns)
   if (placed.x === target.x && placed.y === target.y) return layout
   const next = layout.map((item) => (item.id === id ? placed : item))
-  return compact(resolveCollisions(next, id), id)
+  return settle(resolveCollisions(next, id), id, compaction)
 }
 
+/**
+ * Geometry for a resize anchored to one of the eight handles.
+ *
+ * A `w`/`n` drag grows the tile toward its own origin, so the OPPOSITE edge is
+ * the anchor and must not move: that is the whole reason a resize needs x/y and
+ * not just w/h. Min/max and the grid bounds are applied against that fixed
+ * edge, so dragging a west handle past `minW` parks the left edge instead of
+ * sliding the whole tile rightward.
+ */
+export function resizeRect(
+  origin: LayoutItem,
+  handle: ResizeHandle,
+  dxCells: number,
+  dyCells: number,
+  columns: number
+): { x: number; y: number; w: number; h: number } {
+  const west = handle === "w" || handle === "nw" || handle === "sw"
+  const east = handle === "e" || handle === "ne" || handle === "se"
+  const north = handle === "n" || handle === "nw" || handle === "ne"
+  const south = handle === "s" || handle === "sw" || handle === "se"
+
+  const right = origin.x + origin.w
+  const bottom = origin.y + origin.h
+
+  let w = origin.w
+  let h = origin.h
+  if (east) w = origin.w + dxCells
+  if (west) w = origin.w - dxCells
+  if (south) h = origin.h + dyCells
+  if (north) h = origin.h - dyCells
+
+  /* the near edge cannot pass the grid origin, and an east drag cannot pass
+     the last column */
+  if (west) w = Math.min(w, right)
+  if (north) h = Math.min(h, bottom)
+  if (east) w = Math.min(w, columns - origin.x)
+
+  /* same precedence as `clamp`: maxW wins over minW, minH wins over maxH */
+  w = Math.min(Math.max(w, origin.minW ?? 1), origin.maxW ?? columns, columns)
+  h = Math.max(
+    Math.min(h, origin.maxH ?? Number.MAX_SAFE_INTEGER),
+    origin.minH ?? 1
+  )
+
+  return {
+    x: west ? right - w : origin.x,
+    y: north ? bottom - h : origin.y,
+    w,
+    h,
+  }
+}
+
+/**
+ * Resize `id` to `w`x`h`. `options.x`/`options.y` move the tile's ORIGIN in the
+ * same gesture, which is what a north/west handle needs; omit them and the
+ * resize is anchored at the top-left exactly as it always was.
+ */
 export function resizeItem(
   layout: Array<LayoutItem>,
   id: string,
   w: number,
   h: number,
-  columns: number
+  columns: number,
+  options?: { x?: number; y?: number; compaction?: Compaction }
 ): Array<LayoutItem> {
   const target = layout.find((item) => item.id === id)
   if (!target || target.static) return layout
-  const sized = clamp({ ...target, w, h }, columns)
-  if (sized.w === target.w && sized.h === target.h && sized.x === target.x) return layout
+  const sized = clamp(
+    {
+      ...target,
+      w,
+      h,
+      x: options?.x ?? target.x,
+      y: options?.y ?? target.y,
+    },
+    columns
+  )
+  if (
+    sized.w === target.w &&
+    sized.h === target.h &&
+    sized.x === target.x &&
+    sized.y === target.y
+  ) {
+    return layout
+  }
   const next = layout.map((item) => (item.id === id ? sized : item))
-  return compact(resolveCollisions(next, id), id)
+  return settle(resolveCollisions(next, id), id, options?.compaction ?? "vertical")
 }
 
-export function removeItem(layout: Array<LayoutItem>, id: string): Array<LayoutItem> {
+export function removeItem(
+  layout: Array<LayoutItem>,
+  id: string,
+  compaction: Compaction = "vertical"
+): Array<LayoutItem> {
   const next = layout.filter((item) => item.id !== id)
-  return next.length === layout.length ? layout : compact(next)
+  if (next.length === layout.length) return layout
+  return compaction === "none" ? next : compact(next)
 }
 
 /**
@@ -126,7 +246,10 @@ export function removeItem(layout: Array<LayoutItem>, id: string): Array<LayoutI
  * id/x/y/w/h comparison. Gestures (move/resize/compact) never change any
  * other field, so those five are all that matter here.
  */
-export function layoutsEqual(a: Array<LayoutItem>, b: Array<LayoutItem>): boolean {
+export function layoutsEqual(
+  a: Array<LayoutItem>,
+  b: Array<LayoutItem>
+): boolean {
   if (a.length !== b.length) return false
   for (let i = 0; i < a.length; i++) {
     const itemA = a[i]

@@ -8,7 +8,7 @@ import {
 import { WidgetToolbar } from "@nhic/currantui/components/dashboard-widget-chrome"
 import { Button } from "@nhic/currantui/components/button"
 import { LabeledValue } from "@nhic/currantui/components/labeled-value"
-import type { LayoutItem } from "@nhic/currantui/lib/grid-layout"
+import type { LayoutItem, ResizeHandle } from "@nhic/currantui/lib/grid-layout"
 import type { DashboardGridHandle } from "@nhic/currantui/components/dashboard-grid"
 
 import type { Meta, StoryObj } from "@storybook/react-vite"
@@ -496,3 +496,201 @@ export const RemoveWidget: Story = {
     await expect(onWidgetRemoveSpy).toHaveBeenCalledWith("facilities")
   },
 }
+
+/*
+ * Free placement (`compaction="none"`).
+ *
+ * The defect these stories pin: a TALL tile beside a SHORT one could not be
+ * left on the second row. Nothing blocked the upward float, so gravity pulled
+ * it back to row 0 — and because the settled layout then equalled the
+ * pre-gesture layout, the grid never even emitted the gesture, so a consumer
+ * could not observe (let alone correct) it.
+ */
+const ROW_HEIGHT = 72
+const GAP = 16
+const STEP_Y = ROW_HEIGHT + GAP
+
+const pairLayout: Array<LayoutItem> = [
+  { id: "facilities", x: 0, y: 0, w: 3, h: 2, minW: 2, minH: 2 },
+  { id: "submissions", x: 3, y: 0, w: 6, h: 4, minW: 2, minH: 2 },
+]
+
+function PairDashboard({ compaction }: { compaction?: "vertical" | "none" }) {
+  const [layout, setLayout] = React.useState(pairLayout)
+  return (
+    <div className="flex flex-col gap-4">
+      <DashboardGrid
+        layout={layout}
+        onLayoutChange={setLayout}
+        mode="edit"
+        rowHeight={ROW_HEIGHT}
+        gap={GAP}
+        compaction={compaction}
+      >
+        <DashboardWidget id="facilities" title="Facilities">
+          <Stat label="Reporting this week" value="412" />
+        </DashboardWidget>
+        <DashboardWidget id="submissions" title="Weekly submissions">
+          <div className="grid h-full place-items-center text-sm text-muted-foreground">
+            Chart slot
+          </div>
+        </DashboardWidget>
+      </DashboardGrid>
+      <pre data-testid="layout-readout" className="text-xs text-muted-foreground">
+        {JSON.stringify(layout.map(({ id, x, y, w, h }) => [id, x, y, w, h]))}
+      </pre>
+    </div>
+  )
+}
+
+const pairSource = `
+<DashboardGrid layout={layout} onLayoutChange={setLayout} mode="edit" compaction="none">
+  <DashboardWidget id="facilities" title="Facilities">...</DashboardWidget>
+  <DashboardWidget id="submissions" title="Weekly submissions">...</DashboardWidget>
+</DashboardGrid>
+`.trim()
+
+const pairDocs = {
+  docs: { source: { code: pairSource, language: "tsx" as const } },
+}
+
+/** Drag a widget's move handle by whole cells. */
+async function dragByCells(
+  canvasElement: HTMLElement,
+  name: RegExp,
+  cellsX: number,
+  cellsY: number
+) {
+  const handle = await within(canvasElement).findByRole("button", { name })
+  const grid = canvasElement.querySelector('[data-slot="dashboard-grid"]')!
+  const stepX = grid.getBoundingClientRect().width / 12
+  const from = handle.getBoundingClientRect()
+  await userEvent.pointer([
+    { keys: "[MouseLeft>]", target: handle, coords: { x: from.x, y: from.y } },
+    {
+      coords: { x: from.x + stepX * cellsX, y: from.y + STEP_Y * cellsY },
+    },
+    { keys: "[/MouseLeft]" },
+  ])
+}
+
+export const FreePlacementSecondRow: Story = {
+  render: () => <PairDashboard compaction="none" />,
+  parameters: pairDocs,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await dragByCells(canvasElement, /^move weekly submissions$/i, 0, 2)
+    await waitFor(() => {
+      const readout = canvas.getByTestId("layout-readout").textContent
+      /* the tall tile stays on row 2 beside the short card, gap and all */
+      expect(readout).toContain('["submissions",3,2,6,4]')
+      expect(readout).toContain('["facilities",0,0,3,2]')
+    })
+  },
+}
+
+export const VerticalCompactionStillFloatsUp: Story = {
+  render: () => <PairDashboard compaction="vertical" />,
+  parameters: pairDocs,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await dragByCells(canvasElement, /^move weekly submissions$/i, 0, 2)
+    /* the default is unchanged: gravity returns the tile to row 0, so the
+       layout the consumer holds still reads y=0 */
+    await waitFor(() => {
+      expect(canvas.getByTestId("layout-readout").textContent).toContain(
+        '["submissions",3,0,6,4]'
+      )
+    })
+  },
+}
+
+/*
+ * Resize from every handle. Before 0.10 only `se`, `e` and `s` existed and
+ * `resizeItem` took no x/y, so the top and left edges could not be dragged at
+ * all. The solo widget has clear space on every side so each gesture is
+ * unobstructed.
+ */
+const soloLayout: Array<LayoutItem> = [
+  { id: "solo", x: 3, y: 2, w: 4, h: 3, minW: 2, minH: 2 },
+]
+
+function SoloDashboard() {
+  const [layout, setLayout] = React.useState(soloLayout)
+  return (
+    <div className="flex flex-col gap-4">
+      <DashboardGrid
+        layout={layout}
+        onLayoutChange={setLayout}
+        mode="edit"
+        rowHeight={ROW_HEIGHT}
+        gap={GAP}
+        compaction="none"
+      >
+        <DashboardWidget id="solo" title="Solo">
+          <div className="grid h-full place-items-center text-sm text-muted-foreground">
+            Chart slot
+          </div>
+        </DashboardWidget>
+      </DashboardGrid>
+      <pre data-testid="layout-readout" className="text-xs text-muted-foreground">
+        {JSON.stringify(layout.map(({ id, x, y, w, h }) => [id, x, y, w, h]))}
+      </pre>
+    </div>
+  )
+}
+
+const soloDocs = {
+  docs: {
+    source: {
+      code: '<DashboardGrid mode="edit" compaction="none">...</DashboardGrid>',
+      language: "tsx" as const,
+    },
+  },
+}
+
+function resizeFromHandle(
+  handle: ResizeHandle,
+  cellsX: number,
+  cellsY: number,
+  expected: string
+): Story {
+  return {
+    render: () => <SoloDashboard />,
+    parameters: soloDocs,
+    play: async ({ canvasElement }) => {
+      const canvas = within(canvasElement)
+      await canvas.findByRole("button", { name: /^move solo$/i })
+      const grid = canvasElement.querySelector('[data-slot="dashboard-grid"]')!
+      const stepX = grid.getBoundingClientRect().width / 12
+      const grip = canvasElement.querySelector(
+        `[data-slot="dashboard-widget-resize"][data-handle="${handle}"]`
+      ) as HTMLElement
+      const from = grip.getBoundingClientRect()
+      await userEvent.pointer([
+        { keys: "[MouseLeft>]", target: grip, coords: { x: from.x, y: from.y } },
+        {
+          coords: {
+            x: from.x + stepX * cellsX,
+            y: from.y + STEP_Y * cellsY,
+          },
+        },
+        { keys: "[/MouseLeft]" },
+      ])
+      await waitFor(() => {
+        expect(canvas.getByTestId("layout-readout").textContent).toContain(expected)
+      })
+    },
+  }
+}
+
+/* east/south grow from a fixed top-left; west/north move the ORIGIN and keep
+   the opposite edge pinned, which is what needed x/y in the first place */
+export const ResizeEast: Story = resizeFromHandle("e", 2, 0, '["solo",3,2,6,3]')
+export const ResizeWest: Story = resizeFromHandle("w", -2, 0, '["solo",1,2,6,3]')
+export const ResizeSouth: Story = resizeFromHandle("s", 0, 1, '["solo",3,2,4,4]')
+export const ResizeNorth: Story = resizeFromHandle("n", 0, -1, '["solo",3,1,4,4]')
+export const ResizeSouthEast: Story = resizeFromHandle("se", 2, 1, '["solo",3,2,6,4]')
+export const ResizeSouthWest: Story = resizeFromHandle("sw", -2, 1, '["solo",1,2,6,4]')
+export const ResizeNorthEast: Story = resizeFromHandle("ne", 2, -1, '["solo",3,1,6,4]')
+export const ResizeNorthWest: Story = resizeFromHandle("nw", -2, -1, '["solo",1,1,6,4]')

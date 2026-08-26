@@ -9,6 +9,7 @@ import {
   moveItem,
   removeItem,
   resizeItem,
+  resizeRect,
 } from "@nhic/currantui/lib/grid-layout"
 import type { LayoutItem } from "@nhic/currantui/lib/grid-layout"
 
@@ -233,5 +234,124 @@ describe("findSlot", () => {
 
   it("places the first widget at the origin", () => {
     expect(findSlot([], 4, 2, 12)).toEqual({ x: 0, y: 0 })
+  })
+})
+
+/* The defect this suite was extended for: a tall chart sitting BESIDE a short
+   number card could not be left on the second row. Nothing blocked the upward
+   float, so gravity pulled it back to row 0 — and because the settled layout
+   then equalled the pre-gesture layout, DashboardGrid never even emitted it.
+   Geometry taken from a real dashboard: a 3x2 VALUE card at 0,0 and a 5x4 chart
+   aligned with it on row 0. */
+describe("compaction: free placement beside a shorter tile", () => {
+  const card = item("card", 0, 0, 3, 2)
+  const chart = item("chart", 3, 0, 6, 4)
+  const board = [card, chart]
+
+  it("reverts the row move under vertical gravity, but only once unpinned", () => {
+    /* mid-gesture the dragged tile is pinned, so the PREVIEW honours row 2 */
+    const moved = moveItem(board, "chart", 3, 2, 12, "vertical")
+    expect(moved.find((i) => i.id === "chart")!.y).toBe(2)
+    /* DashboardGrid then settles with an UNPINNED compact() on pointerup, and
+       that is where the row move is lost */
+    const settled = compact(moved)
+    expect(settled.find((i) => i.id === "chart")!.y).toBe(0)
+    expect(layoutsEqual(settled, board)).toBe(true)
+  })
+
+  it("keeps the tile on the second row when compaction is none", () => {
+    const moved = moveItem(board, "chart", 3, 2, 12, "none")
+    expect(moved.find((i) => i.id === "chart")).toMatchObject({ x: 3, y: 2 })
+    expect(moved.find((i) => i.id === "card")).toMatchObject({ x: 0, y: 0 })
+  })
+
+  it("emits a layout that differs from the base, so the gesture is observable", () => {
+    const moved = moveItem(board, "chart", 3, 2, 12, "none")
+    expect(layoutsEqual(moved, board)).toBe(false)
+  })
+
+  it("still refuses to overlap: a tile dropped onto another pushes it down", () => {
+    const moved = moveItem(board, "chart", 0, 0, 12, "none")
+    expect(moved.find((i) => i.id === "chart")).toMatchObject({ x: 0, y: 0 })
+    expect(moved.find((i) => i.id === "card")!.y).toBe(4)
+    for (const a of moved) {
+      for (const b of moved) expect(collides(a, b)).toBe(false)
+    }
+  })
+
+  it("defaults to vertical, so an existing caller is unaffected", () => {
+    expect(
+      layoutsEqual(moveItem(board, "chart", 3, 2, 12), moveItem(board, "chart", 3, 2, 12, "vertical"))
+    ).toBe(true)
+  })
+
+  it("leaves a gap behind a removal only when compaction is none", () => {
+    const stack = [item("a", 0, 0, 2, 2), item("b", 0, 2, 2, 2)]
+    expect(removeItem(stack, "a", "none")[0]).toMatchObject({ id: "b", y: 2 })
+    expect(removeItem(stack, "a")[0]).toMatchObject({ id: "b", y: 0 })
+  })
+})
+
+/* Every handle must be reachable, not merely rendered. Before 0.10 `resizeItem`
+   took only (w, h) and `clamp` preserved x/y, so the top and left edges could
+   not be dragged at all. */
+describe("resizeRect", () => {
+  const origin = item("t", 4, 2, 4, 4, { minW: 2, minH: 2 })
+
+  it("grows east and south from a fixed top-left", () => {
+    expect(resizeRect(origin, "e", 2, 0, 12)).toEqual({ x: 4, y: 2, w: 6, h: 4 })
+    expect(resizeRect(origin, "s", 0, 3, 12)).toEqual({ x: 4, y: 2, w: 4, h: 7 })
+    expect(resizeRect(origin, "se", 2, 3, 12)).toEqual({ x: 4, y: 2, w: 6, h: 7 })
+  })
+
+  it("grows west and north by moving the origin, keeping the far edge fixed", () => {
+    expect(resizeRect(origin, "w", -2, 0, 12)).toEqual({ x: 2, y: 2, w: 6, h: 4 })
+    expect(resizeRect(origin, "n", 0, -2, 12)).toEqual({ x: 4, y: 0, w: 4, h: 6 })
+    expect(resizeRect(origin, "nw", -2, -2, 12)).toEqual({ x: 2, y: 0, w: 6, h: 6 })
+    expect(resizeRect(origin, "ne", 2, -2, 12)).toEqual({ x: 4, y: 0, w: 6, h: 6 })
+    expect(resizeRect(origin, "sw", -2, 3, 12)).toEqual({ x: 2, y: 2, w: 6, h: 7 })
+  })
+
+  it("parks the dragged edge at minW/minH instead of sliding the anchor", () => {
+    /* right edge is 8 and must not move: shrinking from the west stops at minW */
+    expect(resizeRect(origin, "w", 99, 0, 12)).toEqual({ x: 6, y: 2, w: 2, h: 4 })
+    /* bottom edge is 6 and must not move */
+    expect(resizeRect(origin, "n", 0, 99, 12)).toEqual({ x: 4, y: 4, w: 4, h: 2 })
+  })
+
+  it("stops at the grid edges rather than growing past them", () => {
+    expect(resizeRect(origin, "w", -99, 0, 12)).toEqual({ x: 0, y: 2, w: 8, h: 4 })
+    expect(resizeRect(origin, "n", 0, -99, 12)).toEqual({ x: 4, y: 0, w: 4, h: 6 })
+    expect(resizeRect(origin, "e", 99, 0, 12)).toEqual({ x: 4, y: 2, w: 8, h: 4 })
+  })
+
+  it("honours maxW and maxH against the anchored edge", () => {
+    const capped = item("t", 4, 2, 4, 4, { maxW: 5, maxH: 5 })
+    expect(resizeRect(capped, "w", -4, 0, 12)).toEqual({ x: 3, y: 2, w: 5, h: 4 })
+    expect(resizeRect(capped, "n", 0, -4, 12)).toEqual({ x: 4, y: 1, w: 4, h: 5 })
+  })
+})
+
+describe("resizeItem origin-moving", () => {
+  it("moves x and y when they are supplied", () => {
+    const board = [item("t", 4, 2, 4, 4)]
+    const next = resizeItem(board, "t", 6, 6, 12, { x: 2, y: 0, compaction: "none" })
+    expect(next[0]).toMatchObject({ x: 2, y: 0, w: 6, h: 6 })
+  })
+
+  it("is unchanged for a caller that passes no origin", () => {
+    const board = [item("t", 4, 2, 4, 4)]
+    expect(resizeItem(board, "t", 6, 4, 12)[0]).toMatchObject({ x: 4, y: 2, w: 6, h: 4 })
+  })
+
+  it("returns the input when nothing actually changed", () => {
+    const board = [item("t", 4, 2, 4, 4)]
+    expect(resizeItem(board, "t", 4, 4, 12, { x: 4, y: 2 })).toBe(board)
+  })
+
+  it("pushes a collided neighbour down instead of overlapping it", () => {
+    const board = [item("t", 4, 2, 4, 2), item("below", 4, 4, 4, 2)]
+    const next = resizeItem(board, "t", 4, 4, 12, { compaction: "none" })
+    expect(next.find((i) => i.id === "below")!.y).toBe(6)
   })
 })
