@@ -13,10 +13,15 @@ import {
   moveItem,
   removeItem,
   resizeItem,
+  resizeRect,
 } from "@nhic/currantui/lib/grid-layout"
 import { cn } from "@nhic/currantui/lib/utils"
 import type { DropZoneProps, TextDropItem } from "react-aria-components"
-import type { LayoutItem } from "@nhic/currantui/lib/grid-layout"
+import type {
+  Compaction,
+  LayoutItem,
+  ResizeHandle,
+} from "@nhic/currantui/lib/grid-layout"
 
 type DropEvent = Parameters<NonNullable<DropZoneProps["onDrop"]>>[0]
 type DropMoveEvent = Parameters<NonNullable<DropZoneProps["onDropMove"]>>[0]
@@ -26,6 +31,71 @@ declare const process: { env: { NODE_ENV?: string } }
 const isDevelopment = process.env.NODE_ENV !== "production"
 
 const WIDGET_DRAG_TYPE = "application/x-nhic-widget"
+
+/* The pre-0.10 axis vocabulary, kept so an existing `startResize` caller keeps
+   working: those three values named the only three handles that existed. */
+const LEGACY_RESIZE_HANDLES: Record<string, ResizeHandle> = {
+  both: "se",
+  x: "e",
+  y: "s",
+}
+
+/* All eight handles, each a >=24px hit area. Corners sit above the edges so a
+   corner drag wins in the overlap, and the header insets its own controls past
+   the top corners (see the `movable` header padding) so `nw`/`ne` stay
+   reachable. Hidden until the widget is hovered or focused: handles that only
+   appeared under the cursor read as a single handle, which is a discoverability
+   defect in its own right. */
+const RESIZE_HANDLES: Array<{
+  handle: ResizeHandle
+  /** the pre-0.10 `data-axis` value, kept on the three handles that had one */
+  axis?: "both" | "x" | "y"
+  className: string
+}> = [
+  {
+    handle: "n",
+    className:
+      "inset-x-6 top-0 h-6 cursor-ns-resize border-t-2 border-transparent hover:border-primary",
+  },
+  {
+    handle: "s",
+    axis: "y",
+    className:
+      "inset-x-6 bottom-0 h-6 cursor-ns-resize border-b-2 border-transparent hover:border-primary",
+  },
+  {
+    handle: "w",
+    className:
+      "inset-y-6 start-0 w-6 cursor-ew-resize border-s-2 border-transparent hover:border-primary",
+  },
+  {
+    handle: "e",
+    axis: "x",
+    className:
+      "inset-y-6 end-0 w-6 cursor-ew-resize border-e-2 border-transparent hover:border-primary",
+  },
+  {
+    handle: "nw",
+    className:
+      "top-0 start-0 z-30 size-6 cursor-nwse-resize rounded-br border-s-2 border-t-2 border-foreground/25 hover:border-primary",
+  },
+  {
+    handle: "ne",
+    className:
+      "top-0 end-0 z-30 size-6 cursor-nesw-resize rounded-bl border-t-2 border-e-2 border-foreground/25 hover:border-primary",
+  },
+  {
+    handle: "sw",
+    className:
+      "bottom-0 start-0 z-30 size-6 cursor-nesw-resize rounded-tr border-s-2 border-b-2 border-foreground/25 hover:border-primary",
+  },
+  {
+    handle: "se",
+    axis: "both",
+    className:
+      "bottom-0 end-0 z-30 size-6 cursor-nwse-resize rounded-tl border-e-2 border-b-2 border-foreground/25 hover:border-primary",
+  },
+]
 
 /** Column/row pixel sizing at the grid's current width, used to convert a pointer offset to a cell. */
 function gridSteps(
@@ -65,6 +135,8 @@ interface DashboardGridProps {
   onWidgetRemove?: (id: string) => void
   onWidgetDrop?: (type: string, cell: { x: number; y: number }) => void
   mode?: "view" | "edit"
+  /** Gesture settling. Defaults to `vertical` — the historical gravity. */
+  compaction?: Compaction
   columns?: number
   rowHeight?: number
   gap?: number
@@ -92,7 +164,7 @@ interface GridContextValue {
   startDrag: (id: string, e: React.PointerEvent<HTMLElement>) => void
   startResize: (
     id: string,
-    axis: "both" | "x" | "y",
+    handle: ResizeHandle | "both" | "x" | "y",
     e: React.PointerEvent<HTMLElement>
   ) => void
   keyboardId: string | null
@@ -128,6 +200,7 @@ function DashboardGrid({
   onWidgetRemove,
   onWidgetDrop,
   mode = "view",
+  compaction = "vertical",
   columns = 12,
   rowHeight = 96,
   gap = 16,
@@ -226,10 +299,18 @@ function DashboardGrid({
     return map
   }, [layout, columns])
 
+  /* Where a gesture's result comes to rest. Under `none` the layout is already
+     final: collisions were resolved inside moveItem/resizeItem, so only the
+     upward float is skipped and tiles still cannot overlap. */
+  const settleLayout = React.useCallback(
+    (next: Array<LayoutItem>) => (compaction === "none" ? next : compact(next)),
+    [compaction]
+  )
+
   const dragPlaceholderItem = React.useMemo(() => {
     if (!dragId) return undefined
-    return compact(preview ?? layout).find((item) => item.id === dragId)
-  }, [dragId, preview, layout])
+    return settleLayout(preview ?? layout).find((item) => item.id === dragId)
+  }, [dragId, preview, layout, settleLayout])
 
   React.useEffect(() => {
     if (!isDevelopment) return
@@ -285,7 +366,7 @@ function DashboardGrid({
   const announce = (message: string) => setAnnouncement(message)
 
   const commitLayout = (next: Array<LayoutItem>) => {
-    const settled = compact(next)
+    const settled = settleLayout(next)
     lastEmitted.current = settled
     pushHistory(settled)
     onLayoutChange?.(settled)
@@ -355,7 +436,7 @@ function DashboardGrid({
   }
 
   const removeWidget = (id: string) => {
-    const next = removeItem(layout, id)
+    const next = removeItem(layout, id, compaction)
     if (next === layout) return
     lastEmitted.current = next
     pushHistory(next)
@@ -400,6 +481,9 @@ function DashboardGrid({
     }) => {
       move: (dx: number, dy: number, base: Array<LayoutItem>) => Array<LayoutItem>
       commitMessage: (settledItem: LayoutItem) => string
+      /** Announced when the gesture ended where it began, so the live region
+          never claims a move that did not happen. */
+      unchangedMessage: (settledItem: LayoutItem) => string
       start?: () => void
       end?: () => void
       /** Only the drag gesture reorders relative focus; resize never needs a re-focus. */
@@ -444,15 +528,21 @@ function DashboardGrid({
       handlers.end?.()
       setPreview(null)
       if (commit && current !== base) {
-        const settled = compact(current)
-        if (!layoutsEqual(settled, base)) {
+        const settled = settleLayout(current)
+        const settledItem = settled.find((item) => item.id === id)!
+        /* A genuine no-op must not fire onLayoutChange or push a history entry,
+           so the equality guard stays. Under `vertical` a real drag CAN still
+           settle back onto its start row, because that is what gravity means;
+           `compaction: "none"` is what makes such a drag stick. */
+        if (layoutsEqual(settled, base)) {
+          announce(handlers.unchangedMessage(settledItem))
+        } else {
           commitLayout(settled)
           if (handlers.armFocusOnCommit && shouldArmFocusFor(id)) {
             pendingFocusId.current = id
           }
+          announce(handlers.commitMessage(settledItem))
         }
-        const settledItem = settled.find((item) => item.id === id)!
-        announce(handlers.commitMessage(settledItem))
       }
     }
     const onPointerUp = () => finish(true)
@@ -491,9 +581,11 @@ function DashboardGrid({
           setDragRect({ ...rect, left: rect.left + dx, top: rect.top + dy })
           const targetX = Math.round((rect.left + dx) / stepX)
           const targetY = Math.round((rect.top + dy) / stepY)
-          return moveItem(base, id, targetX, targetY, columns)
+          return moveItem(base, id, targetX, targetY, columns, compaction)
         },
         commitMessage: (settled) => `Moved to column ${settled.x + 1}, row ${settled.y + 1}.`,
+        unchangedMessage: (settled) =>
+          `Not moved. Still at column ${settled.x + 1}, row ${settled.y + 1}.`,
         armFocusOnCommit: true,
       }
     })
@@ -501,16 +593,28 @@ function DashboardGrid({
 
   const startResize = (
     id: string,
-    axis: "both" | "x" | "y",
+    handle: ResizeHandle | "both" | "x" | "y",
     event: React.PointerEvent<HTMLElement>
   ) => {
+    const anchor = LEGACY_RESIZE_HANDLES[handle] ?? (handle as ResizeHandle)
     beginGesture(event, id, ({ origin, stepX, stepY }) => ({
       move: (dx, dy, base) => {
-        const w = axis === "y" ? origin.w : origin.w + Math.round(dx / stepX)
-        const h = axis === "x" ? origin.h : origin.h + Math.round(dy / stepY)
-        return resizeItem(base, id, w, h, columns)
+        const rect = resizeRect(
+          origin,
+          anchor,
+          Math.round(dx / stepX),
+          Math.round(dy / stepY),
+          columns
+        )
+        return resizeItem(base, id, rect.w, rect.h, columns, {
+          x: rect.x,
+          y: rect.y,
+          compaction,
+        })
       },
       commitMessage: (settled) => `Resized to ${settled.w} by ${settled.h} cells.`,
+      unchangedMessage: (settled) =>
+        `Not resized. Still ${settled.w} by ${settled.h} cells.`,
     }))
   }
 
@@ -549,7 +653,7 @@ function DashboardGrid({
       setPreview(null)
       let settledLayout = working
       if (working !== keyboardBase.current) {
-        settledLayout = compact(working)
+        settledLayout = settleLayout(working)
         if (!layoutsEqual(settledLayout, keyboardBase.current!)) {
           commitLayout(settledLayout)
           pendingFocusId.current = id
@@ -569,8 +673,10 @@ function DashboardGrid({
       event.preventDefault()
       const [dx, dy] = arrowDeltas[event.key]
       const next = event.shiftKey
-        ? resizeItem(working, id, item.w + dx, item.h + dy, columns)
-        : moveItem(working, id, item.x + dx, item.y + dy, columns)
+        ? resizeItem(working, id, item.w + dx, item.h + dy, columns, {
+            compaction,
+          })
+        : moveItem(working, id, item.x + dx, item.y + dy, columns, compaction)
       if (next === working) {
         announce(
           event.shiftKey ? `${title} cannot resize further.` : `${title} cannot move further.`
@@ -781,7 +887,11 @@ function DashboardWidget({
     >
       <header
         data-slot="dashboard-widget-header"
-        className="flex items-center gap-1 border-b border-border/50 px-3 py-2"
+        className={cn(
+          "flex items-center gap-1 border-b border-border/50 py-2",
+          /* clears the 24px `nw`/`ne` handles so both stay grabbable */
+          movable ? "px-7" : "px-3"
+        )}
       >
         {movable && (
           <button
@@ -789,7 +899,7 @@ function DashboardWidget({
             data-slot="dashboard-widget-move"
             data-widget-id={id}
             aria-label={`Move ${title}`}
-            className="-ms-1 shrink-0 cursor-grab touch-none rounded p-1 text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
+            className="relative z-40 shrink-0 cursor-grab touch-none rounded p-1 text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
             onPointerDown={(event) => context.startDrag(id, event)}
             onKeyDown={(event) => context.handleKeyDown(id, title, event)}
             onBlur={() => context.cancelKeyboard(id, title)}
@@ -804,7 +914,11 @@ function DashboardWidget({
           {title}
         </span>
         {editMode && toolbar != null && (
-          <WidgetContext.Provider value={widgetValue}>{toolbar}</WidgetContext.Provider>
+          <WidgetContext.Provider value={widgetValue}>
+            <span className="relative z-40 flex items-center gap-1">
+              {toolbar}
+            </span>
+          </WidgetContext.Provider>
         )}
       </header>
       <div
@@ -813,31 +927,21 @@ function DashboardWidget({
       >
         {children}
       </div>
-      {movable && (
-        <>
+      {movable &&
+        RESIZE_HANDLES.map(({ handle, axis, className: handleClassName }) => (
           <div
+            key={handle}
             data-slot="dashboard-widget-resize"
-            data-axis="both"
+            data-handle={handle}
+            data-axis={axis}
             aria-hidden="true"
-            className="absolute bottom-0 end-0 z-10 size-6 cursor-nwse-resize touch-none rounded-tl border-e-2 border-b-2 border-transparent hover:border-primary"
-            onPointerDown={(event) => context.startResize(id, "both", event)}
+            className={cn(
+              "absolute z-20 touch-none opacity-0 transition-opacity group-focus-within/widget:opacity-100 group-hover/widget:opacity-100 hover:opacity-100",
+              handleClassName
+            )}
+            onPointerDown={(event) => context.startResize(id, handle, event)}
           />
-          <div
-            data-slot="dashboard-widget-resize"
-            data-axis="x"
-            aria-hidden="true"
-            className="absolute inset-y-6 end-0 z-10 w-6 cursor-ew-resize touch-none hover:bg-primary/10"
-            onPointerDown={(event) => context.startResize(id, "x", event)}
-          />
-          <div
-            data-slot="dashboard-widget-resize"
-            data-axis="y"
-            aria-hidden="true"
-            className="absolute inset-x-6 bottom-0 z-10 h-6 cursor-ns-resize touch-none hover:bg-primary/10"
-            onPointerDown={(event) => context.startResize(id, "y", event)}
-          />
-        </>
-      )}
+        ))}
     </section>
   )
 }
